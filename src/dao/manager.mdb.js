@@ -1,3 +1,5 @@
+//Este manager no se usa
+
 import { MongoClient, ObjectId } from 'mongodb';
 
 class DBManager {
