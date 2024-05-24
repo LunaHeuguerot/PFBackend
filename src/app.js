@@ -3,7 +3,7 @@ import config from './config.js';
 import productsRouter from './public/routes/products.routes.js';
 import cartsRouter from './public/routes/carts.routes.js';
 import chatRouter from './public/routes/chat.routes.js';
-import userRouter from './public/routes/user.routes.js';
+// import userRouter from './public/routes/user.routes.js';
 import viewsRouter from './public/routes/views.routes.js';
 import handlebars from 'express-handlebars';
 import mongoose from 'mongoose';
@@ -28,7 +28,7 @@ app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);
 app.use('/chat', chatRouter);
 app.use('/api/carts', cartsRouter);
-app.use('/api/user', userRouter);
+// app.use('/api/user', userRouter); 
 
 const io = initSocket(expressInstance);
 app.set('io', io);

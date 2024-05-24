@@ -2,16 +2,14 @@ import { Router } from 'express';
 import mongoose from 'mongoose';
 import config from '../../config.js';
 import { ObjectId } from 'mongodb';
-import productModel from '../../dao/models/products.model.js';
 import { uploader } from '../../uploader.js';
 import { ProductManagerDB } from '../../dao/productsManager.db.js';
 
 const router = Router();
 
-
 router.get('/', async (req, res) => {
     try {
-        const products = await productModel.find().lean();
+        const products = await ProductManagerDB.getInstance().getProducts();
         res.status(200).send({ status: 200, payload: products });
     } catch (error) {
         console.error("Error en la consulta:", error);
@@ -25,7 +23,7 @@ router.get('/:id', async (req, res) => {
         if (!ObjectId.isValid(id)) {
             return res.status(400).send({ error: 'Invalid ID format' });
         }
-        const product = await productModel.findById(id);
+        const product = await ProductManagerDB.getInstance().getProductById(id);
         if (product) {
             res.send(product);
         } else {
@@ -36,11 +34,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-
 router.post('/', uploader.array('thumbnails', 4), async (req, res) => {
-    
-
-    const { title, description, price, code, stock, category} = req.body;
+    const { title, description, price, code, stock, category } = req.body;
 
     if (!title || !description || !price || !code || !stock || !category) {
         return res.status(400).json({ error: 'Todos los campos requeridos deben estar presentes.' });
@@ -56,13 +51,12 @@ router.post('/', uploader.array('thumbnails', 4), async (req, res) => {
             category,
             thumbnails: thumbnails || []
         };
-        const addedProduct = await productModel.create(newProduct);
+        const addedProduct = await ProductManagerDB.getInstance().addProduct(newProduct);
         res.status(201).json(addedProduct);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 router.put('/:id', async (req, res) => {
     try {
@@ -82,24 +76,20 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: 'ID de producto no válido' });
         }
-
         const process = await ProductManagerDB.getInstance().deleteProduct(id);
-
         if (!process) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
-
         res.status(200).send({ origin: config.SERVER, payload: process });
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
 });
+
 export default router;

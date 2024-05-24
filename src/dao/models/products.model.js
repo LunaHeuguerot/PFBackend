@@ -9,9 +9,10 @@ const productSchema = new mongoose.Schema({
     description: { type: String, required: true },
     price: { type: Number, required: true },
     code: { type: String, required: true },
+    status: { type: String, default: "true", required: true },
     stock: { type: Number, required: true },
     thumbnails: { type: [String], default: [] },
-    category: { type: String, required: true }
+    category: { type: String, default: 'general', required: true }
 }, { timestamps: true });
 
 const productModel = mongoose.model(collection, productSchema);

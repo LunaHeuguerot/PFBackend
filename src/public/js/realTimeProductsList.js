@@ -1,76 +1,95 @@
-const socket = io();
+document.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
 
-socket.on('products', products => {
-    const productsContainer = document.getElementById('products-table');
+    // Escuchar el evento 'products' para renderizar la tabla de productos
+    socket.on('products', products => {
+        const productsContainer = document.getElementById('products-table');
 
-    if (!productsContainer) {
-        console.error("Element with ID 'products-table' not found.");
-        return;
-    }
+        if (!productsContainer) {
+            console.error("Element with ID 'products-table' not found.");
+            return;
+        }
 
-    const headerHTML = `
-    <tr>
-        <th>Id:</th>
-        <th>Título:</th>
-        <th>Descripción:</th>
-        <th>Código:</th>
-        <th>Precio:</th>
-        <th>Estado:</th>
-        <th>Stock:</th>
-        <th>Categoría:</th>
-        <th>Imágenes:</th>
-    </tr>
-`;
-
-    productsContainer.innerHTML = headerHTML;
-
-    products.forEach((product) => {
-        productsContainer.innerHTML += `
+        const headerHTML = `
             <tr>
-                <td>${product._id}</td>
-                <td>${product.title}</td>
-                <td>${product.description}</td>
-                <td>${product.code}</td>
-                <td>${product.price}</td>
-                <td>${product.status}</td>
-                <td>${product.stock}</td>
-                <td>${product.category}</td>
-                <td>${product.thumbnail}</td>
+                <th>Id:</th>
+                <th>Título:</th>
+                <th>Descripción:</th>
+                <th>Código:</th>
+                <th>Precio:</th>
+                <th>Estado:</th>
+                <th>Stock:</th>
+                <th>Categoría:</th>
+                <th>Imágenes:</th>
             </tr>
         `;
+
+        productsContainer.innerHTML = headerHTML;
+
+        products.forEach((product) => {
+            const {
+                _id,
+                title,
+                description,
+                code,
+                price,
+                status = 'N/A',  
+                stock,
+                category = 'N/A', 
+                thumbnail
+            } = product;
+
+            productsContainer.innerHTML += `
+                <tr>
+                    <td>${_id}</td>
+                    <td>${title}</td>
+                    <td>${description}</td>
+                    <td>${code}</td>
+                    <td>${price}</td>
+                    <td>${status}</td>
+                    <td>${stock}</td>
+                    <td>${category}</td>
+                    <td>${thumbnail}</td>
+                </tr>
+            `;
+        });
     });
-});
 
-document.getElementById('new-Product').addEventListener('submit', (event) => {
-    event.preventDefault();
+    // Manejar el envío del formulario para agregar un nuevo producto
+    document.getElementById('new-Product').addEventListener('submit', (event) => {
+        event.preventDefault();
 
-    socket.emit('new-product', {
-        title: document.getElementById('title').value,
-        description: document.getElementById('description').value,
-        code: document.getElementById('code').value,
-        price: document.getElementById('price').value,
-        status: document.getElementById('status').value,
-        stock: document.getElementById('stock').value,
-        category: document.getElementById('category').value,
-        thumbnail: document.getElementById('thumbnail').value
+        socket.emit('new-product', {
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            code: document.getElementById('code').value,
+            price: document.getElementById('price').value,
+            status: document.getElementById('status').value,
+            stock: document.getElementById('stock').value,
+            category: document.getElementById('category').value,
+            thumbnail: document.getElementById('thumbnail').value
+        });
+
+        event.target.reset();
     });
 
-    event.target.reset();
-});
+    // Manejar el envío del formulario para eliminar un producto
+    document.getElementById('delete-product').addEventListener('submit', (event) => {
+        event.preventDefault();
 
-document.getElementById('delete-product').addEventListener('submit', (event) => {
-    event.preventDefault();
+        const pId = document.getElementById('id').value;
+        console.log(pId);
+        socket.emit('delete-product', pId);
+        event.target.reset();
+    });
 
-    const pId = document.getElementById('id').value;
-    console.log(pId);
-    socket.emit('delete-product', pId);
-    event.target.reset();
-});
-
-socket.on('response', (response) => {
-    if (response.status === 'success') {
-        document.getElementById('responsive-container').innerHTML = `<p class="success">${response.message}</p>`;
-    } else {
-        document.getElementById('responsive-container').innerHTML = `<p class="error">${response.message}</p>`;
-    }
+    // Escuchar el evento 'response' para mostrar mensajes de respuesta
+    socket.on('response', (response) => {
+        const responsiveContainer = document.getElementById('responsive-container');
+        if (response.status === 'success') {
+            responsiveContainer.innerHTML = `<p class="success">${response.message}</p>`;
+        } else {
+            responsiveContainer.innerHTML = `<p class="error">${response.message}</p>`;
+        }
+    });
 });
