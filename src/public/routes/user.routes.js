@@ -92,3 +92,5 @@ userRouter.delete('/:id', async(req, res) => {
         res.status(500).send({ error: error.message });
     }
 });
+
+export default userRouter;

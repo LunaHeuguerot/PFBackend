@@ -1,63 +1,34 @@
 import { Router } from 'express';
-
+import { uploader } from '../../uploader.js';
 import { ProductManagerDB } from '../../dao/productsManager.db.js';
 
 const productsRouter = Router();
 
 productsRouter.get('/', async(req, res) => {
     try {
-        const products = await ProductManagerDB.getInstance().getProducts();
-        const limit = parseInt(req.query.limit);
-        let limitedProducts = [...products];
+        const { title, description, price, code, stock, status, category } = req.body;
+        const thumbnail = req.file ? req.file.filename : null;
 
-        if(!isNaN(limit) && limit > 0){
-            limitedProducts = limitedProducts.slice(0, limit);
-        }
+        const nuevoProducto = {
+            title,
+            description,
+            price,
+            code,
+            stock,
+            status: status === 'true',
+            category,
+            thumbnail: thumbnail ? [thumbnail] : [],
+        };
 
-        res.status(200).send(limitedProducts);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los productos' });
-    }
-});
-productsRouter.get('/:pid', async(req, res) => {
-    try {
-        const products = await ProductManagerDB.getInstance().getProducts();
-        let pid = parseInt(req.params.pid);
-        let product = products.find(p => p.id === pid);
+        const productoGuardado = await ProductManagerDB.getInstance().addProduct(nuevoProducto);
 
-        if(!product) return res.status(404).json({ error: 'Producto no encontrado' });
+        // Emitir evento de nuevo producto a través de Socket.IO
+        req.app.get('io').emit('new-product', productoGuardado);
 
-        res.send(product);
+        res.status(201).json({ message: 'Producto agregado correctamente', product: productoGuardado });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener producto' });
-    }
-});
-productsRouter.post('/', async(req, res) => {
-    try {
-        let product = req.body;
-        product = await ProductManagerDB.getInstance().addProduct(product);
-        res.json({ status: 'success', payload: product });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-productsRouter.put('/:pid', async(req, res) => {
-    try {
-        const id = +req.params.pid;
-        let product = req.body;
-        product = await ProductManagerDB.getInstance().updateProduct(id, product);
-        res.json({ status: 'success', payload: product});
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-productsRouter.delete('/:pid', async(req, res) => {
-    try {
-        const id = req.params.pid;
-        const product = await ProductManagerDB.getInstance().deleteProduct(id);
-        res.json({ status: 'success', payload: product });
-    } catch {
-        res.status(500).json({ error: error.message });
+        console.error('Error al agregar el producto:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 });
 
