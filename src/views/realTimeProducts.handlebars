@@ -1,75 +1,81 @@
 {{>navbar}}
 
 <div class="container">
-    <div class="row">
-        <!-- Lista de productos -->
-        <div class="col-md-6">
-            <h1>Listado de productos</h1>
-            <ul id="productsList" class="list-group">
-                {{#each products}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <span>{{this.title}} ($ {{this.price}})</span>
-                            <span class="ml-2">
-                                <button type="button" class="btn btn-outline-danger btn-sm delete-product" data-product-id="{{this.id}}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                        <path d="M3 5V3h10v2H3z"/>
-                                        <path fill-rule="evenodd" d="M5.5 0a.5.5 0 0 1 .5.5V1h4V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v1H1V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 6a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6zm5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 1 0v-4a.5.5 0 0 0-.5-.5zm2 0a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 1 0v-4a.5.5 0 0 0-.5-.5z"/>
-                                    </svg>
-                                </button>
-                            </span>
-                        </div>
-                    </li>
-                {{/each}}
-            </ul>
+        <h1 class="display-4">Products:</h1>
+
+        <table id="products-table" class="table table-striped table-bordered"></table>
+
+        <div class="row">
+            <div class="col-md-6">
+                <form id="new-Product" action="/realtimeproducts" method="post">
+                    <h2 class="h4">Add Product:</h2>
+
+                    <div class="form-group mb-1">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" name="title" id="title">
+                    </div>
+
+                    <div class="form-group mb-1">
+                        <label for="description">Description</label>
+                        <input type="text" class="form-control" name="description" id="description">
+                    </div>
+
+                    <div class="form-group mb-1">
+                        <label for="code">Code</label>
+                        <input type="text" class="form-control" name="code" id="code">
+                    </div>
+
+                    <div class="form-group mb-1">
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" name="price" id="price">
+                    </div>
+
+                    <div class="form-group mb-1">
+                        <label for="status">Status</label>
+                        <select class="form-control" name="status" id="status">
+                            <option value="true">True</option>
+                            <option value="false">False</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-1">
+                        <label for="stock">Stock</label>
+                        <input type="number" class="form-control" name="stock" id="stock">
+                    </div>
+
+                    <div class="form-group mb-1">
+                        <label for="category">Category</label>
+                        <input type="text" class="form-control" name="category" id="category">
+                    </div>
+
+                    <div class="form-group mb-1">
+                        <label for="thumbnail">Thumbnail</label>
+                        <input type="text" class="form-control" name="thumbnail" id="thumbnail">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Send</button>
+
+                </form>
+            </div>
+            <div class="col-md-6">
+                <form id="delete-product">
+                    <h2 class="h4">Delete product</h2>
+
+                    <div class="form-group">
+                        <label for="id">Id</label>
+                        <input type="text" class="form-control" name="id" id="id">
+                    </div>
+
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Formulario para agregar un nuevo producto -->
-        <div class="col-md-6">
-            <h1>Agregar Producto</h1>
-            <form id="formulario-producto" method="post" enctype="multipart/form-data" action="/api/products"
-                class="mt-3">
-                <div class="mb-3">
-                    <input type="text" id="nombre-producto" name="title" class="form-control"
-                        placeholder="Título del Producto" />
-                </div>
-                <div class="mb-3">
-                    <input type="text" id="descripcion-producto" name="description" class="form-control"
-                        placeholder="Descripción del Producto" />
-                </div>
-                <div class="mb-3">
-                    <input type="number" id="precio-producto" name="price" class="form-control"
-                        placeholder="Precio del Producto" />
-                </div>
-                <div class="mb-3">
-                    <input type="text" id="codigo-producto" name="code" class="form-control"
-                        placeholder="Código del Producto" />
-                </div>
-                <div class="mb-3">
-                    <input type="number" id="stock-producto" name="stock" class="form-control"
-                        placeholder="Stock del Producto" />
-                </div>
-                <div class="mb-3">
-                    <label for="status">Status</label>
-                    <select class="form-control" name="status" id="status">
-                        <option value="true">True</option>
-                        <option value="false">False</option>
-                    </select>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="category">Category</label>
-                    <input type="text" class="form-control" name="category" id="category">
-                </div>
-
-                <div class="mb-3">
-                    <input type="file" id="thumbnails-producto" name="thumbnails" class="form-control" multiple />
-                </div>
-                <button id="agregar-producto-btn" class="btn btn-primary">Agregar Producto</button>
-            </form>
-        </div>
+        <div class="responsive-container" id="responsive-container"></div>
     </div>
-</div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
-<script src="/static/js/realTimeProductsList.js"></script> 
+<script src="/socket.io/socket.io.js"></script>
+<script src="/static/js/realTimeProductsList.js"></script>

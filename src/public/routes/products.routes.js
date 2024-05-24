@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { uploader } from '../../uploader.js';
 import { ProductManagerDB } from '../../dao/productsManager.db.js';
 
 const productsRouter = Router();

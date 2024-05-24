@@ -1,100 +1,76 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const socketClient = io('ws://localhost:5050');
-    const productsList = document.getElementById('productsList');
+const socket = io();
 
-    document.getElementById('agregar-producto-btn').addEventListener('click', async (event) => {
-        event.preventDefault();
+socket.on('products', products => {
+    const productsContainer = document.getElementById('products-table');
 
-        const title = document.getElementById('nombre-producto').value;
-        const description = document.getElementById('descripcion-producto').value;
-        const price = document.getElementById('precio-producto').value;
-        const code = document.getElementById('codigo-producto').value;
-        const stock = document.getElementById('stock-producto').value;
-        const status = document.getElementById('status').checked;
-        const category = document.getElementById('category').value;
-        const thumbnailInput = document.getElementById('thumbnails-producto');;
-        const thumbnailFile = thumbnailInput ? thumbnailInput.files[0] : null;
+    if (!productsContainer) {
+        console.error("Element with ID 'products-table' not found.");
+        return;
+    }
 
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('price', price);
-        formData.append('code', code);
-        formData.append('stock', stock);
-        formData.append('status', status);
-        formData.append('category', category);
-        if (thumbnailFile) {
-            formData.append('thumbnail', thumbnailFile);
-        }
+    const headerHTML = `
+    <tr>
+        <th>Id:</th>
+        <th>Título:</th>
+        <th>Descripción:</th>
+        <th>Código:</th>
+        <th>Precio:</th>
+        <th>Estado:</th>
+        <th>Stock:</th>
+        <th>Categoría:</th>
+        <th>Imágenes:</th>
+    </tr>
+`;
 
-        try {
-            const response = await fetch('/api/products/', {
-                method: 'POST',
-                body: formData,
-            });
+    productsContainer.innerHTML = headerHTML;
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Producto agregado:', data);
-                document.getElementById('formulario-producto').reset();
-                socketClient.emit('new-product', data.product);
-            } else {
-                console.error('Error al agregar el producto:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Error al agregar el producto:', error.message);
-        }
+    products.forEach((product) => {
+        productsContainer.innerHTML += `
+            <tr>
+                <td>${product._id}</td>
+                <td>${product.title}</td>
+                <td>${product.description}</td>
+                <td>${product.code}</td>
+                <td>${product.price}</td>
+                <td>${product.status}</td>
+                <td>${product.stock}</td>
+                <td>${product.category}</td>
+                <td>${product.thumbnail}</td>
+            </tr>
+        `;
+    });
+});
+
+document.getElementById('new-Product').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    socket.emit('new-product', {
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        code: document.getElementById('code').value,
+        price: document.getElementById('price').value,
+        status: document.getElementById('status').value,
+        stock: document.getElementById('stock').value,
+        category: document.getElementById('category').value,
+        thumbnail: document.getElementById('thumbnail').value
     });
 
-    // Código para manejar eventos de WebSocket
-    socketClient.on('new-product', data => {
-        if (data && data.product) {
-            const nuevoProducto = data.product;
-            const nuevoItem = document.createElement('li');
-            nuevoItem.textContent = `${nuevoProducto.title} ($${nuevoProducto.price})`;
-            nuevoItem.classList.add('list-group-item');
+    event.target.reset();
+});
 
-            const deleteIcon = document.createElement('span');
-            deleteIcon.classList.add('delete-product');
-            deleteIcon.setAttribute('data-product-id', nuevoProducto.id);
+document.getElementById('delete-product').addEventListener('submit', (event) => {
+    event.preventDefault();
 
-            const deleteIconInnerHtml = '<i class="bi bi-trash-fill"></i>';
-            deleteIcon.innerHTML = deleteIconInnerHtml;
+    const pId = document.getElementById('id').value;
+    console.log(pId);
+    socket.emit('delete-product', pId);
+    event.target.reset();
+});
 
-            nuevoItem.appendChild(deleteIcon);
-            productsList.appendChild(nuevoItem);
-
-            deleteIcon.addEventListener('click', async (event) => {
-                event.preventDefault();
-                const productId = event.currentTarget.getAttribute('data-product-id');
-                const listItemToDelete = event.currentTarget.parentElement;
-
-                try {
-                    const response = await fetch(`/api/products/${productId}`, {
-                        method: 'DELETE',
-                    });
-
-                    if (response.ok) {
-                        listItemToDelete.remove();
-                        socketClient.emit('delete-product', productId);
-                    } else {
-                        console.error('Error al eliminar el producto:', response.statusText);
-                    }
-                } catch (error) {
-                    console.error('Error al eliminar el producto:', error.message);
-                }
-            });
-        } else {
-            console.error('Datos recibidos no válidos:', data);
-        }
-    });
-
-    socketClient.on('delete-product', data => {
-        if (data && data.id) {
-            const listItemToDelete = document.querySelector(`[data-product-id="${data.id}"]`);
-            if (listItemToDelete) {
-                listItemToDelete.parentElement.removeChild(listItemToDelete);
-            }
-        }
-    });
+socket.on('response', (response) => {
+    if (response.status === 'success') {
+        document.getElementById('responsive-container').innerHTML = `<p class="success">${response.message}</p>`;
+    } else {
+        document.getElementById('responsive-container').innerHTML = `<p class="error">${response.message}</p>`;
+    }
 });
