@@ -78,9 +78,6 @@ export class ProductManagerDB {
 
     async deleteProduct(id){
         try {
-            if(id.length !== 24){
-                throw new Error('El id debe tener 24 caracteres');
-            }
             const product = await productModel.findByIdAndDelete({ _id: id });
             if(!product){
                 throw new Error(`No se encontró el producto con id ${id}`);

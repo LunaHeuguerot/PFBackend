@@ -4,6 +4,7 @@ import config from '../../config.js';
 import { ObjectId } from 'mongodb';
 import productModel from '../../dao/models/products.model.js';
 import { uploader } from '../../uploader.js';
+import { ProductManagerDB } from '../../dao/productsManager.db.js';
 
 const router = Router();
 
@@ -70,7 +71,7 @@ router.put('/:id', async (req, res) => {
             return res.status(400).json({ error: 'Invalid ID format' });
         }
         const updatedProduct = req.body;
-        const result = await productModel.update(productId, updatedProduct);
+        const result = await ProductManagerDB.getInstance().updateProduct(productId, updatedProduct);
         if (result) {
             res.json(result);
         } else {
@@ -90,7 +91,7 @@ router.delete('/:id', async (req, res) => {
             return res.status(400).json({ error: 'ID de producto no válido' });
         }
 
-        const process = await productModel.findOneAndDelete({ _id: id });
+        const process = await ProductManagerDB.getInstance().deleteProduct(id);
 
         if (!process) {
             return res.status(404).json({ error: 'Producto no encontrado' });
