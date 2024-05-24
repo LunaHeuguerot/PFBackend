@@ -1,18 +1,19 @@
 import mongoose from "mongoose";
 
-const productsCollection = "products";
+mongoose.pluralize(null);
 
+const collection = 'products'
 const productSchema = new mongoose.Schema({
-    title: { type: String, required: true, index: true },
+    
+    title: { type: String, required: true },
     description: { type: String, required: true },
-    code: { type: String, required: true, unique: true, index: true },
     price: { type: Number, required: true },
-    status: { type: Boolean, required: true },
+    code: { type: String, required: true },
     stock: { type: Number, required: true },
-    category: { type: String, required: true },
-    thumbnails: { type: Array, required: false }
-});
+    thumbnails: { type: [String], default: [] },
+    category: { type: String, required: true }
+}, { timestamps: true });
 
-const productModel = mongoose.model(productsCollection, productSchema);
+const productModel = mongoose.model(collection, productSchema);
 
 export default productModel;

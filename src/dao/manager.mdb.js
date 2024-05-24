@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
 
-class CollectionManager {
+class DBManager {
     constructor(uri, dbName) {
         this.uri = uri;
         this.dbName = dbName;
@@ -9,7 +9,7 @@ class CollectionManager {
         this.collection = null;
     }
 
-    connect =  async() => {
+    async connect() {
         if (!this.client.topology || !this.client.topology.isConnected()) {
             await this.client.connect();
         }
@@ -17,13 +17,13 @@ class CollectionManager {
         this.collection = this.db.collection('products');
     }
 
-    disconnect = async() => {
+    async disconnect() {
         if (this.client && this.client.topology && this.client.topology.isConnected()) {
             await this.client.close();
         }
     }
 
-    getAll = async (limit = 50) => {
+    async getAll(limit = 50) {
         try {
             await this.connect();
             const products = await this.collection.find().limit(limit).toArray();
@@ -33,9 +33,9 @@ class CollectionManager {
         } finally {
             await this.disconnect();
         }
-    };
+    }
 
-    add = async (newData) => {
+    async add(newData) {
         try {
             await this.connect();
             const now = new Date();
@@ -52,9 +52,9 @@ class CollectionManager {
         } finally {
             await this.disconnect();
         }
-    };
+    }
 
-    getById = async (id) => {
+    async getById(id) {
         try {
             await this.connect();
             const product = await this.collection.findOne({ _id: new ObjectId(id) });
@@ -64,9 +64,9 @@ class CollectionManager {
         } finally {
             await this.disconnect();
         }
-    };
+    }
 
-    update = async (id, updProd) => {
+    async update(id, updProd) {
         try {
             await this.connect();
             const now = new Date();
@@ -84,9 +84,9 @@ class CollectionManager {
         } finally {
             await this.disconnect();
         }
-    };
+    }
 
-    delete = async (idDelete) => {
+    async delete(idDelete) {
         try {
             await this.connect();
             const result = await this.collection.deleteOne({ _id: new ObjectId(idDelete) });
@@ -96,7 +96,7 @@ class CollectionManager {
         } finally {
             await this.disconnect();
         }
-    };
+    }
 }
 
-export default CollectionManager;
+export default DBManager;
