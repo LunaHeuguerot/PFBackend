@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const stock = document.getElementById('stock-producto').value;
         const status = document.getElementById('status').checked;
         const category = document.getElementById('category').value;
-        const thumbnailInput = document.getElementById('thumbnail');
+        const thumbnailInput = document.getElementById('thumbnails-producto');;
         const thumbnailFile = thumbnailInput ? thumbnailInput.files[0] : null;
 
         const formData = new FormData();
@@ -55,9 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
             nuevoItem.classList.add('list-group-item');
 
             const deleteIcon = document.createElement('span');
-            deleteIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M3 5V3h10v2H3z"/><path fill-rule="evenodd" d="M5.5 0a.5.5 0 0 1 .5.5V1h4V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v1H1V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 6a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6zm5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 1 0v-4a.5.5 0 0 0-.5-.5zm2 0a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 1 0v-4a.5.5 0 0 0-.5-.5z"/></svg>`;
             deleteIcon.classList.add('delete-product');
             deleteIcon.setAttribute('data-product-id', nuevoProducto.id);
+
+            const deleteIconInnerHtml = '<i class="bi bi-trash-fill"></i>';
+            deleteIcon.innerHTML = deleteIconInnerHtml;
 
             nuevoItem.appendChild(deleteIcon);
             productsList.appendChild(nuevoItem);
