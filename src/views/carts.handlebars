@@ -1,12 +1,12 @@
 {{>navbar}}
 
-<h1>Carrito ID {{cart._id}}</h1>
+<h1>Carrito ID</h1>
 
 <div class="go-back-btn">
     <a href="/products">Volver</a>
 </div>
 
-{{#if cart.products}}
+{{#if cart.docs}}
 <table>
     <tr>
         <th>ID</th>
@@ -19,16 +19,16 @@
         <th>Subtotal</th>
     </tr>
 
-    {{#each cart.products.docs}}
+    {{#each cart.docs}}
     <tr>
-        <td>{{this.productId._id}}</td>
-        <td>{{this.productId.code}}</td>
-        <td>{{this.productId.title}}</td>
-        <td>{{this.productId.description}}</td>
-        <td>{{this.productId.category}}</td>
-        <td>${{this.productId.price}}</td>
-        <td>{{this.quantity}}</td>
-        <td>${{multiply this.quantity this.productId.price}}</td>
+        <td>{{productId._id}}</td>
+        <td>{{productId.code}}</td>
+        <td>{{productId.title}}</td>
+        <td>{{productId.description}}</td>
+        <td>{{productId.category}}</td>
+        <td>${{productId.price}}</td>
+        <td>{{quantity}}</td>
+        <td>${{subtotal}}</td>
     </tr>
     {{/each}}
 </table>
