@@ -9,11 +9,21 @@ const router = Router();
 
 router.get('/', async (req, res) => {
     try {
-        const products = await ProductManagerDB.getInstance().getProducts();
-        res.status(200).send({ status: 200, payload: products });
+        const products = await ProductManagerDB.getInstance().getProducts(req);
+        res.json({
+            status: 'success',
+            payload: products.docs,
+            totalPages: products.totalPages,
+            prevPage: products.prevPage,
+            nextPage: products.nextPage,
+            page: products.page,
+            hasPrevPage: products.hasPrevPage,
+            hasNextPage: products.hasNextPage,
+            prevLink: products.prevLink,
+            nextLink: products.nextLink
+        });
     } catch (error) {
-        console.error("Error en la consulta:", error);
-        res.status(500).send({ error: "Error al obtener productos" });
+        res.status(500).json({ error: error.message });
     }
 });
 

@@ -15,16 +15,39 @@ export class ProductManagerDB {
         return ProductManagerDB.#instance;
     }
 
-    async getProducts(limit){
+    async getProducts(req){
+        let limit = req.query.limit ? parseInt(req.query.limit) : 10;
+        const page = req.query.page ? parseInt(req.query.page) : 1;
+        const status = req.query.status ? req.query.status : null;
+        const category = req.query.category ? req.query.category : null;
+        let sort = req.query.sort;
+        
+        if(limit > 10) {
+            limit = 10;
+        };
+        
+        const filter = {};
+        if(status) {
+            filter.status = status;
+        };
+        if(category) {
+            filter.category = category;
+        };
+        if(sort === 'asc' || sort === 'desc' ) {
+            sort= { price: sort };
+        } else {
+            sort = null;
+        };
+
         try {
-            this.products = await productModel.find().limit(limit).lean();
-            if(!this.products){
-                throw new Error('No se encontraron productos');
-            }
-            return this.products;
+            const products = await productModel.paginate(filter, { limit, page, sort, lean: true });
+            products.prevLink = products.page > 1 ? `products?page=${products.page - 1}` : null;
+            products.nextLink = products.page < products.totalPages ? `products?page=${products.page + 1}` : null;
+
+            return products;
         } catch (error) {
             throw error;
-        }
+        };
     }
 
     async getProductById(id){

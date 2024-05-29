@@ -30,6 +30,18 @@
         {{/each}}
     </table>
 
+    <div class="pagination">
+        {{#if products.hasPrevPage}}
+            <a href={{products.prevLink}}><<</a>
+        {{/if}}
+
+        <p>{{products.page}} de {{products.totalPages}}</p>
+
+        {{#if products.hasNextPage}}
+            <a href={{products.nextLink}}>>></a>
+        {{/if}}
+    </div>
+
     <div class="row">
         <div class="col-md-6">
             <form id="new-Product" action="/realtimeproducts" method="post">

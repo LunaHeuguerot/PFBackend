@@ -1,6 +1,8 @@
 {{>navbar}}
 <h1>Lista Productos</h1>
 
+<button class="view-cart-btn" id="view-cart" onclick="viewCart()">Ver carrito</button>
+
 <table>
     <tr>
         <th>Id:</th>
@@ -14,9 +16,9 @@
         <th>Imágenes:</th>
     </tr>
 
-    {{#each products}}
+    {{#each products.docs}}
         <tr>
-            <td>{{this.id}}</td>
+            <td>{{this._id}}</td>
             <td>{{this.title}}</td>
             <td>{{this.description}}</td>
             <td>{{this.code}}</td>
@@ -25,6 +27,24 @@
             <td>{{this.stock}}</td>
             <td>{{this.category}}</td>
             <td>{{this.thumbnail}}</td>
+            <td>
+                <button class="add-to-cart-btn" id="add-to-cart" onclick="addProductToCart('{{_id}}')">Agregar al carrito</button>
+            </td>
         </tr>
     {{/each}}
 </table>
+
+<div class="pagination">
+    {{#if products.hasPrevPage}}
+        <a href={{products.prevLink}}><<</a>
+    {{/if}}
+
+    <p>{{products.page}} de {{products.totalPages}}</p>
+
+    {{#if products.hasNextPage}}
+        <a href={{products.nextLink}}>>></a>
+    {{/if}}
+</div>
+
+
+<script src="/static/js/products.js"></script>

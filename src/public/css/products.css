@@ -1,0 +1,75 @@
+/* Estilos para el título */
+h1 {
+    color: #f1fffa;
+    text-align: center;
+}
+
+/* Estilos para el botón de ver carrito */
+.view-cart-btn {
+    background-color: #96e6b3; 
+    color: #464e47; 
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.view-cart-btn:hover {
+    background-color: #568259; 
+}
+
+/* Estilos para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+/* Estilos para la fila de encabezado */
+table th {
+    background-color: #ccfccb;
+}
+
+/* Estilos para las filas de datos */
+table tr:nth-child(even) {
+    background-color: #f1fffa; 
+}
+
+/* Estilos para el botón de agregar al carrito */
+.add-to-cart-btn {
+    background-color: #96e6b3;
+    color: #464e47;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #568259;
+}
+
+/* Estilos para la paginación */
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #007bff;
+    padding: 0 10px;
+}
+
+.pagination a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
