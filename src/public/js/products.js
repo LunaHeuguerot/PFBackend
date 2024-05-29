@@ -1,29 +1,8 @@
-let cartId = sessionStorage.getItem('cartId');
-
-async function createCart() {
-    try {
-        const response = await fetch('/api/carts', { method: 'POST' });
-        const data = await response.json();
-
-        if(data.status === 'success') {
-            cartId = data.payload._id;
-            sessionStorage.setItem('cartId', cartId);
-            return cartId;
-        } else {
-            throw new Error(data.error);
-        }
-    } catch (error) {
-        alert(error.message || 'Error al crear el carrito');
-    }
-};
+// Id del carrito hardcodeado, falta agregar sessions
 
 async function addProductToCart(productId) {
     try {
-        if(!cartId) {
-            cartId = await createCart();
-        }
-        
-        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'POST' });
+        const response = await fetch(`/api/carts/66578fc1d0ea1f237953fc21/products/${productId}`, { method: 'POST' });
         const data = await response.json();
         if(data.status === 'success') {
             alert(`Producto con id ${productId} agregado al carrito exitosamente`);
@@ -35,12 +14,8 @@ async function addProductToCart(productId) {
 
 async function viewCart() {
     try {
-        // if(!cartId) {
-        //     cartId = await createCart();
-        // }
-
-        window.location.href = `/carts/66578fc1d0ea1f237953fc21`; //harcodeado, cuando agregue sessions agregar para que busque el carrito que pertenece al user
-    } catch (error) {
+        window.location.href = `/carts/665798b7da3ee74baeccfd58`;
+    } catch {
         alert(error.message || 'Error al mostrar carrito');
     }
 };
