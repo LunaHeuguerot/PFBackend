@@ -35,11 +35,11 @@ async function addProductToCart(productId) {
 
 async function viewCart() {
     try {
-        if(!cartId) {
-            cartId = await createCart();
-        }
+        // if(!cartId) {
+        //     cartId = await createCart();
+        // }
 
-        window.location.href = `/carts/${cartId}`;
+        window.location.href = `/carts/66578fc1d0ea1f237953fc21`; //harcodeado, cuando agregue sessions agregar para que busque el carrito que pertenece al user
     } catch (error) {
         alert(error.message || 'Error al mostrar carrito');
     }
