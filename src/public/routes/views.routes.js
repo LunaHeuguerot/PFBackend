@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ProductManagerDB } from '../../dao/productsManager.db.js';
 import { CartsManagerDB } from '../../dao/cartsManager.db.js';
 import productModel from '../../dao/models/products.model.js';
+import cartModel from '../../dao/models/cart.model.js';
 
 const viewsRouter = Router();
 
@@ -34,15 +35,14 @@ viewsRouter.get('/chat', (req, res) => {
 viewsRouter.get('/carts/:cid', async(req, res) => {
     const id = req.params.cid;
     try {
-        const cart = await CartsManagerDB.getInstance().getCartById(id);
+        const cart = await cartModel.findOne({ _id: id }).lean();
         cart.products = cart.products.map(product => {
             return {
                 ...product,
-                // subtotal: product.productId.price * product.quantity
+                subtotal: product.productId.price * product.quantity
             };
         });
-        // cart.total = cart.products.reduce((acc, product) => acc + product.total, 0).toFixed(2);
-        console.log(cart);
+        cart.total = cart.products.reduce((acc, product) => acc + product.subtotal, 0).toFixed(2);
         res.render('carts', {
             style: 'carts.css',
             cart
