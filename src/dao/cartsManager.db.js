@@ -49,7 +49,7 @@ export class CartsManagerDB {
         try {
             await ProductManagerDB.getInstance().getProductById(productId);
             let cart = await this.getCartById(cartId);
-            const productIndex = cart.products.findIndex(product => product.productId === productId);
+            const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
 
             if(productIndex !== -1){
                 cart.products[productIndex].quantity++;

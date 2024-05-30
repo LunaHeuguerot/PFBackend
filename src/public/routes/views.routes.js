@@ -42,6 +42,7 @@ viewsRouter.get('/carts/:cid', async(req, res) => {
             };
         });
         // cart.total = cart.products.reduce((acc, product) => acc + product.total, 0).toFixed(2);
+        console.log(cart);
         res.render('carts', {
             style: 'carts.css',
             cart
