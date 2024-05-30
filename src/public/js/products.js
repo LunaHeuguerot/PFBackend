@@ -2,7 +2,7 @@
 
 async function addProductToCart(productId) {
     try {
-        const response = await fetch(`/api/carts/66578fc1d0ea1f237953fc21/products/${productId}`, {
+        const response = await fetch(`/carts/66578fc1d0ea1f237953fc21/products/${productId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ async function addProductToCart(productId) {
 
 async function viewCart() {
     try {
-        window.location.href = `/carts/665798b7da3ee74baeccfd58`;
+        window.location.href = `/carts/66578fc1d0ea1f237953fc21`;
     } catch {
         alert(error.message || 'Error al mostrar carrito');
     }
