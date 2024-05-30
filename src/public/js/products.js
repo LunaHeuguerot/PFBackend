@@ -2,7 +2,13 @@
 
 async function addProductToCart(productId) {
     try {
-        const response = await fetch(`/api/carts/66578fc1d0ea1f237953fc21/products/${productId}`, { method: 'POST' });
+        const response = await fetch(`/api/carts/66578fc1d0ea1f237953fc21/products/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantity: 1 })
+        });
         const data = await response.json();
         if(data.status === 'success') {
             alert(`Producto con id ${productId} agregado al carrito exitosamente`);
