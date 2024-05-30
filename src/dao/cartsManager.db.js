@@ -78,7 +78,7 @@ export class CartsManagerDB {
             let cart = await this.getCartById(id);
 
             products.forEach(product => {
-                const productIndex = cart.products.findIndex(cartProduct => cartProduct.productId && cartProduct.productId._id && cartProduct.productId._id.toString() === product.productId);
+                const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
                 if (productIndex !== -1) {
                     cart.products[productIndex].quantity = product.quantity;
                 } else {
@@ -98,7 +98,7 @@ export class CartsManagerDB {
     async updateProdQuantity(cartId, productId, quantity) {
         try {
             let cart = await this.getCartById(cartId);
-            const productIndex = cart.products.findIndex(product => product.productId.id.toString() === productId);
+            const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
             if(productIndex === -1) {
                 throw new Error(`No se encontró el producto con id ${productId} en el carrito con id ${cartId}`);
             } else {
@@ -128,7 +128,7 @@ export class CartsManagerDB {
     async removeProdFromCart(cartId, productId) {
         try {
             let cart = await this.getCartById(cartId);
-            const productIndex = cart.products.findIndex(product => product.productId.id.toString() === productId);
+            const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
 
             if(productIndex === -1) {
                 throw new Error(`No se encontró el producto con id ${productId} en el carrito con id ${cartId}`);
