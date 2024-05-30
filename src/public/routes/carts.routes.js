@@ -26,7 +26,7 @@ cartsRouter.post('/:cid/products/:pid', async(req, res) => {
     try {
         const cartId = req.params.cid;
         const productId = req.params.pid;
-        const quantity = req.body.quantity ?? 1
+        const quantity = req.body.quantity ?? 1; 
         const cart = await CartsManagerDB.getInstance().addProductToCart(cartId, productId, quantity);
         res.json({ status: 'success', payload: cart });
     } catch (error) {
