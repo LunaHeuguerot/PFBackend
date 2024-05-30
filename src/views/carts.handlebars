@@ -1,15 +1,12 @@
 {{>navbar}}
 
-<h1>Carrito ID {{cart._id}}</h1>
+<h1>Carrito ID</h1>
 
 <div class="go-back-btn">
     <a href="/products">Volver</a>
 </div>
 
-{{!-- Depuración: Imprime el objeto cart en la consola del navegador --}}
-{{log cart}}
-
-{{#if cart.products.length}}
+{{#if cart}}
 <table>
     <tr>
         <th>ID</th>
@@ -22,15 +19,15 @@
         <th>Subtotal</th>
     </tr>
 
-    {{#each cart.products}}
+    {{#each cart.products.payload}}
     <tr>
         <td>{{this.productId._id}}</td>
-        <td>{{this.productId.code}}</td>
-        <td>{{this.productId.title}}</td>
-        <td>{{this.productId.description}}</td>
-        <td>{{this.productId.category}}</td>
-        <td>${{this.productId.price}}</td>
-        <td>{{this.quantity}}</td>
+        <td>{{this.product.code}}</td>
+        <td>{{this.product.title}}</td>
+        <td>{{this.product.description}}</td>
+        <td>{{this.product.category}}</td>
+        <td>${{this.product.price}}</td>
+        <td>{{this.product.quantity}}</td>
         {{!-- <td>${{this.productId.price * this.quantity}}</td> --}}
     </tr>
     {{/each}}

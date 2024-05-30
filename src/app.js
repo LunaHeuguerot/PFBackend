@@ -27,7 +27,7 @@ app.set('view engine', 'handlebars');
 app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);
 app.use('/chat', chatRouter);
-app.use('/carts', cartsRouter);
+app.use('/api/carts', cartsRouter);
 // app.use('/api/user', userRouter); 
 
 const io = initSocket(expressInstance);
