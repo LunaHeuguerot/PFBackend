@@ -1,4 +1,13 @@
 {{>navbar}}
+{{#if user}}
+    <div class="welcome-message">
+        <p>Bienvenido, {{user.first_name}} {{user.last_name}}!</p>
+        <form id="logoutForm" action="/api/sessions/logout" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+{{/if}}
+
 <h1>Lista Productos</h1>
 
 <button class="view-cart-btn" id="view-cart" onclick="viewCart()">Ver carrito</button>
@@ -48,3 +57,4 @@
 
 
 <script src="/static/js/products.js"></script>
+<script src="/static/js/logout.js"></script>
