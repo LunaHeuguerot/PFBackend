@@ -1,0 +1,30 @@
+<main class="main_session">
+    <div class="login_box">
+        <h1 class="title_login">Register</h1>
+        <form id="registerForm" action="/api/sessions/register" method="POST" class="form_session">
+            <div class="section_box">
+                <input type="text" id="first_name" name="first_name" required placeholder="First name">
+            </div>
+
+            <div class="section_box">
+                <input type="text" id="last_name" name="last_name" required placeholder="Last name">
+            </div>
+            <div class="section_box">
+                <input type="number" id="age" name="age" required placeholder="Age">
+            </div>
+            <div class="section_box">
+                <input type="email" id="email" name="email" required placeholder="Email">
+            </div>
+            <div class="section_box">
+                <input type="password" id="password" name="password" required placeholder="Password">
+            </div>
+            <div class="section_box">
+                <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm password">
+            </div>
+            <button type="submit">Register</button>
+            <p class="text_box_account">Already have an account? <a href="/" class="register_string">Login</a></p>
+        </form>
+    </div>
+</main>
+
+<script src="/static/js/register.js"></script>

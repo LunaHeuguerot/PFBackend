@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { ProductManagerDB } from '../../dao/productsManager.db.js';
-import { CartsManagerDB } from '../../dao/cartsManager.db.js';
 import productModel from '../../dao/models/products.model.js';
 import cartModel from '../../dao/models/cart.model.js';
 
@@ -9,8 +8,10 @@ const viewsRouter = Router();
 viewsRouter.get('/products', async(req, res) => {
     try {
         const products = await ProductManagerDB.getInstance().getProducts(req);
+        const user = req.session.user;
         res.render('products', {
             products: products,
+            user: user, 
             style: 'products.css'
         })
     } catch (error) {
@@ -49,6 +50,37 @@ viewsRouter.get('/carts/:cid', async(req, res) => {
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+viewsRouter.get('/', (req, res) => {
+    try {
+        res.render('login', {
+            // style: 'login.css',
+            title: 'User logged'
+        })
+    } catch (error) {
+        res.status(400).send('Internal server error', error);
+    }
+});
+
+viewsRouter.get('/register', (req, res) => {
+    try {
+        res.render('register', {
+            title: 'Register'
+        })
+    } catch (error) {
+        res.status(400).send('Internal server error', error);
+    }
+});
+
+viewsRouter.get('/registered', (req, res) => {
+    try {
+        res.render('registered', {
+            title: 'Signed Up Complete'
+        })
+    } catch (error) {
+        res.status(400).send('Internal server error', error);
     }
 });
 
