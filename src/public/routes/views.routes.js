@@ -5,19 +5,19 @@ import cartModel from '../../dao/models/cart.model.js';
 
 const viewsRouter = Router();
 
-viewsRouter.get('/products', async(req, res) => {
+viewsRouter.get('/products', async (req, res) => {
     try {
         const products = await ProductManagerDB.getInstance().getProducts(req);
-        const user = req.session.user;
         res.render('products', {
             products: products,
-            user: user, 
+            user: req.session.user, 
             style: 'products.css'
-        })
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 viewsRouter.get('/api/products', async (req, res) => {
     try {

@@ -6,4 +6,4 @@ function isAuthenticated(req, res, next) {
     }
 };
 
-export { isAuthenticated };
+export default isAuthenticated;

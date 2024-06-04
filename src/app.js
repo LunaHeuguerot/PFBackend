@@ -11,6 +11,7 @@ import MongoStore from 'connect-mongo';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import sessionRouter from './public/routes/session.router.js';
+import profileRouter from './public/routes/profile.routes.js';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/products', productsRouter);
 app.use('/chat', chatRouter);
 app.use('/carts', cartsRouter);
 app.use('/api/sessions', sessionRouter);
+app.use('/profile', profileRouter);
 
 const io = initSocket(expressInstance);
 app.set('io', io);
