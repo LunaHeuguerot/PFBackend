@@ -11,7 +11,7 @@ viewsRouter.get('/products', isAuthenticated, async (req, res) => {
         const products = await ProductManagerDB.getInstance().getProducts(req);
         res.render('products', {
             products: products,
-            user: req.user, 
+            user: req.session.user, 
             style: 'products.css'
         });
     } catch (error) {
@@ -89,11 +89,18 @@ viewsRouter.get('/admin/dashboard', isAuthenticated, adminAuth, (req, res) => {
     try {
         res.render('adminDashboard', {
             title: 'Admin Dashboard',
-            user: req.user
+            user: req.session.user
         });
     } catch (error) {
         res.status(500).send('Internal server error');
     }
+});
+
+viewsRouter.get('/profile', isAuthenticated, (req, res) => {
+    res.render('profile', {
+        user: req.session.user, 
+        style: 'profile.css'
+    });
 });
 
 export default viewsRouter;

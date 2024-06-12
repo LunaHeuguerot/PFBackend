@@ -4,28 +4,28 @@ document.addEventListener('DOMContentLoaded', function() {
     registerForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
-        const firstName = registerForm.querySelector('#first_name').value;
-        const lastName = registerForm.querySelector('#last_name').value;
-        const email = registerForm.querySelector('#email').value;
+        const first_name = registerForm.querySelector('#first_name').value;
+        const last_name = registerForm.querySelector('#last_name').value;
         const age = registerForm.querySelector('#age').value;
+        const email = registerForm.querySelector('#email').value;
         const password = registerForm.querySelector('#password').value;
-        const confirmPassword = registerForm.querySelector('#confirm_password').value;
+        const confirm_password = registerForm.querySelector('#confirm_password').value;
 
-        if(password !== confirmPassword) {
+        if (password !== confirm_password) {
             alert('Las contraseñas no coinciden');
             return;
         }
 
-        if(password.length < 8){
+        if (password.length < 8) {
             alert('La contraseña debe tener al menos 8 caracteres');
             return;
         }
 
         const formData = {
-            first_name: firstName,
-            last_name: lastName,
+            first_name,
+            last_name,
+            age,
             email,
-            age, 
             password
         };
 
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(formData)
             });
 
-            if(response.ok){
+            if (response.ok) {
                 window.location.href = '/registered';
             } else {
                 const data = await response.json();
