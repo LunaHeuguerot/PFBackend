@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // const githubLoginButton = document.querySelector('#githubLogin');
-    // githubLoginButton.addEventListener('click', function() {
-    //     window.location.href = '/api/sessions/ghlogin';
-    // });
+    const githubLoginButton = document.querySelector('#githubLogin');
+    githubLoginButton.addEventListener('click', function() {
+        window.location.href = '/api/sessions/ghlogin';
+    });
 });

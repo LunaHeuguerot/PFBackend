@@ -1,42 +1,119 @@
 import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import local from 'passport-local';
+import GitHubStrategy from 'passport-github2';
 import userModel from '../dao/models/user.model.js';
-import { isValidPassword } from '../utils.js';
+import { isValidPassword, createHash } from '../utils.js';
+import config from '../config.js';
+import UsersManager from '../dao/user.manager.db.js';
 
-// passport.strategies.js
-passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
-    try {
-        const user = await userModel.findOne({ email });
-        console.log("User found:", user);  // Log user found
+const localStrategy = local.Strategy;
+const manager = new UsersManager(userModel);
 
-        if (!user) {
-            console.log("Incorrect email");  // Log incorrect email
-            return done(null, false, { message: 'Incorrect email.' });
+const initAuthStrategies = ()=>{
+    passport.use('register', new LocalStrategy(
+        { passReqToCallback: true, usernameField: 'email' },
+        async (req, username, password, done) => {
+            try {
+                const { first_name, last_name, age } = req.body;
+                const foundUser = await manager.getOne({ email: username });
+    
+                if (foundUser) {
+                    return done(null, false, { message: 'El usuario ya existe' });
+                }
+    
+                const hashedPassword = createHash(password);
+                const newUser = {
+                    first_name,
+                    last_name,
+                    age,
+                    email: username,
+                    password: hashedPassword,
+                };
+    
+                const createdUser = await manager.add(newUser);
+                if (createdUser.status === 201) {
+                    return done(null, createdUser.payload);
+                } else {
+                    return done(null, false, { message: createdUser.error });
+                }
+            } catch (err) {
+                return done(err);
+            }
         }
-        if (!isValidPassword(password, user.password)) {
-            console.log("Incorrect password");  // Log incorrect password
-            return done(null, false, { message: 'Incorrect password.' });
+    ));
+
+    passport.use('login', new localStrategy(
+        { passReqToCallback: true, usernameField: 'email' },
+        async (req, email, password, done) => {
+            try {
+                const foundUser = await userModel.findOne({ email }).lean();
+                if (foundUser && isValidPassword(password, foundUser.password)) {
+                    return done(null, foundUser);
+                } else {
+                    return done(null, false, { message: 'Invalid credentials' });
+                }
+            } catch (err) {
+                return done(err);
+            }
         }
-        console.log("User authenticated");  // Log successful authentication
-        return done(null, user);
-    } catch (error) {
-        console.log("Error:", error);  // Log any errors
-        return done(error);
+    ));
+
+passport.use('ghlogin', new GitHubStrategy(
+    {
+        clientID: config.GITHUB_CLIENT_ID,
+        clientSecret: config.GITHUB_CLIENT_SECRET,
+        callbackURL: config.GITHUB_CALLBACK_URL
+    },
+    async (req, accessToken, refreshToken, profile, done) => {
+        try {
+            const email = profile._json?.email || null;
+
+            if (email) {
+                let foundUser = await manager.getOne({ email });
+
+                if (!foundUser) {
+                    const user = {
+                        firstName: profile._json.name.split(' ')[0],
+                        lastName: profile._json.name.split(' ')[1],
+                        email,
+                        password: 'none'
+                    };
+
+                    const process = await manager.add(user);
+
+                    foundUser = process.payload;
+                }
+
+                return done(null, foundUser);
+            } else {
+                return done(new Error('Faltan datos de perfil'), null);
+            }
+        } catch (err) {
+            return done(err, false);
+        }
     }
-}));
-
+));
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    const userId = user._id || user.payload?._id;
+    if (userId) {
+        done(null, userId);
+    } else {
+        done(new Error('user id no encontrado'), null);
+    }
 });
 
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await userModel.findById(id);
         done(null, user);
-    } catch (error) {
-        done(error);
+    } catch (err) {
+        done(err, null);
     }
 });
 
-export default passport;
+}
+
+
+
+export default initAuthStrategies;
