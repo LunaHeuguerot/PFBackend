@@ -3,20 +3,28 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import userModel from '../dao/models/user.model.js';
 import { isValidPassword } from '../utils.js';
 
+// passport.strategies.js
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
     try {
         const user = await userModel.findOne({ email });
+        console.log("User found:", user);  // Log user found
+
         if (!user) {
+            console.log("Incorrect email");  // Log incorrect email
             return done(null, false, { message: 'Incorrect email.' });
         }
         if (!isValidPassword(password, user.password)) {
+            console.log("Incorrect password");  // Log incorrect password
             return done(null, false, { message: 'Incorrect password.' });
         }
+        console.log("User authenticated");  // Log successful authentication
         return done(null, user);
     } catch (error) {
+        console.log("Error:", error);  // Log any errors
         return done(error);
     }
 }));
+
 
 passport.serializeUser((user, done) => {
     done(null, user.id);

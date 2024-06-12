@@ -30,7 +30,9 @@ viewsRouter.get('/api/products', isAuthenticated, async (req, res) => {
 });
 
 viewsRouter.get('/chat', isAuthenticated, (req, res) => {
-    res.render('chat', {});
+    res.render('chat', {
+        // user: req.user
+    });
 });
 
 viewsRouter.get('/carts/:cid', isAuthenticated, async(req, res) => {
