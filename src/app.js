@@ -12,6 +12,8 @@ import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import sessionRouter from './public/routes/session.router.js';
 import profileRouter from './public/routes/profile.routes.js';
+import passport from 'passport';
+import initAuthStrategies from './auth/passport.strategies.js';
 
 const app = express();
 
@@ -38,6 +40,9 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());        
 
 app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);

@@ -2,15 +2,16 @@ import { Router } from 'express';
 import { ProductManagerDB } from '../../dao/productsManager.db.js';
 import productModel from '../../dao/models/products.model.js';
 import cartModel from '../../dao/models/cart.model.js';
-
+import isAuthenticated from '../../middlewares/authMiddleware.js'; 
+import { adminAuth } from '../../middlewares/adminAuth.js';  
 const viewsRouter = Router();
 
-viewsRouter.get('/products', async (req, res) => {
+viewsRouter.get('/products', isAuthenticated, async (req, res) => {
     try {
         const products = await ProductManagerDB.getInstance().getProducts(req);
         res.render('products', {
             products: products,
-            user: req.session.user, 
+            user: req.user, 
             style: 'products.css'
         });
     } catch (error) {
@@ -18,8 +19,7 @@ viewsRouter.get('/products', async (req, res) => {
     }
 });
 
-
-viewsRouter.get('/api/products', async (req, res) => {
+viewsRouter.get('/api/products', isAuthenticated, async (req, res) => {
     try {
         const products = await productModel.find().lean(); 
         res.render('realTimeProducts', { products }); 
@@ -29,11 +29,11 @@ viewsRouter.get('/api/products', async (req, res) => {
     }
 });
 
-viewsRouter.get('/chat', (req, res) => {
+viewsRouter.get('/chat', isAuthenticated, (req, res) => {
     res.render('chat', {});
 });
 
-viewsRouter.get('/carts/:cid', async(req, res) => {
+viewsRouter.get('/carts/:cid', isAuthenticated, async(req, res) => {
     const id = req.params.cid;
     try {
         const cart = await cartModel.findOne({ _id: id }).lean();
@@ -56,7 +56,6 @@ viewsRouter.get('/carts/:cid', async(req, res) => {
 viewsRouter.get('/', (req, res) => {
     try {
         res.render('login', {
-            // style: 'login.css',
             title: 'User logged'
         })
     } catch (error) {
@@ -81,6 +80,17 @@ viewsRouter.get('/registered', (req, res) => {
         })
     } catch (error) {
         res.status(400).send('Internal server error', error);
+    }
+});
+
+viewsRouter.get('/admin/dashboard', isAuthenticated, adminAuth, (req, res) => {
+    try {
+        res.render('adminDashboard', {
+            title: 'Admin Dashboard',
+            user: req.user
+        });
+    } catch (error) {
+        res.status(500).send('Internal server error');
     }
 });
 

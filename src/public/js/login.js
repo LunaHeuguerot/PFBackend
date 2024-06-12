@@ -31,4 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
             messageElement.textContent = 'Failed to login';
         }
     });
+
+    // const githubLoginButton = document.querySelector('#githubLogin');
+    // githubLoginButton.addEventListener('click', function() {
+    //     window.location.href = '/api/sessions/ghlogin';
+    // });
 });
