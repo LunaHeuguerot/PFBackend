@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-
 import config from './config.js';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -17,3 +16,4 @@ export const verifyRequiredBody = (requiredFields) => {
       next();
     };
 };
+
