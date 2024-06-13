@@ -54,21 +54,25 @@ sessionRouter.post('/pplogin', verifyRequiredBody(['email', 'password']),
     }
 );
 
-sessionRouter.get('/ghlogincallback',
-    passport.authenticate('ghlogin',
-        { failureRedirect: `/login?error=${encodeURI('Error al identificar con Github')}` }), async (req, res) => {
-            try {
-                req.session.user = req.user // req.user es inyectado AUTOMATICAMENTE por Passport al parsear el done()
-                console.log(req.session.user)
-                req.session.save(err => {
-                    if (err) return res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+sessionRouter.get('/ghlogin', passport.authenticate('ghlogin', {scope: ['user: email']}), async (req, res) => {
+});
 
-                    res.redirect('/profile');
-                });
-            } catch (err) {
-                res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
-            }
+sessionRouter.get('/ghlogincallback',
+    passport.authenticate('ghlogin', { failureRedirect: `/login?error=${encodeURI('Error al identificar con Github')}` }),
+    async (req, res) => {
+        try {
+            req.session.user = req.user;
+            console.log('Authenticated user:', req.user);
+            req.session.save(err => {
+                if (err) return res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+
+                res.redirect('/profile');
+            });
+        } catch (err) {
+            console.error('Error en callback de GitHub:', err);
+            res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
         }
+    }
 );
 
 

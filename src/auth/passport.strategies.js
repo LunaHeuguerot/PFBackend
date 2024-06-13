@@ -58,41 +58,45 @@ const initAuthStrategies = ()=>{
         }
     ));
 
-        passport.use('ghlogin', new GitHubStrategy(
+    passport.use('ghlogin', new GitHubStrategy(
         {
             clientID: config.GITHUB_CLIENT_ID,
             clientSecret: config.GITHUB_CLIENT_SECRET,
-            callbackURL: config.GITHUB_CALLBACK_URL
+            callbackURL: config.GITHUB_CALLBACK_URL,
+            scope: ['user:email']  
         },
-        async (req, accessToken, refreshToken, profile, done) => {
+        async (accessToken, refreshToken, profile, done) => {
             try {
-                const email = profile._json?.email || null;
-
-                if (email) {
-                    let foundUser = await manager.getOne({ email });
-
-                    if (!foundUser) {
-                        const user = {
-                            firstName: profile._json.name.split(' ')[0],
-                            lastName: profile._json.name.split(' ')[1],
-                            email,
-                            password: 'none'
-                        };
-
-                        const process = await manager.add(user);
-
-                        foundUser = process.payload;
-                    }
-
-                    return done(null, foundUser);
-                } else {
-                    return done(new Error('Faltan datos de perfil'), null);
+                const email = profile.emails && profile.emails[0].value;
+                if (!email) {
+                    return done(new Error('No se proporcionó el correo electrónico desde GitHub'), null);
                 }
+    
+                let foundUser = await manager.getOne({ email });
+    
+                if (!foundUser) {
+                    const name = profile.displayName || profile._json.name || 'Usuario GitHub';
+                    const nameParts = name.split(' ');
+                    const user = {
+                        first_name: nameParts[0] || '',
+                        last_name: nameParts.slice(1).join(' ') || '',
+                        email,
+                        password: 'none',
+                        age: 18
+                    };
+    
+                    const process = await manager.add(user);
+                    foundUser = process.payload;
+                }
+    
+                return done(null, foundUser);
             } catch (err) {
-                return done(err, false);
+                console.error('Error en GitHub Strategy:', err);
+                return done(err, null);
             }
         }
-        ));
+    ));
+    
 
     passport.serializeUser((user, done) => {
         const userId = user._id || user.payload?._id;
