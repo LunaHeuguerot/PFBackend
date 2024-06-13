@@ -34,6 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const githubLoginButton = document.querySelector('#githubLogin');
     githubLoginButton.addEventListener('click', function() {
-        window.location.href = '/api/sessions/ghlogin';
+        window.location.href = '/api/sessions/ghlogincallback';
     });
 });
