@@ -14,8 +14,7 @@ sessionRouter.post('/register',
     verifyRequiredBody(['first_name', 'last_name', 'age', 'email', 'password']),
     passport.authenticate('register', {
         successRedirect: '/registered',
-        failureRedirect: '/register',
-        failureFlash: true
+        failureRedirect: '/register'
     })
 );
 
