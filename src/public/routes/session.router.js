@@ -77,12 +77,15 @@ sessionRouter.get('/ghlogincallback',
 
 sessionRouter.get('/current', async(req, res) => {
     try {
-        res.status(200).send(('profile', { 
-            user: req.session.user,
-            login_type: req.session.user.login_type 
-        }))
+        const user = { ...req.session.user };
+        user.password = '*********';
+
+        res.status(200).send({
+            user: user,
+            login_type: user.login_type 
+        });
     } catch (error) {
-        res.status(500).send({ error: error.message })
+        res.status(500).send({ error: error.message });
     }
 })
 
