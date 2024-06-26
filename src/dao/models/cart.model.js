@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import userModel from './user.model.js';
+import productModel from './products.model.js';
 
 const cartsCollection = 'carts';
 
@@ -22,8 +23,13 @@ const cartSchema = new mongoose.Schema({
     }
 });
 
+cartSchema.pre('find', function () {
+    this.populate({ path: '_user_id', model: userModel });
+    this.populate({ path: 'products.product', model: productModel });
+});
+
 cartSchema.pre('findOne', function(next) {
-    this.populate({ path: '_user_id', model: usersModel });
+    this.populate({ path: '_user_id', model: userModel });
     this.populate('products.productId');
     next();
 });
