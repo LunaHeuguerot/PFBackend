@@ -5,6 +5,7 @@ import userModel from '../dao/models/user.model.js';
 import { isValidPassword, createHash } from '../utils.js';
 import config from '../config.js';
 import UsersManager from '../dao/user.manager.db.js';
+import cartModel from '../dao/models/cart.model.js';
 
 const localStrategy = local.Strategy;
 const manager = new UsersManager(userModel);
@@ -20,6 +21,9 @@ const initAuthStrategies = ()=>{
                 if (foundUser) {
                     return done(null, false, { message: 'El usuario ya existe' });
                 }
+
+                const newCart = new cartModel();
+                const savedCart = await newCart.save();
     
                 const hashedPassword = createHash(password);
                 const newUser = {
@@ -28,6 +32,7 @@ const initAuthStrategies = ()=>{
                     age,
                     email: username,
                     password: hashedPassword,
+                    cart_id: savedCart._id
                 };
     
                 const createdUser = await manager.add(newUser);

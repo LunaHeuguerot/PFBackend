@@ -39,6 +39,10 @@ userSchema.pre('find', function () {
     this.populate({ path: 'cart_id', model: cartModel });
 });
 
+userSchema.pre('findOne', function () {
+    this.populate({ path: 'cart_id', model: cartModel });
+});
+
 const userModel = mongoose.model(usersCollection, userSchema);
 
 export default userModel;

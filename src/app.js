@@ -56,3 +56,5 @@ app.use('/api/cookie', cookieRouter);
 
 const io = initSocket(expressInstance);
 app.set('io', io);
+
+mongoose.set('strictPopulate', false);
