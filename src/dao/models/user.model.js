@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import cartModel from "./cart.model.js";
 
 const usersCollection = "users";
 
@@ -27,7 +28,15 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    cart_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "carts",
+      },
+});
+
+userSchema.pre('find', function () {
+    this.populate({ path: 'cart_id', model: cartModel });
 });
 
 const userModel = mongoose.model(usersCollection, userSchema);
