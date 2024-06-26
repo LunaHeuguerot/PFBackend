@@ -10,7 +10,8 @@ const config = {
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     GITHUB_CLIENT_ID: 'Iv23liHmJG1wVluLldGJ',
     GITHUB_CLIENT_SECRET: 'a7bbd9db8ec26eaa475b8d19a10475153f9c0659',
-    GITHUB_CALLBACK_URL: 'http://localhost:5050/api/sessions/ghlogincallback'
+    GITHUB_CALLBACK_URL: 'http://localhost:5050/api/sessions/ghlogincallback',
+    SECRET: 'sign3dLÑ75622'
 }
 
 export default config;
