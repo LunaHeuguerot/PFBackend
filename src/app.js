@@ -14,6 +14,7 @@ import sessionRouter from './public/routes/session.router.js';
 import profileRouter from './public/routes/profile.routes.js';
 import passport from 'passport';
 import initAuthStrategies from './auth/passport.strategies.js';
+import cookieRouter from './public/routes/cookie.routes.js';
 
 const app = express();
 
@@ -36,7 +37,7 @@ app.use(session({
         mongoUrl: config.MONGODB_URI,
         ttl: 600 
     }),
-    secret: "sign3dLÑ75622",
+    secret: config.SECRET,
     resave: false,
     saveUninitialized: false
 }));
@@ -51,6 +52,7 @@ app.use('/chat', chatRouter);
 app.use('/carts', cartsRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/profile', profileRouter);
+app.use('/api/cookie', cookieRouter);
 
 const io = initSocket(expressInstance);
 app.set('io', io);

@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import userModel from '../../dao/models/user.model.js';
+import UserManager from '../../dao/user.manager.db.js';
 
 const userRouter = Router();
+
+const userManager = new UserManager();
 
 userRouter.get('/', async(req, res) => {
     try {
@@ -90,6 +93,34 @@ userRouter.delete('/:id', async(req, res) => {
         res.status(200).send({ payload: process });
     } catch (error) {
         res.status(500).send({ error: error.message });
+    }
+});
+
+userRouter.get('/aggregate/:role', async (req, res) => {
+    try {
+        if (req.params.role === 'admin' || req.params.role === 'user') {
+            const match = { role: req.params.role };
+            const sort = { lastName: 1 };
+            const process = await userManager.getAggregated(match, sort);
+
+            res.status(200).send({ origin: config.SERVER, payload: process });
+        } else {
+            res.status(200).send({ origin: config.SERVER, payload: null, error: 'role: solo se acepta admin o user' });
+        }
+    } catch (err) {
+        res.status(500).send({ origin: config.SERVER, payload: null, error: err.message }); 
+    }
+});
+
+userRouter.get('/paginate/:page/:limit', async (req, res) => {
+    try {
+        const filter = { role: 'admin' };
+        const options = { page: req.params.page, limit: req.params.limit, sort: { lastName: 1 } };
+        const process = await userManager.getPaginated(filter, options);
+
+        res.status(200).send({ origin: config.SERVER, payload: process });
+    } catch (err) {
+        res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
 

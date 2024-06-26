@@ -97,9 +97,12 @@ viewsRouter.get('/admin/dashboard', isAuthenticated, adminAuth, (req, res) => {
 });
 
 viewsRouter.get('/profile', isAuthenticated, (req, res) => {
-    res.render('profile', {
-        user: req.session.user, 
-        style: 'profile.css'
+    if (!req.session.user) {
+        return res.redirect('/login');
+    } 
+    res.render('profile', { 
+        user: req.session.user,
+        login_type: req.session.user.login_type 
     });
 });
 
