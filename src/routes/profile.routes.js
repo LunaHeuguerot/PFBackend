@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import isAuthenticated from '../../middlewares/authMiddleware.js';
+import isAuthenticated from '../middlewares/authMiddleware.js';
 
 const profileRouter = Router();
 

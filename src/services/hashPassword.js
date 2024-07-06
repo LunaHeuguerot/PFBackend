@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import userModel from './dao/models/user.model.js';
+import userModel from '../dao/models/user.model.js';
 import { createHash } from './utils.js';
 import config from './config.js';
 

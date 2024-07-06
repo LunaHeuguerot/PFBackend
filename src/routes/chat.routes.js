@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import chatModel from '../../dao/models/chat.model.js';
+import chatModel from '../dao/models/chat.model.js';
 const chatRouter = Router();
 
 chatRouter.get('/messages', async (req, res) => {

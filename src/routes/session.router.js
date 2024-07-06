@@ -1,8 +1,8 @@
 import express from 'express';
 import passport from 'passport';
-import { logout } from '../../dao/session.manager.js';
-import { adminAuth } from '../../middlewares/adminAuth.js';
-import { createHash, isValidPassword, verifyRequiredBody } from '../../utils.js';
+import { logout } from '../controllers/session.manager.js';
+import { adminAuth } from '../middlewares/adminAuth.js';
+import { createHash, isValidPassword, verifyRequiredBody } from '../services/utils.js';
 
 const sessionRouter = express.Router();
 

@@ -1,26 +1,29 @@
 import express from 'express';
-import config from './config.js';
-import productsRouter from './public/routes/products.routes.js';
-import cartsRouter from './public/routes/carts.routes.js';
-import chatRouter from './public/routes/chat.routes.js';
-import viewsRouter from './public/routes/views.routes.js';
+import config from './services/config.js';
+import productsRouter from './routes/products.routes.js';
+import cartsRouter from './routes/carts.routes.js';
+import chatRouter from './routes/chat.routes.js';
+import viewsRouter from './routes/views.routes.js';
 import handlebars from 'express-handlebars';
 import mongoose from 'mongoose';
-import initSocket from './sockets.js';
+import initSocket from './services/sockets.js';
 import MongoStore from 'connect-mongo';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import sessionRouter from './public/routes/session.router.js';
-import profileRouter from './public/routes/profile.routes.js';
+import sessionRouter from './routes/session.router.js';
+import profileRouter from './routes/profile.routes.js';
 import passport from 'passport';
 import initAuthStrategies from './auth/passport.strategies.js';
-import cookieRouter from './public/routes/cookie.routes.js';
+import cookieRouter from './routes/cookie.routes.js';
+import dotenv from 'dotenv';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/static', express.static(`${config.DIRNAME}/public`));
+
+dotenv.config();
 
 const expressInstance = app.listen(config.PORT, async () => {
     await mongoose.connect(config.MONGODB_URI);

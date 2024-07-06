@@ -1,5 +1,5 @@
 import express from 'express';
-import { CartsManagerDB } from '../../dao/cartsManager.db.js';
+import { CartsManagerDB } from '../controllers/cartsManager.db.js';
 
 const cartsRouter = express.Router();
 

@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { ProductManagerDB } from '../../dao/productsManager.db.js';
-import productModel from '../../dao/models/products.model.js';
-import cartModel from '../../dao/models/cart.model.js';
-import isAuthenticated from '../../middlewares/authMiddleware.js'; 
-import { adminAuth } from '../../middlewares/adminAuth.js';  
+import { ProductManagerDB } from '../controllers/productsManager.db.js';
+import productModel from '../dao/models/products.model.js';
+import cartModel from '../dao/models/cart.model.js';
+import isAuthenticated from '../middlewares/authMiddleware.js'; 
+import { adminAuth } from '../middlewares/adminAuth.js';  
 const viewsRouter = Router();
 
 viewsRouter.get('/products', isAuthenticated, async (req, res) => {

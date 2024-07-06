@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
-import config from '../../config.js';
+import config from '../services/config.js';
 import { ObjectId } from 'mongodb';
-import { uploader } from '../../uploader.js';
-import { ProductManagerDB } from '../../dao/productsManager.db.js';
+import { uploader } from '../services/uploader.js';
+import { ProductManagerDB } from '../controllers/productsManager.db.js';
 
 const router = Router();
 

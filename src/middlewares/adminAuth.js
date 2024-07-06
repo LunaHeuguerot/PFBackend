@@ -1,4 +1,4 @@
-import config from '../config.js';
+import config from '../services/config.js';
 
 export const adminAuth = (req, res, next) => {
     if (!req.user || !req.user.isAdmin) {
