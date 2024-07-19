@@ -86,7 +86,7 @@ socketServer.on('connection', async (client) => {
     const messageRender = { messageRender: savedMessages };
     client.emit('cargaMessages', messageRender);
     
-    const prodManager = new ProductManagerDB();
+    const prodManager = new ProductManagerDB().getInstance();
     const products = await prodManager.getProducts();
     const prodRender = { prodRender: products.docs };
     client.emit('cargaProducts', prodRender);
