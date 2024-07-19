@@ -110,4 +110,19 @@ export class ProductManagerDB {
             throw error;
         }
     }
+
+    async paginateProds({ limit = 10, page = 1, query = {}, sort = {} }) {
+        try {
+            const options = {
+                page: parseInt(page, 10),
+                limit: parseInt(limit, 10),
+                sort: sort
+            };
+            const result = await productModel.paginate(query, options);
+            
+            return { status: 200, origin: 'DAO', payload: result };
+        } catch (error) {
+            return { status: 500, origin: 'DAO', payload: { error: error.message } };
+        }
+    }
 }

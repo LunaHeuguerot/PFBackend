@@ -1,10 +1,16 @@
 import cartModel from '../dao/models/cart.model.js';
 import { ProductManagerDB } from './productsManager.db.js';
+import productModel from '../../dao/models/products.model.js';
+import ticketModel from '../dao/models/ticket.model.js';
 
 export class CartsManagerDB {
     static #instance;
 
-    constructor() { };
+    constructor(cartModel, userModel) { 
+        this.cartModel = cartModel;
+        this.userModel = userModel;
+        this.productModel = productModel;
+    };
 
     static getInstance() {
         if(!CartsManagerDB.#instance) {
@@ -143,4 +149,63 @@ export class CartsManagerDB {
             throw error;
         }
     };
+
+    async purchaseCart(cartId, userMail, req){
+        try {
+            const userId = req.session.user._id;
+            console.log('User ID:', userId);
+
+            const cart = await this.getCartById(cartId, userId);
+            if(!cart){
+                console.log('Carrito no encontrado');
+                return { status: 400, error: 'Carrito no encontrado' };
+            }
+            console.log('Carrito encontrado', cart);
+
+            let totalAmount = 0;
+            const unavailableProducts = [];
+
+            for(const cartProduct of cart.products) {
+                const product = cartProduct.product;
+                const availableStock = product.stock
+
+                if(availableStock >= cartProduct.quantity) {
+                    product.stock -= cartProduct.quantity;
+                    totalAmount += productPrice * cartProduct.quantity;
+                    await product.save();
+                } else {
+                    unavailableProducts.push(product._id);
+                }
+            };
+
+            const purchasedProducts = cart.products.filter(cartProduct => !unavailableProducts.includes(cartProduct.products._id));
+
+            let ticket = null;
+            if(purchasedProducts.length > 0){
+                ticket = new ticketModel({
+                    amount: totalAmount,
+                    purchaser: userMail
+                });
+
+                await ticket.save();
+                console.log('Ticket creado: ', ticket);
+            };
+
+            cart.products = cart.products.filter(cartProduct => unavailableProducts.includes(cartProduct.product._id));
+            await cart.save();
+
+            console.log('Compra realizada exitosamente');
+            return {
+                status: 200,
+                payload: {
+                    message: 'Compra realizada exitosamente',
+                    ticket: ticket,
+                    unavailableProducts: unavailableProducts
+                }
+            };
+        } catch (error) {
+            console.error('Error al procesar la compra:', error);
+            return { status: 500, error: 'Error al procesar la compra' };
+        }
+    }
 }

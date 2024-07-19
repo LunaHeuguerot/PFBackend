@@ -1,6 +1,6 @@
 import passport from 'passport';
-import userModel from '../dao/models/user.model.js';
-import { createHash, isValidPassword } from '../services/utils.js';
+import userModel from '../../dao/models/user.model.js';
+import { createHash, isValidPassword } from '../../services/utils.js';
 
 async function register(req, res) {
     const { first_name, last_name, email, age, password } = req.body;

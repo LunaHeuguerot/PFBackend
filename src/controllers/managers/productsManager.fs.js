@@ -1,5 +1,5 @@
 import fs from 'fs';
-import config from '../services/config.js';
+import config from '../../services/config.js';
 
 export class ProductManagerFS {
     static #instance;

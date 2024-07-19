@@ -1,5 +1,13 @@
 import mongoose from 'mongoose';
 import config from '../services/config.js';
+import UserController from '../user.controller.js';
+
+class UsersDTO {
+    constructor(user) {
+        const { password, ...filteredFoundUser } = user;
+        return filteredFoundUser;
+    }
+}
 
 class UserManager {
     constructor(model) {
@@ -14,7 +22,8 @@ class UserManager {
             console.error("Error en la consulta:", error);
             return { status: 500, error: "Error al obtener usuarios" };
         }
-    }
+    };
+
     async getOne(filter) {
         try {
             return await this.model.findOne(filter).lean();
@@ -22,6 +31,7 @@ class UserManager {
             return err.message;
         };
     };
+    
     async getById(id) {
         try {
             if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -117,6 +127,11 @@ class UserManager {
             return err.message;
         };
     };
-}
+
+    async UsersDTO(user) {
+        const { password, ...filteredFoundUser } = user;
+        return filteredFoundUser;
+    };
+};
 
 export default UserManager;

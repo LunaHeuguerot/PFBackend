@@ -14,6 +14,7 @@ const clOptions = commandLine.opts();
 const __dirname = path.resolve(path.dirname(''));
 
 const config = {
+    PERSISTENCE: process.env.PERSISTENCE || 'FS',
     SERVER: 'local',
     PORT: process.env.PORT || clOptions.port || 8080,
     DIRNAME: path.join(__dirname, 'src'), // path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')), // Win
@@ -24,7 +25,12 @@ const config = {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
-    SECRET: process.env.SECRET
+    SECRET: process.env.SECRET,
+    TWILIO_SID: process.env.TWILIO_SID,
+    TWILIO_TOKEN: process.env.TWILIO_TOKEN,
+    TWILIO_NUMBER: process.env.TWILIO_NUMBER,
+    GMAIL_APP_PASS: process.env.GMAIL_APP_PASS,
+    GMAIL_APP_USER: process.env.GMAIL_APP_USER
 }
 
 export default config;

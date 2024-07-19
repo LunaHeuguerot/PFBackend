@@ -2,6 +2,7 @@ import { Router } from 'express';
 import mongoose from 'mongoose';
 import userModel from '../dao/models/user.model.js';
 import UserManager from '../controllers/user.manager.db.js';
+import UserDTO from '../dao/dto/user.dto.js';
 
 const userRouter = Router();
 
@@ -120,6 +121,19 @@ userRouter.get('/paginate/:page/:limit', async (req, res) => {
 
         res.status(200).send({ origin: config.SERVER, payload: process });
     } catch (err) {
+        res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+    }
+});
+
+userRouter.get('/current', async (req, res) => {
+    try {
+        if(req.session.user) {
+            const userFiltered = await userManager.UserDTO(req.session.user);
+            res.status(200).send({ status: 'OK', payload: userFiltered });
+        } else {
+            res.status(400).send({ status: 'ERR', payload: [] });
+        }
+    } catch (error) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
