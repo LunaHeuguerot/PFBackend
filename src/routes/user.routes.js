@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import userModel from '../dao/models/user.model.js';
-import UserManager from '../controllers/user.manager.db.js';
-import UserDTO from '../dao/dto/user.dto.js';
+import UserManager from '../controllers/managers/user.manager.db.js';
 
 const userRouter = Router();
 

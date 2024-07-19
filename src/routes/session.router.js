@@ -1,6 +1,6 @@
 import express from 'express';
 import passport from 'passport';
-import { logout } from '../controllers/session.manager.js';
+import { logout } from '../controllers/managers/session.manager.js';
 import { adminAuth } from '../middlewares/adminAuth.js';
 import { createHash, isValidPassword, verifyRequiredBody } from '../services/utils.js';
 
@@ -97,7 +97,7 @@ sessionRouter.get('/private', adminAuth, async (req, res) => {
     }
 });
 
-router.all('*', async (req, res) => {
+sessionRouter.all('*', async (req, res) => {
     res.status(404).send({ origin: config.SERVER, payload: null, error: 'No se encuentra la ruta solicitada' }); 
 });
 

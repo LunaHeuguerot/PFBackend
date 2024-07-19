@@ -23,6 +23,8 @@ import FileStore from 'session-file-store';
 import cors from 'cors';
 import messageManager from './controllers/managers/messageManager.db.js';
 import { ProductManagerDB } from './controllers/managers/productsManager.db.js';
+import { Server } from 'socket.io';
+import MongoSingleton from './services/mongo.singleton.js'
 
 const app = express();
 
@@ -33,10 +35,10 @@ app.use('/static', express.static(`${config.DIRNAME}/public`));
 
 dotenv.config();
 
-const expressInstance = app.listen(config.PORT, async () => {
-    await mongoose.connect(config.MONGODB_URI);
-    console.log(`App activa en puerto ${config.PORT} conectada a bbdd`);
-});
+// const expressInstance = app.listen(config.PORT, async () => {
+//     await mongoose.connect(config.MONGODB_URI);
+//     console.log(`App activa en puerto ${config.PORT} conectada a bbdd`);
+// });
 
 app.engine('handlebars', handlebars.engine());
 app.set('views', `${config.DIRNAME}/views`);
@@ -68,8 +70,8 @@ app.use('/profile', profileRouter);
 app.use('/api/cookie', cookieRouter);
 app.use('/api/user', userRouter);
 
-const io = initSocket(expressInstance);
-app.set('io', io);
+// const io = initSocket(expressInstance);
+// app.set('io', io);
 
 const httpServer = app.listen(config.PORT, async () => {
 

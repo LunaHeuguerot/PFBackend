@@ -4,7 +4,7 @@ import GitHubStrategy from 'passport-github2';
 import userModel from '../dao/models/user.model.js';
 import { isValidPassword, createHash } from '../services/utils.js';
 import config from '../services/config.js';
-import UsersManager from '../controllers/user.manager.db.js';
+import UsersManager from '../controllers/managers/user.manager.db.js';
 import cartModel from '../dao/models/cart.model.js';
 
 const localStrategy = local.Strategy;

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserManager } from '../controllers/user.controller.js';
+import UserManager from '../controllers/user.controller.js';
 import { handlePolicies, verifySession, verifyRequiredBody, createHash } from '../services/utils.js';
 import config from '../services/config.js';
 

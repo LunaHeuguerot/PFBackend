@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import config from '../services/config.js';
-import UserController from '../user.controller.js';
+import config from '../../services/config.js';
+// import UserController from '../user.controller.js';
 
 class UsersDTO {
     constructor(user) {

@@ -1,7 +1,7 @@
-import cartModel from '../dao/models/cart.model.js';
+import cartModel from '../../dao/models/cart.model.js';
 import { ProductManagerDB } from './productsManager.db.js';
 import productModel from '../../dao/models/products.model.js';
-import ticketModel from '../dao/models/ticket.model.js';
+import ticketModel from '../../dao/models/ticket.model.js';
 
 export class CartsManagerDB {
     static #instance;
