@@ -2,6 +2,7 @@ import { Router } from 'express';
 import mongoose from 'mongoose';
 import userModel from '../dao/models/user.model.js';
 import UserManager from '../controllers/managers/user.manager.db.js';
+import { createHash, verifyRequiredBody } from '../services/utils.js';
 
 const userRouter = Router();
 
@@ -55,6 +56,23 @@ userRouter.post('/create', async(req, res) => {
         res.status(201).send(addedUser);
     } catch (error) {
         res.status(500).send({ error: error.message });
+    }
+});
+
+userRouter.post('/', verifyRequiredBody(['firstName', 'lastName', 'email', 'age', 'password']), async (req, res) => {
+
+    try {
+        const { firstName, lastName, email, password, age } = req.body;
+        const foundUser = await UserManager.getOne(email);
+
+        if (!foundUser) {
+            const process = await UserManager.add({ firstName, lastName, email, age, password: createHash(password)});
+            res.status(200).send({ origin: config.SERVER, payload: process });
+        } else {
+            res.status(400).send({ origin: config.SERVER, payload: 'El email ya se encuentra registrado' });
+        }
+    } catch (err) {
+        res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
 
@@ -127,7 +145,7 @@ userRouter.get('/paginate/:page/:limit', async (req, res) => {
 userRouter.get('/current', async (req, res) => {
     try {
         if(req.session.user) {
-            const userFiltered = await userManager.UserDTO(req.session.user);
+            const userFiltered = await userManager.UsersDTO(req.session.user);
             res.status(200).send({ status: 'OK', payload: userFiltered });
         } else {
             res.status(400).send({ status: 'ERR', payload: [] });

@@ -18,7 +18,7 @@ import cookieRouter from './routes/cookie.routes.js';
 import dotenv from 'dotenv';
 import cartRouter from './routes/cartRouter.js';
 import productsRouter from './routes/productsRoutes.js';
-import userRouter from './routes/userRouter.js';
+import userRouter from './routes/user.routes.js';
 import FileStore from 'session-file-store';
 import cors from 'cors';
 import messageManager from './controllers/managers/messageManager.db.js';
