@@ -3,8 +3,11 @@ import { CartsManagerDB } from "../controllers/managers/cartsManager.db.js";
 import config from '../services/config.js';
 import nodemailer from 'nodemailer';
 import { handlePolicies } from '../services/utils.js';
+import twilio from 'twilio';
 
 const cartRouter = Router();
+
+const twilioClient = twilio(config.TWILIO_SID, config.TWILIO_TOKEN);
 
 
 const transport = nodemailer.createTransport({
@@ -39,6 +42,19 @@ cartRouter.get('/mail', async (req, res) => {
             to: 'dblunah@gmail.com',
             subject: 'Pruebas Nodemailer',
             html: '<h1>Prueba 01</h1>'
+        });
+        res.status(200).send({ status: 'OK', data: confirmation });
+    } catch (err) {
+        res.status(500).send({ status: 'ERR', data: err.message });
+    }
+});
+
+cartRouter.get('/sms', async (req, res) => {
+    try {
+        const confirmation = await twilioClient.messages.create({
+            body: 'Mensaje enviado con servicio Twilio',
+            from: config.TWILIO_PHONE,
+            to: 'telefono_destino'
         });
         res.status(200).send({ status: 'OK', data: confirmation });
     } catch (err) {
@@ -144,7 +160,7 @@ cartRouter.delete('/:cid', async (req, res) => {
 
 cartRouter.post('/:cid/purchase', handlePolicies('user'), async (req, res) => {
     const cid = req.params.cid;
-    const cart = await manager.getCartById(cid);
+    const cart = await CartsManagerDB.getInstance().getCartById(cid);
     if(cart) {
         const cartFiltered = await manager.punchaseCart(cart);
         res.status(200).send({ status: 'Ok', payload: cartFiltered, mensaje: `Se cerro correctamente el carrito con id ${cid} OK` });
