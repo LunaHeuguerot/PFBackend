@@ -45,4 +45,13 @@ export const verifySession = (req, res, next) => {
     }
 };
 
+export const errorHandler = (err, req, res, next) => {
+    if (err) {
+        const { message, statusCode } = err;
+        res.status(statusCode).json({ error: message });
+    } else {
+        next();
+    }
+};
+
 

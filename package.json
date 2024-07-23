@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "bootstrap-icons": "^1.11.3",
@@ -33,6 +34,7 @@
     "session-file-store": "^1.5.0",
     "socket.io": "^4.7.5",
     "sweetalert2": "^11.6.13",
-    "twilio": "^5.2.2"
+    "twilio": "^5.2.2",
+    "uuid": "^10.0.0"
   }
 }

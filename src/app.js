@@ -24,7 +24,8 @@ import cors from 'cors';
 import messageManager from './controllers/managers/messageManager.db.js';
 import { ProductManagerDB } from './controllers/managers/productsManager.db.js';
 import { Server } from 'socket.io';
-import MongoSingleton from './services/mongo.singleton.js'
+import MongoSingleton from './services/mongo.singleton.js';
+import { errorHandler } from './services/utils.js';
 
 const app = express();
 
@@ -69,6 +70,8 @@ app.use('/api/sessions', sessionRouter);
 app.use('/profile', profileRouter);
 app.use('/api/cookie', cookieRouter);
 app.use('/api/user', userRouter);
+
+app.use(errorHandler);
 
 // const io = initSocket(expressInstance);
 // app.set('io', io);

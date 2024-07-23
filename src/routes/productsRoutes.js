@@ -3,6 +3,7 @@ import { CartsManagerDB } from "../controllers/managers/cartsManager.db.js";
 import { uploader } from '../services/uploader.js';
 import { isValidPassword, handlePolicies, verifySession, verifyRequiredBody } from "../services/utils.js";
 import config from "../services/config.js";
+import { generateMockProds } from "../services/mocking.js";
 
 const productsRouter = Router();
 
@@ -12,7 +13,16 @@ productsRouter.param('id', async (req, res, next, id) => {
     }
 
     next();
-})
+});
+
+productsRouter.get('/mockingproducts/:qty', (req, res) => {
+    const qty = parseInt(req.params.qty, 10);
+    if (isNaN(qty) || qty <= 0) {
+        return res.status(400).send({ error: 'not valid quantity' });
+    }
+    const mockProducts = generateMockProds(qty);
+    res.json(mockProducts);
+});
 
 productsRouter.get('/', async (req, res) => {
     const limit = +req.query.limit || 10;

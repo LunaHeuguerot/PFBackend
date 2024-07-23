@@ -2,6 +2,7 @@ import cartModel from '../../dao/models/cart.model.js';
 import { ProductManagerDB } from './productsManager.db.js';
 import productModel from '../../dao/models/products.model.js';
 import ticketModel from '../../dao/models/ticket.model.js';
+import { sendPurchaseEmail } from '../../services/emails.js';
 
 export class CartsManagerDB {
     static #instance;
@@ -150,59 +151,71 @@ export class CartsManagerDB {
         }
     };
 
-    async purchaseCart(cartId, userMail, req){
+    async purchaseCart(cid, user){
         try {
-            const userId = req.session.user._id;
-            console.log('User ID:', userId);
-
-            const cart = await this.getCartById(cartId, userId);
-            if(!cart){
-                console.log('Carrito no encontrado');
-                return { status: 400, error: 'Carrito no encontrado' };
+            const cartResponse = await this.getById(cid); 
+        if (cartResponse.status !== 200) {
+            throw new Error('Carrito no encontrado');
+        }
+    
+        const cart = cartResponse.payload;
+        if (cart.products.length === 0) {
+            return { status: 400, error: 'cart empty' };
+        }
+    
+        const userData = user;
+        let ticketAmount = 0;
+    
+        for (let item of cart.products) {
+            const productId = item.product._id;
+            const product = await this.productModel.findById(productId);
+            
+            if (!product) {
+                throw new Error(`product not found: ${productId}`);
             }
-            console.log('Carrito encontrado', cart);
+    
+            const productStock = product.stock;
+            const requestedQuantity = item.qty;
+    
+            if (requestedQuantity <= productStock) {
+                const quantityUpdated = productStock - requestedQuantity;
+                await this.productModel.findByIdAndUpdate(productId, { stock: quantityUpdated }, { new: true });
+    
+                ticketAmount += requestedQuantity * product.price;
+    
+            } else {
+                await this.productModel.findByIdAndUpdate(productId, { stock: 0 }, { new: true });
 
-            let totalAmount = 0;
-            const unavailableProducts = [];
+                const quantityNotPurchased = requestedQuantity - productStock;
 
-            for(const cartProduct of cart.products) {
-                const product = cartProduct.product;
-                const availableStock = product.stock
-
-                if(availableStock >= cartProduct.quantity) {
-                    product.stock -= cartProduct.quantity;
-                    totalAmount += productPrice * cartProduct.quantity;
-                    await product.save();
-                } else {
-                    unavailableProducts.push(product._id);
+                const updateResponse = await this.updateProduct(cid, productId, quantityNotPurchased);
+                if (updateResponse.status !== 200) {
+                    return { status: 500, error: 'error updating product stock' };
                 }
+
+                ticketAmount += productStock * product.price;
+            }
+        }
+
+        if (ticketAmount > 0) {
+            const ticket = {
+                amount: ticketAmount,
+                purchaser: userData.email
             };
-
-            const purchasedProducts = cart.products.filter(cartProduct => !unavailableProducts.includes(cartProduct.products._id));
-
-            let ticket = null;
-            if(purchasedProducts.length > 0){
-                ticket = new ticketModel({
-                    amount: totalAmount,
-                    purchaser: userMail
-                });
-
-                await ticket.save();
-                console.log('Ticket creado: ', ticket);
-            };
-
-            cart.products = cart.products.filter(cartProduct => unavailableProducts.includes(cartProduct.product._id));
-            await cart.save();
-
-            console.log('Compra realizada exitosamente');
-            return {
-                status: 200,
-                payload: {
-                    message: 'Compra realizada exitosamente',
-                    ticket: ticket,
-                    unavailableProducts: unavailableProducts
-                }
-            };
+            const ticketFinished = await ticketModel.create(ticket);
+            console.log('ticket created:', ticketFinished);
+               const subject = 'Compra realizada con éxito';
+               const text = `Hola ${userData.firstName},\n\nTu compra con el carrito ${cid} ha sido realizada con éxito.\n\nGracias por tu compra.\n\nSaludos.`;
+               
+               await sendPurchaseEmail(userData.email, subject, text);
+            const clearCartResponse = await this.clearCartProducts(cid);
+            if (clearCartResponse.status !== 200) {
+                console.error("error emptying cart", clearCartResponse.error);
+                return { status: 500, error: 'error emptying cart' };
+            }
+    
+            return { status: 200, payload: ticketFinished };
+        }
         } catch (error) {
             console.error('Error al procesar la compra:', error);
             return { status: 500, error: 'Error al procesar la compra' };
