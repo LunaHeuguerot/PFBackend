@@ -35,6 +35,10 @@
     "socket.io": "^4.7.5",
     "sweetalert2": "^11.6.13",
     "twilio": "^5.2.2",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "winston": "^3.13.1"
+  },
+  "devDependencies": {
+    "artillery": "^2.0.18"
   }
 }

@@ -98,7 +98,8 @@ sessionRouter.get('/private', adminAuth, async (req, res) => {
 });
 
 sessionRouter.all('*', async (req, res) => {
-    res.status(404).send({ origin: config.SERVER, payload: null, error: 'No se encuentra la ruta solicitada' }); 
+    res.status(404).send({ origin: config.SERVER, payload: null, error: 'No se encuentra la ruta solicitada' });
+    req.logger.error(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${routeUrl}${req.url}`);
 });
 
 sessionRouter.post('/logout', logout);

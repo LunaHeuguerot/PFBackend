@@ -10,5 +10,5 @@ export const errors = {
     CART_ERROR: {
         message: 'Error adding product to cart',
         statusCode: 500
-    }
+    },    
 };

@@ -6,6 +6,7 @@ import isAuthenticated from '../middlewares/authMiddleware.js';
 import { adminAuth } from '../middlewares/adminAuth.js';  
 const viewsRouter = Router();
 
+
 viewsRouter.get('/products', isAuthenticated, async (req, res) => {
     try {
         const products = await ProductManagerDB.getInstance().getProducts(req);
@@ -104,6 +105,19 @@ viewsRouter.get('/profile', isAuthenticated, (req, res) => {
         user: req.session.user,
         login_type: req.session.user.login_type 
     });
+});
+
+viewsRouter.get('/loggerTest', async (req, res) => {
+    console.log(req.logger);
+    // req.logger.fatal(`date: ${new Date().toDateString()} | method: ${req.method} | ip: ${req.ip} | url: ${routeUrl}${req.url} | user: ${req.user.email}`);
+    req.logger.fatal(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${req.url} | user: ${req.user}`);
+    req.logger.error(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${req.url} | user: ${req.user}`);
+    req.logger.warning(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${req.url} | user: ${req.user}`);
+    req.logger.info(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${req.url} | user: ${req.user}`);
+    req.logger.http(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${req.url} | user: ${req.user}`);
+    req.logger.debug(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${req.url} | user: ${req.user}`);
+
+    res.status(200).send({ status: 'OK', payload: '' });
 });
 
 export default viewsRouter;

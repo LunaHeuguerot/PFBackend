@@ -26,6 +26,7 @@ import { ProductManagerDB } from './controllers/managers/productsManager.db.js';
 import { Server } from 'socket.io';
 import MongoSingleton from './services/mongo.singleton.js';
 import { errorHandler } from './services/utils.js';
+import addLogger from './services/logger.js';
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/api/cookie', cookieRouter);
 app.use('/api/user', userRouter);
 
 app.use(errorHandler);
+app.use(addLogger);
 
 // const io = initSocket(expressInstance);
 // app.set('io', io);
