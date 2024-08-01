@@ -4,7 +4,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "node ./src/app.js"
+    "dev": "node --watch --env-file .env src/app --mode=devel",
+    "prod": "node --watch --env-file .env.prod  src/app --mode=prod"
   },
   "keywords": [],
   "author": "",

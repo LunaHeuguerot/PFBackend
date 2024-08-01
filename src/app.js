@@ -25,8 +25,8 @@ import messageManager from './controllers/managers/messageManager.db.js';
 import { ProductManagerDB } from './controllers/managers/productsManager.db.js';
 import { Server } from 'socket.io';
 import MongoSingleton from './services/mongo.singleton.js';
-import { errorHandler } from './services/utils.js';
-import addLogger from './services/logger.js';
+import errorsHandler from './services/errors.handler.js';
+import { addLogger, logHttpRequests } from './services/logger.js';
 
 const app = express();
 
@@ -72,8 +72,29 @@ app.use('/profile', profileRouter);
 app.use('/api/cookie', cookieRouter);
 app.use('/api/user', userRouter);
 
-app.use(errorHandler);
+app.use(errorsHandler);
 app.use(addLogger);
+app.use(logHttpRequests);
+app.get('/loggerTest', (req, res) => {
+    try {
+        req.logger.debug('Este es un mensaje de debug');
+        req.logger.http('Este es un mensaje http');
+        req.logger.info('Este es un mensaje info');
+        req.logger.warn('Este es un mensaje warning');
+        req.logger.error('Este es un mensaje error');
+        req.logger.fatal('Este es un mensaje fatal');
+    
+        res.send('Prueba de logger realizada');
+    } catch (error) {
+        req.logger.error('Error en /loggerTest: ', error);
+        res.status(500).send('Error en /loggerTest');
+    }
+});
+app.get('/test-error', (req, res, next) => {
+    const error = new CustomError({ code: 8, status: 404, message: 'error creado por mi' });
+    next(error);
+});
+console.log(`Logger en modo: ${config.MODE}`);
 
 // const io = initSocket(expressInstance);
 // app.set('io', io);

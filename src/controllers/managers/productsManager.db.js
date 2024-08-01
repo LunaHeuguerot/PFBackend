@@ -1,4 +1,5 @@
 import productModel from '../../dao/models/products.model.js';
+import { errorsDictionary } from '../../services/config.js';
 
 export class ProductManagerDB {
     static #instance;
@@ -46,23 +47,23 @@ export class ProductManagerDB {
 
             return products;
         } catch (error) {
-            throw error;
+            return { status: 500, origin: 'DAO', payload: { error: errorsDictionary.UNHANDLED_ERROR } };
         };
     }
 
     async getProductById(id){
         try {
             if(id.length !== 24){
-                throw new Error ('El id debe tener 24 caracteres');
+                return { status: 400, origin: 'DAO', payload: { error: errorsDictionary.INVALID_MONGOID_FORMAT } };
             }
 
             const product = await productModel.findById({ _id: id });
             if(!product){
-                throw new Error(`No se encontró el producto con id ${id}`)
+                return { status: 404, origin: 'DAO', payload: { error: errorsDictionary.ID_NOT_FOUND } };
             }
             return product;
         } catch (error) {
-            throw error;
+            return { status: 500, origin: 'DAO', payload: { error: errorsDictionary.UNHANDLED_ERROR } };
         }
     }
 
@@ -77,25 +78,25 @@ export class ProductManagerDB {
             if(error.code === 11000){
                 throw new Error(`Ya existe un producto con código ${product.code}`);
             }
-            throw error;
+            return { status: 500, origin: 'DAO', payload: { error: errorsDictionary.RECORD_CREATION_ERROR } };
         }
     }
 
     async updateProduct(id, product){
         try {
             if(id.length !== 24){
-                throw new Error('El id debe tener 24 caracteres');
+                return { status: 400, origin: 'DAO', payload: { error: errorsDictionary.INVALID_MONGOID_FORMAT } };
             }
             product = await productModel.findByIdAndUpdate({ _id: id }, product, { new: true });
             if(!product){
-                throw new Error(`No se encontró el producto con id ${id}`);
+                return { status: 404, origin: 'DAO', payload: { error: errorsDictionary.ID_NOT_FOUND } };
             }
             return product;
         } catch (error) {
             if(error.code === 11000){
                 throw new Error(`Ya existe un producto con el código ${product.code}`);
             }
-            throw error;
+            return { status: 500, origin: 'DAO', payload: { error: errorsDictionary.UNHANDLED_ERROR } };
         }
     }
 
@@ -103,11 +104,11 @@ export class ProductManagerDB {
         try {
             const product = await productModel.findByIdAndDelete({ _id: id });
             if(!product){
-                throw new Error(`No se encontró el producto con id ${id}`);
+                return { status: 400, origin: 'DAO', payload: { error: errorsDictionary.INVALID_MONGOID_FORMAT } };
             }
             return product;
         } catch (error) {
-            throw error;
+            return { status: 500, origin: 'DAO', payload: { error: errorsDictionary.UNHANDLED_ERROR } };
         }
     }
 
@@ -122,7 +123,7 @@ export class ProductManagerDB {
             
             return { status: 200, origin: 'DAO', payload: result };
         } catch (error) {
-            return { status: 500, origin: 'DAO', payload: { error: error.message } };
+            return { status: 500, origin: 'DAO', payload: { error: errorsDictionary.UNHANDLED_ERROR } };
         }
     }
 }

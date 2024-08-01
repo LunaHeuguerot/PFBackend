@@ -1,74 +1,76 @@
 import winston from 'winston';
 import config from './config.js';
 
-const customLevelsOptions = {
-  levels: {
-    fatal: 0,
-    error: 1,
-    warning: 2,
-    info: 3,
-    http: 4,
-    debug: 5,
-  },
-  colors: {
-    fatal: 'red bold',
-    error: 'red',
-    warning: 'yellow',
-    info: 'blue',
-    http: 'white',
-    debug: 'green',
-  }
+const customLevels = {
+    levels: {
+        fatal: 0,
+        error: 1,
+        warn: 2,
+        info: 3,
+        http: 4,
+        debug: 5
+    },
+    colors: {
+        fatal: 'red',
+        error: 'red',
+        warn: 'yellow',
+        info: 'green',
+        http: 'magenta',
+        debug: 'blue'
+    }
 };
 
-winston.addColors(customLevelsOptions.colors);
+const fileFormat = winston.format.printf(({ level, message, timestamp }) => {
+    return `
+    ${timestamp} [${level}]
+    ${message}
+      `;
+});
+
+const consoleFormat = winston.format.combine(
+    winston.format.colorize(), 
+    winston.format.simple() 
+);
 
 const devLogger = winston.createLogger({
-  levels: customLevelsOptions.levels,
-  transports: [
-    new winston.transports.Console({
-      level: 'debug',
-      format: winston.format.combine(
-        winston.format.colorize({ colors: customLevelsOptions.colors }),
-        winston.format.simple()
-      )
-    }),
-    new winston.transports.File({ level: 'error', filename: `${config.DIRNAME}/logs/errors.log`, format: winston.format.simple() }),
-  ]
+    levels: customLevels.levels,
+    format: consoleFormat, 
+    transports: [
+        new winston.transports.Console({ level: 'debug' })
+    ]
 });
 
 const prodLogger = winston.createLogger({
-  levels: customLevelsOptions.levels,
-  transports: [
-    new winston.transports.Console({
-      level: 'info',
-      format: winston.format.combine(
-        winston.format.colorize({ colors: customLevelsOptions.colors }),
-        winston.format.simple()
-      )
-    }),
-    new winston.transports.File({ level: 'error', filename: `${config.DIRNAME}/logs/errors.log`, format: winston.format.simple() }),
-  ]
+    levels: customLevels.levels,
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        fileFormat 
+    ),
+    transports: [
+        new winston.transports.File({ level: 'error', filename: `${config.DIRNAME}/logs/errors.log` }), 
+        new winston.transports.Console({ level: 'error', format: consoleFormat }) 
+    ]
 });
 
+winston.addColors(customLevels.colors);
+
 const addLogger = (req, res, next) => {
-  console.log("Middleware addLogger ejecutado");
+    req.logger = config.MODE === 'dev' ? devLogger : prodLogger;
+    next();
+}
 
-  if (process.env.MODE === 'dev') {
-    console.log("Asignando devLogger");
-    req.logger = devLogger;
-  } else {
-    console.log("Asignando prodLogger");
-    req.logger = prodLogger;
-  }
+const logHttpRequests = (req, res, next) => {
+    const start = process.hrtime();
 
-  if (!req.logger) {
-    console.error("Error: Logger no definido en el middleware.");
-  } else {
-    req.logger.info(`${new Date().toDateString()} ${req.method} ${req.url}`);
-  }
+    res.on('finish', () => {
+        const diff = process.hrtime(start);
+        const responseTime = (diff[0] * 1e3 + diff[1] * 1e-6).toFixed(2); 
 
-  next();
-};
+        const logMessage = `${req.method} ${req.originalUrl} ${res.statusCode} ${responseTime} ms - ${res.get('Content-Length') || 0}`;
+        req.logger.http(logMessage);
+    });
+    
+    next();
+}
 
-
-export default addLogger;
+export { addLogger, logHttpRequests };
