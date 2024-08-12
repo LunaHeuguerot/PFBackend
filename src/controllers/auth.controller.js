@@ -34,15 +34,13 @@ class AuthService {
             if (!user) {
                 throw new Error('Usuario no encontrado');
             }
-    
-            // Comparar la nueva contraseña con la contraseña actual
+
             const isSamePassword = await bcrypt.compare(newPassword, user.password);
     
             if (isSamePassword) {
                 throw new Error('La nueva contraseña no puede ser igual a la anterior');
             }
-    
-            // Si la contraseña es diferente, crear un hash y actualizar la contraseña
+
             user.password = createHash(newPassword);
     
             await user.save();
