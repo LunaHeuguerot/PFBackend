@@ -27,6 +27,8 @@ import { Server } from 'socket.io';
 import MongoSingleton from './services/mongo.singleton.js';
 import errorsHandler from './services/errors.handler.js';
 import { addLogger, logHttpRequests } from './services/logger.js';
+import authRouter from './routes/authRouter.js';
+import morgan from 'morgan';
 
 const app = express();
 
@@ -34,6 +36,7 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/static', express.static(`${config.DIRNAME}/public`));
+app.use(morgan('dev'));
 
 dotenv.config();
 
@@ -67,6 +70,7 @@ app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);
 app.use('/chat', chatRouter);
 app.use('/carts', cartRouter);
+app.use('/api/sessions/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/profile', profileRouter);
 app.use('/api/cookie', cookieRouter);

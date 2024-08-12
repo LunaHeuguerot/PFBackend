@@ -52,23 +52,30 @@ export class CartsManagerDB {
         }
     };
 
-    async addProductToCart(cartId, productId){
+    async addProductToCart(cartId, productId, userId) {
         try {
-            await ProductManagerDB.getInstance().getProductById(productId);
+            const product = await ProductManagerDB.getInstance().getProductById(productId);
+
+            if (userId === product.owner.toString()) {
+                throw new Error('Los usuarios premium no pueden agregar sus propios productos al carrito.');
+            }
+    
             let cart = await this.getCartById(cartId);
             const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
-
-            if(productIndex !== -1){
+    
+            if (productIndex !== -1) {
                 cart.products[productIndex].quantity++;
             } else {
-                cart.products.push({ productId: productId, quantity: 1});
+                cart.products.push({ productId: productId, quantity: 1 });
             }
+            
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true });
             return cart;
         } catch (error) {
             throw error;
         }
     }
+    
 
 
     async updateCart(id, products) {

@@ -107,4 +107,5 @@ viewsRouter.get('/profile', isAuthenticated, (req, res) => {
     });
 });
 
+
 export default viewsRouter;

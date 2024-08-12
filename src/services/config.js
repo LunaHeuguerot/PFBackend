@@ -31,7 +31,8 @@ const config = {
     TWILIO_NUMBER: process.env.TWILIO_NUMBER,
     GMAIL_APP_PASS: process.env.GMAIL_APP_PASS,
     GMAIL_APP_USER: process.env.GMAIL_APP_USER,
-    MODE: 'dev'
+    MODE: 'dev',
+    JWT_SECRET: process.env.JWT_SECRET
 }
 
 export const errorsDictionary = {

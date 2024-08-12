@@ -19,6 +19,14 @@ class UserController {
             return err.message;
         };
     };
+
+    updateRole = async (id, newRole) => {
+        try {
+            return await usersModel.findByIdAndUpdate(id, { role: newRole }, { new: true }).lean();
+        } catch (err) {
+            return err.message;
+        }
+    };
 }
 
 export default UserController;

@@ -3,8 +3,21 @@ import passport from 'passport';
 import { logout } from '../controllers/managers/session.manager.js';
 import { adminAuth } from '../middlewares/adminAuth.js';
 import { createHash, isValidPassword, verifyRequiredBody } from '../services/utils.js';
+import config from '../services/config.js';
 
 const sessionRouter = express.Router();
+
+sessionRouter.use((req, res, next) => {
+    req.logger = {
+        error: (message) => {
+            console.error(message);
+        },
+        info: (message) => {
+            console.log(message);
+        }
+    };
+    next();
+});
 
 sessionRouter.get('/hash/:password', async (req, res) => {
     res.status(200).send({ origin: config.SERVER, payload: createHash(req.params.password) });
@@ -99,7 +112,7 @@ sessionRouter.get('/private', adminAuth, async (req, res) => {
 
 sessionRouter.all('*', async (req, res) => {
     res.status(404).send({ origin: config.SERVER, payload: null, error: 'No se encuentra la ruta solicitada' });
-    req.logger.error(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${routeUrl}${req.url}`);
+    req.logger.error(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${req.originalUrl}`);
 });
 
 sessionRouter.post('/logout', logout);

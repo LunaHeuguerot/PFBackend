@@ -122,11 +122,30 @@ class UserManager {
 
     async getPaginated(filter, options) {
         try {
-            return await usersModel.paginate(filter, options);
+            return await this.model.paginate(filter, options);
         } catch (err) {
             return err.message;
         };
     };
+
+    async updateRole(id, newRole) {
+        try {
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return { status: 400, error: 'Invalid ID format' };
+            }
+            const updatedUser = await this.model.findByIdAndUpdate(id, { role: newRole }, { new: true }).lean();
+            if (updatedUser) {
+                console.log(`Rol del usuario actualizado: ${updatedUser}`);
+                return { origin: config.SERVER, status: 200, payload: updatedUser };
+            } else {
+                return { status: 404, error: 'User not found' };
+            }
+        } catch (error) {
+            console.error("Error al actualizar el rol del usuario:", error.message);
+            return { status: 500, error: error.message };
+        }
+    }
+    
 
     async UsersDTO(user) {
         const { password, ...filteredFoundUser } = user;

@@ -36,4 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
     githubLoginButton.addEventListener('click', function() {
         window.location.href = '/api/sessions/ghlogincallback';
     });
+
+    document.getElementById('forgotPasswordBtn').addEventListener('click', function() {
+        window.location.href = '/api/sessions/auth/forgot-password';
+    }); 
 });

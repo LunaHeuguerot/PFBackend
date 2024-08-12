@@ -13,7 +13,8 @@ const productSchema = new mongoose.Schema({
     status: { type: String, default: "true", required: true },
     stock: { type: Number, required: true },
     thumbnails: { type: [String], default: [] },
-    category: { type: String, default: 'general', required: true }
+    category: { type: String, default: 'general', required: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true }
 }, { timestamps: true });
 
 productSchema.plugin(mongoosePaginate);
