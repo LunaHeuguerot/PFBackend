@@ -155,27 +155,30 @@ userRouter.get('/current', async (req, res) => {
     }
 });
 
-userRouter.get('/premium', (req, res) => {
-    res.render('premium', {
-        title: 'Update User Role'
-    })
-})
+// userRouter.get('/premium', (req, res) => {
+//     res.render('premium', {
+//         title: 'Update User Role'
+//     })
+// })
 
 userRouter.put('/premium/:id', async (req, res) => {
     try {
         const { id } = req.params;
         console.log(`Request to update role for user ID: ${id}`); 
-        const user = await userManager.getById(id);
 
-        if (user.status === 404) {
-            return res.status(404).send({ error: 'User not found' });
+        const user = await userManager.getById(id);
+        
+        console.log('User from getById:', user); 
+
+        if (!user.payload || !user.payload.role) {
+            return res.status(500).send({ error: 'User role not found in response' });
         }
 
         const newRole = user.payload.role === 'user' ? 'premium' : 'user';
-        const result = await userManager.updateRole(id, newRole);
 
+        const result = await userManager.updateRole(id, newRole);
         if (result.status === 200) {
-            res.status(200).send(result.payload);
+            res.status(200).send({ message: `User role updated to: ${newRole}` });
         } else {
             res.status(result.status).send({ error: result.error });
         }
@@ -184,6 +187,9 @@ userRouter.put('/premium/:id', async (req, res) => {
         res.status(500).send({ error: error.message });
     }
 });
+
+
+
 
 
 

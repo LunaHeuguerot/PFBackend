@@ -48,6 +48,8 @@ class UserManager {
             return { status: 500, error: error.message };
         }
     }
+    
+    
 
     async add(userData) {
         try {
@@ -145,6 +147,8 @@ class UserManager {
             return { status: 500, error: error.message };
         }
     }
+    
+    
     
 
     async UsersDTO(user) {
