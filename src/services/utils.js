@@ -45,6 +45,17 @@ export const verifySession = (req, res, next) => {
     }
 };
 
+export const isAdmin = (req, res, next) => {
+    const role = req.session.user ? req.session.user.role : req.user._doc?.role;
+    console.log('User role:', role);
+    if (role === 'admin') {
+        next();
+    } else {
+        res.status(403).send({ error: 'Access denied. Admin role required.' });
+    }
+};
+
+
 
 
 
