@@ -24,11 +24,15 @@ const errorsHandler = (error, req, res, next) => {
         console.log(`Error: ${customErr.message}`);
     }
 
-    res.status(customErr.status).send({
-        origin: config.SERVER,
-        payload: '',
-        error: customErr.message
-    });
+    if (!res.headersSent) {
+        res.status(customErr.status).send({
+            origin: config.SERVER,
+            payload: '',
+            error: customErr.message
+        });
+    } else {
+        next(error);
+    }
 };
 
 export default errorsHandler;

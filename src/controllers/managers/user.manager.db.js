@@ -130,12 +130,12 @@ class UserManager {
         };
     };
 
-    async updateRole(id, newRole) {
+    async updateRole(id, role) {
         try {
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return { status: 400, error: 'Invalid ID format' };
             }
-            const updatedUser = await this.model.findByIdAndUpdate(id, { role: newRole }, { new: true }).lean();
+            const updatedUser = await this.model.findByIdAndUpdate(id, { role: role }, { new: true }).lean();
             if (updatedUser) {
                 console.log(`Rol del usuario actualizado: ${updatedUser}`);
                 return { origin: config.SERVER, status: 200, payload: updatedUser };

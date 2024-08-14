@@ -59,7 +59,7 @@ viewsRouter.get('/carts/:cid', isAuthenticated, async(req, res) => {
 viewsRouter.get('/', (req, res) => {
     try {
         res.render('login', {
-            title: 'User logged'
+            title: 'Home'
         })
     } catch (error) {
         res.status(400).send('Internal server error', error);

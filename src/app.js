@@ -29,6 +29,7 @@ import errorsHandler from './services/errors.handler.js';
 import { addLogger, logHttpRequests } from './services/logger.js';
 import authRouter from './routes/authRouter.js';
 import morgan from 'morgan';
+import premiumRouter from './routes/premium.routes.js';
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use('/api/sessions/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/profile', profileRouter);
 app.use('/api/cookie', cookieRouter);
+app.use('/api/user/premium', premiumRouter);
 app.use('/api/user', userRouter);
 
 app.use(errorsHandler);
@@ -129,3 +131,5 @@ socketServer.on('connection', async (client) => {
 });
 
 mongoose.set('strictPopulate', false);
+mongoose.set('strictQuery', false);
+
