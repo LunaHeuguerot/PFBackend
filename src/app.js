@@ -67,7 +67,7 @@ initAuthStrategies();
 app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);
 app.use('/chat', chatRouter);
-app.use('/carts', cartRouter);
+app.use('carts', cartRouter);
 app.use('/api/sessions/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/profile', profileRouter);
