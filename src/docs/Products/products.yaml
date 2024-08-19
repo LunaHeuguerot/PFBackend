@@ -1,0 +1,140 @@
+openapi: 3.0.1
+info:
+  title: Products API
+  description: API endpoints for managing products
+  version: 1.0.0
+
+paths:
+  /api/products:
+    get:
+      summary: Get all products
+      description: Retrieve a list of all products.
+      responses:
+        200:
+          description: A list of products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        500:
+          description: Internal server error.
+
+    post:
+      summary: Create a new product
+      description: Add a new product to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        201:
+          description: Product created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        400:
+          description: Invalid input.
+        500:
+          description: Internal server error.
+
+  /api/products/{id}:
+    get:
+      summary: Get a product by ID
+      description: Retrieve a single product by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the product to retrieve.
+          schema:
+            type: string
+      responses:
+        200:
+          description: A product object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: Product not found.
+        500:
+          description: Internal server error.
+
+    put:
+      summary: Update a product
+      description: Modify the details of an existing product.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the product to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        200:
+          description: Product updated successfully.
+        404:
+          description: Product not found.
+        500:
+          description: Internal server error.
+
+    delete:
+      summary: Delete a product
+      description: Remove a product from the database.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the product to delete.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Product deleted successfully.
+        404:
+          description: Product not found.
+        500:
+          description: Internal server error.
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        description:
+          type: string
+        owner:
+          type: string
+
+    NewProduct:
+      type: object
+      required:
+        - name
+        - price
+        - description
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+        description:
+          type: string
+        owner:
+          type: string

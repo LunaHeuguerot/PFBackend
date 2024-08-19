@@ -1,6 +1,6 @@
 import messageController from "../message.controller.js";
 
-class messageManager {
+class MessageManager {
     constructor(){
 
     };
@@ -26,4 +26,4 @@ class messageManager {
     };
 };
 
-export default messageManager;
+export default MessageManager;

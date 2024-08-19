@@ -1,0 +1,143 @@
+openapi: 3.0.1
+info:
+  title: Users API
+  description: API endpoints for managing users
+  version: 1.0.0
+
+paths:
+  /api/user:
+    get:
+      summary: Get all users
+      description: Retrieve a list of all users.
+      responses:
+        200:
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        500:
+          description: Internal server error.
+
+    post:
+      summary: Create a new user
+      description: Add a new user to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        201:
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Invalid input.
+        500:
+          description: Internal server error.
+
+  /api/user/{id}:
+    get:
+      summary: Get a user by ID
+      description: Retrieve a single user by their ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve.
+          schema:
+            type: string
+      responses:
+        200:
+          description: A user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: User not found.
+        500:
+          description: Internal server error.
+
+    put:
+      summary: Update a user's role
+      description: Change the role of a user.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleUpdate'
+      responses:
+        200:
+          description: User role updated successfully.
+        404:
+          description: User not found.
+        500:
+          description: Internal server error.
+
+    delete:
+      summary: Delete a user
+      description: Remove a user from the database.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to delete.
+          schema:
+            type: string
+      responses:
+        200:
+          description: User deleted successfully.
+        404:
+          description: User not found.
+        500:
+          description: Internal server error.
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+
+    NewUser:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    UserRoleUpdate:
+      type: object
+      properties:
+        role:
+          type: string
+

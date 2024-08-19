@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { CartsManagerDB } from "../controllers/managers/cartsManager.db.js";
 import { uploader } from '../services/uploader.js';
 import { isValidPassword, handlePolicies, verifySession, verifyRequiredBody } from "../services/utils.js";
 import config from "../services/config.js";
 import { generateMockProds } from "../services/mocking.js";
+import { ProductManagerDB } from "../controllers/managers/productsManager.db.js";
 
 const productsRouter = Router();
 
@@ -29,7 +29,7 @@ productsRouter.get('/', async (req, res) => {
     const page = +req.query.page || 1;
     const sort = req.query.sort;
     const query = req.query.query;
-    const products = await CartsManagerDB.getInstance().getProducts(limit, page, sort, query);
+    const products = await ProductManagerDB.getInstance().getProducts(limit, page, sort, query);
     if(products) {
         res.status(200).send({ status: 'Ok', payload: products });
     } else {
@@ -40,7 +40,7 @@ productsRouter.get('/', async (req, res) => {
 
 productsRouter.get('/:pid', async (req, res) => {
     const pid = req.params.pid;
-    const product = await CartsManagerDB.getInstance().getProductById( { _id: pid } );
+    const product = await ProductManagerDB.getInstance().getProductById( { _id: pid } );
     if(product !== undefined) {
         res.status(200).send({ status: 'Ok', payload: product });
     } else {
@@ -51,7 +51,7 @@ productsRouter.get('/:pid', async (req, res) => {
 productsRouter.post('/', handlePolicies(['admin']), async (req, res) => {
     const socketServer = req.app.get('socketServer');
     const prodAdd = req.body;
-    const rta = await CartsManagerDB.getInstance().addProduct(prodAdd);
+    const rta = await ProductManagerDB.getInstance().addProduct(prodAdd);
     res.status(200).send({ status: 'Ok', payload: rta, mensaje: `Producto con código ${rta.code}, agregado OK` });
     socketServer.emit('newProduct', rta);
 });
@@ -59,7 +59,7 @@ productsRouter.post('/', handlePolicies(['admin']), async (req, res) => {
 productsRouter.put('/:pid', handlePolicies('admin'), async (req, res) => {
     const pid = req.params.pid;
     const prodUp = req.body;
-    const rta = await CartsManagerDB.getInstance().updateProduct(pid, prodUp);
+    const rta = await ProductManagerDB.getInstance().updateProduct(pid, prodUp);
     if (rta === 0) {
         res.status(200).send({ status: 'Ok', payload: prodUp, mensaje: `Producto con id ${pid}, fue modificado.` });
     } else {
@@ -70,9 +70,9 @@ productsRouter.put('/:pid', handlePolicies('admin'), async (req, res) => {
 productsRouter.delete('/:pid', handlePolicies('admin'), async (req, res) => {
     const socketServer = req.app.get('socketServer');
     const pid = req.params.pid;
-    const rta = await CartsManagerDB.getInstance().deleteProduct(pid);
+    const rta = await ProductManagerDB.getInstance().deleteProduct(pid);
     res.status(200).send({ status: 'Ok', payload: [], mensaje: `Producto con id ${pid}, fue borrado.` });
-    const prodRender = await CartsManagerDB.getInstance().getProducts(0);
+    const prodRender = await ProductManagerDB.getInstance().getProducts(0);
     socketServer.emit('deleteProduct', prodRender);
 });
 

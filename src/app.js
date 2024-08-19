@@ -6,8 +6,8 @@ import chatRouter from './routes/chat.routes.js';
 import viewsRouter from './routes/views.routes.js';
 import handlebars from 'express-handlebars';
 import mongoose from 'mongoose';
-import initSocket from './services/sockets.js';
-import MongoStore from 'connect-mongo';
+// import initSocket from './services/sockets.js';
+// import MongoStore from 'connect-mongo';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import sessionRouter from './routes/session.router.js';
@@ -21,7 +21,7 @@ import productsRouter from './routes/productsRoutes.js';
 import userRouter from './routes/user.routes.js';
 import FileStore from 'session-file-store';
 import cors from 'cors';
-import messageManager from './controllers/managers/messageManager.db.js';
+import MessageManager from './controllers/managers/messageManager.db.js';
 import { ProductManagerDB } from './controllers/managers/productsManager.db.js';
 import { Server } from 'socket.io';
 import MongoSingleton from './services/mongo.singleton.js';
@@ -30,6 +30,8 @@ import { addLogger, logHttpRequests } from './services/logger.js';
 import authRouter from './routes/authRouter.js';
 import morgan from 'morgan';
 import premiumRouter from './routes/premium.routes.js';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express';
 
 const app = express();
 
@@ -40,11 +42,6 @@ app.use('/static', express.static(`${config.DIRNAME}/public`));
 app.use(morgan('dev'));
 
 dotenv.config();
-
-// const expressInstance = app.listen(config.PORT, async () => {
-//     await mongoose.connect(config.MONGODB_URI);
-//     console.log(`App activa en puerto ${config.PORT} conectada a bbdd`);
-// });
 
 app.engine('handlebars', handlebars.engine());
 app.set('views', `${config.DIRNAME}/views`);
@@ -78,6 +75,20 @@ app.use('/api/cookie', cookieRouter);
 app.use('/api/user/premium', premiumRouter);
 app.use('/api/user', userRouter);
 
+//Swagger
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.1',
+        info: {
+            title: 'Documentación E-Commerce Proyecto Final',
+            description: 'Esta documentación cubre toda la API habilitada para Proyecto Final',
+        },
+    },
+    apis: ['./src/docs/**/*.yaml'], 
+};
+const specs = swaggerJSDoc(swaggerOptions);
+app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
+
 app.use(errorsHandler);
 app.use(addLogger);
 app.use(logHttpRequests);
@@ -102,8 +113,6 @@ app.get('/test-error', (req, res, next) => {
 });
 console.log(`Logger en modo: ${config.MODE}`);
 
-// const io = initSocket(expressInstance);
-// app.set('io', io);
 
 const httpServer = app.listen(config.PORT, async () => {
 
@@ -114,6 +123,7 @@ const socketServer = new Server(httpServer);
 app.set('socketServer', socketServer);
 
 socketServer.on('connection', async (client) => {
+    const messageManager = new MessageManager();
     const savedMessages = await messageManager.getMessages();
     const messageRender = { messageRender: savedMessages };
     client.emit('cargaMessages', messageRender);
