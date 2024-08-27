@@ -9,7 +9,8 @@ let idCart = '';
 describe('Test Integración Carts con Sesiones', function () {
     
     before(async function () {
-        const loginResult  = await requester.post('/api/sessions/login').send( { "email": "jperez@gmail.com", "password": "abc445" } );
+        this.timeout(5000);
+        const loginResult  = await requester.post('/').send( { "email": "dblunah@gmail.com", "password": "Test1234" } );
         cookieData = loginResult.headers['set-cookie'][0];
     });
 
@@ -53,15 +54,15 @@ describe('Test Integración Carts con Sesiones', function () {
     });
 
 
-    // it('POST /api/carts/:cid/product/:pid should NOT add the product because the user logged is the owner', async function () {
-    //     const id = '664ffecc837b4cb4d336ef52'; //Id de un cart de ese usuario.
-    //     const pid = '664762de1edc16c5a026b221'; //Id de un producto valido que es de este usuario.
-    //     const { _body, statusCode } = await requester.post(`/api/carts/${id}/product/${pid}`)
-    //         .set('Cookie', cookieData)
-    //     expect(statusCode).to.be.equals(400);
-    //     expect(_body.payload).eql([]);
-    //     expect(_body.error).to.include('El user es owner del producto');
-    // });
+    it('POST /api/carts/:cid/product/:pid should NOT add the product because the user logged is the owner', async function () {
+        const id = '664ffecc837b4cb4d336ef52'; //Id de un cart de ese usuario.
+        const pid = '66ce3b6d435788ac5f0df358'; //Id de un producto valido que es de este usuario.
+        const { _body, statusCode } = await requester.post(`/api/carts/${id}/product/${pid}`)
+            .set('Cookie', cookieData)
+        expect(statusCode).to.be.equals(400);
+        expect(_body.payload).eql([]);
+        expect(_body.error).to.include('El user es owner del producto');
+    });
 
     it('PUT /api/carts/:cid should update the cart with the body´s products', async function () {
         const id = '664ffecc837b4cb4d336ef52'; //Id de un cart de ese usuario.

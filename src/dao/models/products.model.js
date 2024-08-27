@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
     stock: { type: Number, required: true },
     thumbnails: { type: [String], default: [] },
     category: { type: String, default: 'general', required: true },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'users', default: '665f860db1545bd165c391cd', required: true }
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'users', default: '66ba7073882f29cb58f741b8', required: true }
 }, { timestamps: true });
 
 productSchema.plugin(mongoosePaginate);

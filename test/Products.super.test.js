@@ -10,7 +10,7 @@ describe('Test Integración Products con Sesiones', function () {
     
     before(async function () {
 
-        const loginResult  = await requester.post('/api/sessions/login').send( { "email": "adminCoder@coder.com", "password": "abc445" } );
+        const loginResult  = await requester.post('/api/sessions/login').send( { "email": "dblunah@gmail.com", "password": "Test1234" } );
         cookieData = loginResult.headers['set-cookie'][0];
 
     });

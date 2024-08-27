@@ -9,7 +9,7 @@ let idProd = '';
 describe('Test Integración Sessions con Sesiones', function () {
     
     before(async function () {
-        const loginResult  = await requester.post('/api/sessions/login').send( { "email": "jperez@gmail.com", "password": "abc445" } );
+        const loginResult  = await requester.post('/api/sessions/login').send( { "email": "dblunah@gmail.com", "password": "Test1234" } );
         cookieData = loginResult.headers['set-cookie'][0];
     });
 
