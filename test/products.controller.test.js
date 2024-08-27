@@ -7,12 +7,12 @@ const connection = await mongoose.connect(config.MONGODB_URI);
 const dao = new UserController();
 const assert = Assert.strict;
 const testProd = { title: 'Producto Nuevo Test', description: 'Este es un producto agregado en Test', price: 230, code: 'abc445', stock: 25, category: 'f11' };
-const testUserUser = { first_name: 'Juan', last_name: 'Perez', email: 'jperez@gmail.com', password: 'abc445', role: 'user' };
-const testUserPremium = { first_name: 'Juan', last_name: 'Perez', email: 'jperez@gmail.com', password: 'abc445', role: 'premium' };
+const testUserUser = { first_name: 'Luna', last_name: 'Heuguerot', email: 'dblunah@gmail.com', password: 'Test1234', role: 'admin' };
+const testUserPremium = { first_name: 'Luna', last_name: 'Heuguerot', email: 'dblunah@gmail.com', password: 'Test1234', role: 'admin' };
 
 describe('Test Products DAO', function() {
     before(function () {
-        mongoose.connection.collections.test_prods.drop();
+        mongoose.connection.collections.products.drop();
         this.timeout = 5000;
     });
 
