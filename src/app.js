@@ -143,3 +143,4 @@ socketServer.on('connection', async (client) => {
 mongoose.set('strictPopulate', false);
 mongoose.set('strictQuery', false);
 
+export default app;
