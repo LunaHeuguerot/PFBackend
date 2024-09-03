@@ -130,27 +130,59 @@ class UserManager {
         };
     };
 
-    async updateRole(id, role) {
+    async uploadDocuments(userId, documents) {
         try {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
                 return { status: 400, error: 'Invalid ID format' };
             }
-            const updatedUser = await this.model.findByIdAndUpdate(id, { role: role }, { new: true }).lean();
-            if (updatedUser) {
-                console.log(`Rol del usuario actualizado: ${updatedUser}`);
-                return { origin: config.SERVER, status: 200, payload: updatedUser };
-            } else {
+    
+            const user = await this.model.findById(userId);
+            if (!user) {
                 return { status: 404, error: 'User not found' };
             }
+
+            user.documents = user.documents || [];
+
+            user.documents.push(...documents);
+
+            const updatedUser = await user.save();
+
+            return { origin: config.SERVER, status: 200, payload: updatedUser };
         } catch (error) {
-            console.error("Error al actualizar el rol del usuario:", error.message);
+            console.error("Error al subir documentos:", error);
             return { status: 500, error: error.message };
         }
     }
     
-    
-    
 
+    async upgradeToPremium(userId) {
+        try {
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                return { status: 400, error: 'Invalid ID format' };
+            }
+
+            const user = await this.model.findById(userId).lean();
+            if (!user) {
+                return { status: 404, error: 'User not found' };
+            }
+
+            const requiredDocuments = ['Identificación', 'Comprobante de domicilio', 'Comprobante de estado de cuenta'];
+            const uploadedDocuments = user.documents.map(doc => doc.name);
+
+            const hasAllRequiredDocuments = requiredDocuments.every(doc => uploadedDocuments.includes(doc));
+
+            if (!hasAllRequiredDocuments) {
+                return { status: 400, error: 'El usuario no ha terminado de procesar su documentación.' };
+            }
+
+            const updatedUser = await this.model.findByIdAndUpdate(userId, { role: 'premium' }, { new: true }).lean();
+            return { origin: config.SERVER, status: 200, payload: updatedUser };
+        } catch (error) {
+            console.error("Error al actualizar el rol del usuario a premium:", error.message);
+            return { status: 500, error: error.message };
+        }
+    };
+    
     async UsersDTO(user) {
         const { password, ...filteredFoundUser } = user;
         return filteredFoundUser;

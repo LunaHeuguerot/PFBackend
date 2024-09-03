@@ -107,5 +107,13 @@ viewsRouter.get('/profile', isAuthenticated, (req, res) => {
     });
 });
 
+viewsRouter.get('/upload-documents', isAuthenticated, (req, res) => {
+    res.render('uploadDocuments', {
+        user: req.session.user,
+        title: 'Upload Documents',
+        // style: 'uploadDocuments.css'  
+    });
+});
+
 
 export default viewsRouter;

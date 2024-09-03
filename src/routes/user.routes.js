@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import userModel from '../dao/models/user.model.js';
 import UserManager from '../controllers/managers/user.manager.db.js';
 import { createHash, verifyRequiredBody, isAdmin } from '../services/utils.js';
+import { uploader } from '../services/uploader.js';
 
 const userRouter = Router();
 
@@ -152,6 +153,47 @@ userRouter.get('/current', async (req, res) => {
         }
     } catch (error) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+    }
+});
+
+userRouter.post('/:uid/documents', uploader.array('documents'), async (req, res) => {
+    try {
+        const { uid } = req.params;
+        const files = req.files;
+
+        if (!mongoose.Types.ObjectId.isValid(uid)) {
+            return res.status(400).send({ error: 'Invalid ID format' });
+        }
+
+        const user = await userManager.uploadDocuments(uid, files);
+
+        if (user) {
+            res.status(200).send({ status: 'Documents uploaded successfully', user });
+        } else {
+            res.status(404).send({ error: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
+userRouter.put('/premium/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(uid)) {
+            return res.status(400).send({ error: 'Invalid ID format' });
+        }
+
+        const user = await userManager.upgradeToPremium(uid);
+
+        if (user) {
+            res.status(200).send({ status: 'User role updated to premium', user });
+        } else {
+            res.status(404).send({ error: 'User not found or incomplete documentation' });
+        }
+    } catch (error) {
+        res.status(500).send({ error: error.message });
     }
 });
 

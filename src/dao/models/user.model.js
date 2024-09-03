@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
     cart_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "carts",
-      },
+    },
+    last_connection: { type: Date }
 });
 
 userSchema.pre('find', function () {

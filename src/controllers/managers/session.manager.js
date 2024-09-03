@@ -30,25 +30,38 @@ async function register(req, res) {
 }
 
 async function login(req, res, next) {
-    passport.authenticate('local', (err, user, info) => {
+    passport.authenticate('local', async (err, user, info) => {
         if (err) return next(err);
         if (!user) {
             return res.status(401).json({ message: info.message });
         }
-        req.logIn(user, (err) => {
-            if (err) return next(err);
-            return res.status(200).json({ message: 'Successful login', user });
-        });
+        try {
+            await userModel.findByIdAndUpdate(user._id, { last_connection: new Date() });
+            req.logIn(user, (err) => {
+                if (err) return next(err);
+                return res.status(200).json({ message: 'Successful login', user });
+            });
+        } catch (updateError) {
+            return next(updateError);
+        }
     })(req, res, next);
 }
 
 async function logout(req, res) {
-    req.logout((err) => {
-        if (err) {
-            return res.status(500).json({ message: 'Logout error', error: err });
+    try {
+        if (req.user) {
+            await userModel.findByIdAndUpdate(req.user._id, { last_connection: new Date() });
         }
-        res.status(200).json({ message: 'Successful logout' });
-    });
+        req.logout((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Logout error', error: err });
+            }
+            res.status(200).json({ message: 'Successful logout' });
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error during logout" });
+    }
 }
+
 
 export { register, login, logout };

@@ -6,8 +6,6 @@ import chatRouter from './routes/chat.routes.js';
 import viewsRouter from './routes/views.routes.js';
 import handlebars from 'express-handlebars';
 import mongoose from 'mongoose';
-// import initSocket from './services/sockets.js';
-// import MongoStore from 'connect-mongo';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import sessionRouter from './routes/session.router.js';
@@ -29,7 +27,6 @@ import errorsHandler from './services/errors.handler.js';
 import { addLogger, logHttpRequests } from './services/logger.js';
 import authRouter from './routes/authRouter.js';
 import morgan from 'morgan';
-import premiumRouter from './routes/premium.routes.js';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUiExpress from 'swagger-ui-express';
 
@@ -72,7 +69,6 @@ app.use('/api/sessions/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/profile', profileRouter);
 app.use('/api/cookie', cookieRouter);
-app.use('/api/user/premium', premiumRouter);
 app.use('/api/user', userRouter);
 
 //Swagger
