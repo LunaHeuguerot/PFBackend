@@ -3,6 +3,11 @@ import config from './config.js';
 import path from 'path';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import fs from 'fs';
+
+if (!fs.existsSync(config.UPLOAD_DIR)) {
+    fs.mkdirSync(config.UPLOAD_DIR);
+}
 
 cloudinary.config({
     cloud_name: config.CLOUDINARY_CLOUD_NAME,

@@ -144,11 +144,11 @@ class UserManager {
             }
     
             user.documents = user.documents || [];
-
+    
             documents.forEach(doc => {
                 user.documents.push({
                     name: doc.originalname,
-                    reference: doc.url // doc.path para storage en ram
+                    reference: doc.path 
                 });
             });
     
@@ -159,6 +159,7 @@ class UserManager {
             return { status: 500, error: error.message };
         }
     }
+    
     
     
 
