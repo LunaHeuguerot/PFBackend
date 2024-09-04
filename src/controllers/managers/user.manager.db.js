@@ -125,10 +125,12 @@ class UserManager {
     async getPaginated(filter, options) {
         try {
             return await this.model.paginate(filter, options);
-        } catch (err) {
-            return err.message;
-        };
-    };
+        } catch (error) {
+            console.error("Error al obtener usuarios paginados:", error);
+            return { status: 500, error: error.message };
+        }
+    }
+
 
     async uploadDocuments(userId, documents) {
         try {
@@ -140,19 +142,24 @@ class UserManager {
             if (!user) {
                 return { status: 404, error: 'User not found' };
             }
-
+    
             user.documents = user.documents || [];
 
-            user.documents.push(...documents);
-
+            documents.forEach(doc => {
+                user.documents.push({
+                    name: doc.originalname,
+                    reference: doc.url // doc.path para storage en ram
+                });
+            });
+    
             const updatedUser = await user.save();
-
             return { origin: config.SERVER, status: 200, payload: updatedUser };
         } catch (error) {
             console.error("Error al subir documentos:", error);
             return { status: 500, error: error.message };
         }
     }
+    
     
 
     async upgradeToPremium(userId) {

@@ -156,7 +156,8 @@ userRouter.get('/current', async (req, res) => {
     }
 });
 
-userRouter.post('/:uid/documents', uploader.array('documents'), async (req, res) => {
+userRouter.post('/:uid/documents', uploader.array('documents', 3), async (req, res) => {
+    console.log("Archivos recibidos:", req.files);
     try {
         const { uid } = req.params;
         const files = req.files;
@@ -173,9 +174,11 @@ userRouter.post('/:uid/documents', uploader.array('documents'), async (req, res)
             res.status(404).send({ error: 'User not found' });
         }
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        console.error("Error al subir documentos:", error); 
+        res.status(500).send({ error: error.message || 'Error no identificado' });
     }
 });
+
 
 userRouter.put('/premium/:uid', async (req, res) => {
     try {
