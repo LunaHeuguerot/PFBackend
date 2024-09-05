@@ -138,7 +138,7 @@ class UserManager {
                 return { status: 400, error: 'Invalid ID format' };
             }
 
-            const user = await this.model.findById(userId);
+            const user = await this.model.findById(userId).lean();
             if (!user) {
                 return { status: 404, error: 'User not found' };
             }
