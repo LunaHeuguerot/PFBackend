@@ -137,21 +137,21 @@ class UserManager {
             if (!mongoose.Types.ObjectId.isValid(userId)) {
                 return { status: 400, error: 'Invalid ID format' };
             }
-    
+
             const user = await this.model.findById(userId);
             if (!user) {
                 return { status: 404, error: 'User not found' };
             }
-    
+
             user.documents = user.documents || [];
-    
+
             documents.forEach(doc => {
                 user.documents.push({
                     name: doc.originalname,
-                    reference: doc.path 
+                    reference: doc.path    
                 });
             });
-    
+
             const updatedUser = await user.save();
             return { origin: config.SERVER, status: 200, payload: updatedUser };
         } catch (error) {
@@ -159,6 +159,8 @@ class UserManager {
             return { status: 500, error: error.message };
         }
     }
+    
+    
     
     
     

@@ -5,25 +5,22 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import fs from 'fs';
 
-if (!fs.existsSync(config.UPLOAD_DIR)) {
-    fs.mkdirSync(config.UPLOAD_DIR);
-}
 
-cloudinary.config({
-    cloud_name: config.CLOUDINARY_CLOUD_NAME,
-    api_key: config.CLOUDINARY_API_KEY,
-    api_secret: config.CLOUDINARY_API_SECRET
-});
+// cloudinary.config({
+//     cloud_name: config.CLOUDINARY_CLOUD_NAME,
+//     api_key: config.CLOUDINARY_API_KEY,
+//     api_secret: config.CLOUDINARY_API_SECRET
+// });
 
-const cloudStorage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: (req, file) => ({
-        folder: path.basename(req.path),
-        allowed_formats: ['jpg', 'png', 'pdf', 'docx'],  
-        transformation: [{ width: 640 }],
-        public_id: `${Date.now()}-${file.originalname.split('.')[0]}`
-    })
-});
+// const cloudStorage = new CloudinaryStorage({
+//     cloudinary: cloudinary,
+//     params: (req, file) => ({
+//         folder: path.basename(req.path),
+//         allowed_formats: ['jpg', 'png', 'pdf', 'docx'],  
+//         transformation: [{ width: 640 }],
+//         public_id: `${Date.now()}-${file.originalname.split('.')[0]}`
+//     })
+// });
 
 const localStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -35,4 +32,6 @@ const localStorage = multer.diskStorage({
     }
 });
 
-export const uploader = multer({ storage: config.STORAGE === 'cloud' ? cloudStorage : localStorage });
+// export const uploader = multer({ storage: config.STORAGE === 'cloud' ? cloudStorage : localStorage });
+
+export const uploader = multer({ storage: localStorage });

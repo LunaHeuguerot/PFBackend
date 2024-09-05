@@ -17,9 +17,10 @@ const config = {
     PERSISTENCE: process.env.PERSISTENCE || 'FS',
     SERVER: 'local',
     PORT: process.env.PORT || clOptions.port || 8080,
-    STORAGE: 'cloud',
-    DIRNAME: path.join(__dirname, 'src'), // path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')), // Win
-    get UPLOAD_DIR() { return `${this.DIRNAME}/public/img` },
+    // STORAGE: 'cloud',
+    DIRNAME: path.join(__dirname, 'src'),
+    DIRNAME_STR: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')), // Win
+    get UPLOAD_DIR() { return `${this.DIRNAME_STR}/public/img` },
     // MONGODB_URI: 'mongodb+srv://dblunah:coderhouse123@cluster0.lnkenam.mongodb.net/', //local 
     MONGODB_URI: process.env.MONGODB_URI, //remoto
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
@@ -34,9 +35,9 @@ const config = {
     GMAIL_APP_USER: process.env.GMAIL_APP_USER,
     MODE: 'dev',
     JWT_SECRET: process.env.JWT_SECRET,
-    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
-    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+    // CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    // CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    // CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
 }
 
 export const errorsDictionary = {

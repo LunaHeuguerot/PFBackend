@@ -157,27 +157,27 @@ userRouter.get('/current', async (req, res) => {
 });
 
 userRouter.post('/:uid/documents', uploader.array('documents', 3), async (req, res) => {
-    console.log("Archivos recibidos:", req.files);
     try {
         const { uid } = req.params;
-        const files = req.files;
+        const files = req.files; // Los archivos están en RAM
 
-        if (!mongoose.Types.ObjectId.isValid(uid)) {
-            return res.status(400).send({ error: 'Invalid ID format' });
+        if (!files || files.length === 0) {
+            return res.status(400).send({ error: 'No files uploaded' });
         }
 
-        const user = await userManager.uploadDocuments(uid, files);
+        const result = await userManager.uploadDocuments(uid, files);
 
-        if (user) {
-            res.status(200).send({ status: 'Documents uploaded successfully', user });
+        if (result.status === 200) {
+            res.status(200).send({ status: 'Documents uploaded successfully', user: result.payload });
         } else {
-            res.status(404).send({ error: 'User not found' });
+            res.status(result.status).send({ error: result.error });
         }
     } catch (error) {
-        console.error("Error al subir documentos:", error); 
-        res.status(500).send({ error: error.message || 'Error no identificado' });
+        console.error("Error al subir documentos:", error);
+        res.status(500).send({ error: 'Error no identificado' });
     }
 });
+
 
 
 

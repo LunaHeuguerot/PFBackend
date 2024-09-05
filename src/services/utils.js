@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import config from './config.js';
+import { faker } from '@faker-js/faker';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
@@ -53,7 +54,33 @@ export const isAdmin = (req, res, next) => {
     }
 };
 
+function generateImageUrls(count) {
+    let imageUrls = [];
+    for (let i = 0; i < count; i++) {
+        let imageUrl = faker.image.url();
+        imageUrls.push(imageUrl);
+    }
+    return imageUrls;
+}
 
+export const generateFakeProducts = async (qty) => {
+    const products = [];
+    const cat = ['general', 'cat1', 'cat2'];
+    for (let i = 0; i < qty; i++) {
+        const _id = faker.database.mongodbObjectId();
+        const title = faker.commerce.productName();
+        const description = faker.commerce.productDescription();
+        const price = faker.commerce.price();
+        const code = faker.string.uuid();
+        const stock = faker.number.int({ min: 0, max: 1000 });
+        const category = cat[Math.floor(Math.random() * cat.length)];
+        const status = faker.datatype.boolean(0.9);
+        const thumbnail = generateImageUrls(faker.number.int({ min: 1, max: 3 })); 
+
+        products.push({ _id, title, description, price, code, stock, category, status, thumbnail });
+    }
+    return products;
+}
 
 
 

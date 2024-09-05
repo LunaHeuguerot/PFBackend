@@ -1,19 +1,9 @@
-<body>
-    <header>
-        <h1>Upload Documents</h1>
-    </header>
-    
+<div class="container">
+    <h2>Subir archivos</h2>
     <form action="/api/user/{{user._id}}/documents" method="POST" enctype="multipart/form-data">
-        <div>
-            <label for="document">Select document:</label>
-            <input type="file" name="document" id="document" required>
-        </div>
-        <button type="submit">Upload</button>
+        <input type="file" id="document" name="document" multiple>
+        <br /><br />
+        <button type="submit">Subir documentos de usuario</button>
     </form>
-
-    
-    <footer>
-        <p>Logged in as {{user.email}}</p>
-    </footer>
-</body>
+</div>
 <script src="/static/js/uploadDocuments.js"></script>
