@@ -33,8 +33,16 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "carts",
     },
-    last_connection: { type: Date }
+    last_connection: {
+        type: Date,
+        default: null
+    }
 });
+
+userSchema.methods.updateLastConnection = function() {
+    this.last_connection = new Date();
+    return this.save();
+};
 
 userSchema.pre('find', function () {
     this.populate({ path: 'cart_id', model: cartModel });

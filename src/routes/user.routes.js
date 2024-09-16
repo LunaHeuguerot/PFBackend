@@ -11,7 +11,7 @@ const userManager = new UserManager();
 
 userRouter.get('/', async(req, res) => {
     try {
-        const users = await userModel.find().lean();
+        const users = await userManager.getAll();
         res.status(200).send({ status: 200, payload: users });
     } catch (error) {
         console.error("Error en la consulta:", error);
@@ -198,6 +198,17 @@ userRouter.put('/premium/:uid', async (req, res) => {
         }
     } catch (error) {
         res.status(500).send({ error: error.message });
+    }
+});
+
+
+userRouter.delete('/inactive', async (req, res) => {
+    try {
+        const result = await userManager.deleteInactiveUsers();
+        res.status(result.status).send(result);
+    } catch (error) {
+        console.error('Error al eliminar usuarios inactivos:', error);
+        res.status(500).send({ error: 'Error al eliminar usuarios inactivos' });
     }
 });
 

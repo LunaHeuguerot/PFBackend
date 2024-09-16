@@ -192,6 +192,26 @@ class UserManager {
             return { status: 500, error: error.message };
         }
     };
+
+    async deleteInactiveUsers(){
+        try {
+            const twoMonthsAgo = new Date();
+            twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+
+            const result = await this.model.deleteMany({
+                last_connection: { $lt: twoMonthsAgo }
+            });
+
+            if (result.deletedCount > 0) {
+                return { status: 200, message: `${result.deletedCount} usuarios eliminados` };
+            } else {
+                return { status: 200, message: 'No se encontraron usuarios inactivos para eliminar' };
+            }
+        } catch (error) {
+            console.error('Error al eliminar usuarios inactivos:', error);
+            return { status: 500, error: 'Error al eliminar usuarios inactivos' };
+        }        
+    };
     
     async UsersDTO(user) {
         const { password, ...filteredFoundUser } = user;
