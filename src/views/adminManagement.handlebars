@@ -1,0 +1,40 @@
+<div class="container mt-5"></div>
+        <h1>Gestión de Usuarios</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each users}}
+                <tr>
+                    <td>{{this._id}}</td>
+                    <td>{{this.firstName}} {{this.lastName}}</td>
+                    <td>{{this.email}}</td>
+                    <td>
+                        <form action="/api/users/premium/{{this._id}}" method="POST" class="role-form">
+                            <select name="role" class="form-select">
+                                <option value="user" {{#ifCond this.role '==' 'user'}}selected{{/ifCond}}>Usuario</option>
+                                <option value="premium" {{#ifCond this.role '==' 'premium'}}selected{{/ifCond}}>Premium</option>
+                                <option value="admin" {{#ifCond this.role '==' 'admin'}}selected{{/ifCond}}>Administrador</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary mt-2">Modificar Rol</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/api/users/{{this._id}}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

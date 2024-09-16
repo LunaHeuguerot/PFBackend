@@ -95,7 +95,7 @@ userRouter.put('/:id', async(req, res) => {
     }
 });
 
-userRouter.delete('/:id', async(req, res) => {
+userRouter.delete('/:id', isAdmin, async(req, res) => {
     try {
         const { id } = req.params;
 
@@ -178,31 +178,28 @@ userRouter.post('/:uid/documents', uploader.array('documents', 3), async (req, r
     }
 });
 
-
-
-
-userRouter.put('/premium/:uid', async (req, res) => {
+userRouter.put('/:id/role', isAdmin, async (req, res) => {
     try {
-        const { uid } = req.params;
+        const { id } = req.params;
+        const { role } = req.body;
 
-        if (!mongoose.Types.ObjectId.isValid(uid)) {
-            return res.status(400).send({ error: 'Invalid ID format' });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ error: 'ID de usuario no válido' });
         }
 
-        const user = await userManager.upgradeToPremium(uid);
+        const updatedUser = await userModel.findByIdAndUpdate(id, { role }, { new: true });
 
-        if (user) {
-            res.status(200).send({ status: 'User role updated to premium', user });
+        if (updatedUser) {
+            res.status(200).send({ status: 'Rol de usuario actualizado', user: updatedUser });
         } else {
-            res.status(404).send({ error: 'User not found or incomplete documentation' });
+            res.status(404).send({ error: 'Usuario no encontrado' });
         }
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
 });
 
-
-userRouter.delete('/inactive', async (req, res) => {
+userRouter.delete('/inactive', isAdmin, async (req, res) => {
     try {
         const result = await userManager.deleteInactiveUsers();
         res.status(result.status).send(result);
