@@ -4,6 +4,8 @@ import { isValidPassword, handlePolicies, verifySession, verifyRequiredBody } fr
 import config from "../services/config.js";
 import { generateMockProds } from "../services/mocking.js";
 import { ProductManagerDB } from "../controllers/managers/productsManager.db.js";
+import userModel from "../dao/models/user.model.js";
+import { sendProductDeletionEmail } from "../services/emails.js";
 
 const productsRouter = Router();
 
@@ -70,10 +72,23 @@ productsRouter.put('/:pid', handlePolicies('admin'), async (req, res) => {
 productsRouter.delete('/:pid', handlePolicies('admin'), async (req, res) => {
     const socketServer = req.app.get('socketServer');
     const pid = req.params.pid;
-    const rta = await ProductManagerDB.getInstance().deleteProduct(pid);
-    res.status(200).send({ status: 'Ok', payload: [], mensaje: `Producto con id ${pid}, fue borrado.` });
-    const prodRender = await ProductManagerDB.getInstance().getProducts(0);
-    socketServer.emit('deleteProduct', prodRender);
+
+    const result = await ProductManagerDB.getInstance().deleteProduct(pid);
+
+    if (result) {
+        const product = result; 
+
+        const owner = await userModel.findById(product.owner);
+        if (owner && owner.role === 'premium') {
+            await sendProductDeletionEmail(owner.email, product.title);
+        }
+
+        res.status(200).send({ status: 'Ok', payload: [], mensaje: `Producto con id ${pid}, fue borrado.` });
+        const prodRender = await ProductManagerDB.getInstance().getProducts(0);
+        socketServer.emit('deleteProduct', prodRender);
+    } else {
+        res.status(400).send({ status: 'Not Ok', mensaje: 'No se pudo eliminar el producto.' });
+    }
 });
 
 productsRouter.all('*', async (req, res) => {
