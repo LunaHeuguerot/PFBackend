@@ -44,3 +44,47 @@ async function viewCart() {
         alert(error.message || 'Error al mostrar carrito');
     }
 };
+
+async function updateProductQuantity(productId) {
+    try {
+        const quantity = document.getElementById(`quantity-${productId}`).value;
+        if (quantity <= 0) {
+            alert('La cantidad debe ser mayor a 0.');
+            return;
+        }
+
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity })
+        });
+
+        const data = await response.json();
+        if (data.status === 'Ok') {
+            alert('Cantidad actualizada correctamente');
+            window.location.reload();
+        } else {
+            alert(data.error || 'Error al actualizar la cantidad');
+        }
+    } catch (error) {
+        alert(error.message || 'Error al actualizar la cantidad');
+    }
+}
+
+async function removeProduct(productId) {
+    try {
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'DELETE' });
+        const data = await response.json();
+
+        if (data.status === 'Ok') {
+            alert('Producto eliminado correctamente');
+            window.location.reload();
+        } else {
+            alert(data.error || 'Error al eliminar el producto');
+        }
+    } catch (error) {
+        alert(error.message || 'Error al eliminar el producto');
+    }
+}

@@ -51,14 +51,6 @@ productsRouter.get('/:pid', async (req, res) => {
     }
 });
 
-// productsRouter.post('/', handlePolicies(['admin']), async (req, res) => {
-//     const socketServer = req.app.get('socketServer');
-//     const prodAdd = req.body;
-//     const rta = await ProductManagerDB.getInstance().addProduct(prodAdd);
-//     res.status(200).send({ status: 'Ok', payload: rta, mensaje: `Producto con código ${rta.code}, agregado OK` });
-//     socketServer.emit('newProduct', rta);
-// });
-
 productsRouter.post('/', uploader.single('thumbnails'), handlePolicies(['admin','premium']), verifyRequiredBody(['title', 'description', 'price', 'code', 'stock', 'category']), async (req, res) => {
     const socketServer = req.app.get('socketServer');
     const prodAdd = req.body;
