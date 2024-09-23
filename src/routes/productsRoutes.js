@@ -8,6 +8,7 @@ import userModel from "../dao/models/user.model.js";
 import { sendProductDeletionEmail } from "../services/emails.js";
 
 const productsRouter = Router();
+const routeUrl = '/api/products'
 
 productsRouter.param('id', async (req, res, next, id) => {
     if (!config.MONGODB_ID_REGEX.test(req.params.id)) {
@@ -50,12 +51,33 @@ productsRouter.get('/:pid', async (req, res) => {
     }
 });
 
-productsRouter.post('/', handlePolicies(['admin']), async (req, res) => {
+// productsRouter.post('/', handlePolicies(['admin']), async (req, res) => {
+//     const socketServer = req.app.get('socketServer');
+//     const prodAdd = req.body;
+//     const rta = await ProductManagerDB.getInstance().addProduct(prodAdd);
+//     res.status(200).send({ status: 'Ok', payload: rta, mensaje: `Producto con código ${rta.code}, agregado OK` });
+//     socketServer.emit('newProduct', rta);
+// });
+
+productsRouter.post('/', uploader.single('thumbnails'), handlePolicies(['admin','premium']), verifyRequiredBody(['title', 'description', 'price', 'code', 'stock', 'category']), async (req, res) => {
     const socketServer = req.app.get('socketServer');
     const prodAdd = req.body;
-    const rta = await ProductManagerDB.getInstance().addProduct(prodAdd);
-    res.status(200).send({ status: 'Ok', payload: rta, mensaje: `Producto con código ${rta.code}, agregado OK` });
-    socketServer.emit('newProduct', rta);
+    const user = req.session.user;
+    const rta = await ProductManagerDB.getInstance().addProduct(prodAdd, user);
+
+    if(rta===0) {
+        res.status(400).send({ status: 'Not Ok', payload: [], error: 'Alguno de los campos no llego correctamente.' });
+        req.logger.error(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${routeUrl}${req.url}`);
+    } else {
+        if(rta===1) {
+            res.status(400).send({ status: 'Not Ok', payload: [], error: 'El valor del campo code ya existe y no se puede repetir.' });
+            req.logger.error(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${routeUrl}${req.url}`);    
+        } else {
+            res.status(200).send({ status: 'Ok', payload: rta, mensaje: `Producto con código ${rta.code}, agregado OK` });
+            req.logger.info(`date: ${new Date().toDateString()} ${new Date().toLocaleTimeString()} | method: ${req.method} | ip: ${req.ip} | url: ${routeUrl}${req.url}`);
+            socketServer.emit('newProduct', rta);
+        }
+    }
 });
 
 productsRouter.put('/:pid', handlePolicies('admin'), async (req, res) => {
