@@ -1,7 +1,5 @@
 import express from 'express';
 import config from './services/config.js';
-// import productsRouter from './routes/products.routes.js';
-// import cartsRouter from './routes/carts.routes.js';
 import chatRouter from './routes/chat.routes.js';
 import viewsRouter from './routes/views.routes.js';
 import handlebars from 'express-handlebars';
