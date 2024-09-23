@@ -15,7 +15,7 @@ const __dirname = path.resolve(path.dirname(''));
 
 const config = {
     PERSISTENCE: process.env.PERSISTENCE || 'FS',
-    SERVER: 'local',
+    SERVER: process.env.NODE_ENV === 'production' ? 'render' : 'local',
     PORT: process.env.PORT || clOptions.port || 8080,
     // STORAGE: 'cloud',
     DIRNAME: path.join(__dirname, 'src'),
@@ -26,7 +26,9 @@ const config = {
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
+    GITHUB_CALLBACK_URL: process.env.NODE_ENV === 'production' 
+        ? process.env.GITHUB_CALLBACK_URL_RENDER
+        : process.env.GITHUB_CALLBACK_URL,
     SECRET: process.env.SECRET,
     TWILIO_SID: process.env.TWILIO_SID,
     TWILIO_TOKEN: process.env.TWILIO_TOKEN,
