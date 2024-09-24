@@ -162,7 +162,7 @@ cartRouter.post('/:cid/purchase', handlePolicies('user'), async (req, res) => {
     const cid = req.params.cid;
     const cart = await CartsManagerDB.getInstance().getCartById(cid);
     if(cart) {
-        const cartFiltered = await manager.punchaseCart(cart);
+        const cartFiltered = await CartsManagerDB.getInstance().purchaseCart(cart);
         res.status(200).send({ status: 'Ok', payload: cartFiltered, mensaje: `Se cerro correctamente el carrito con id ${cid} OK` });
     } else {
         res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito buscado con id ${cid} no existe` });

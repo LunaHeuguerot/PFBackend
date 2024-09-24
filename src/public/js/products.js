@@ -88,3 +88,25 @@ async function removeProduct(productId) {
         alert(error.message || 'Error al eliminar el producto');
     }
 }
+
+async function confirmPurchase() {
+    try {
+        const response = await fetch(`/carts/${cartId}/purchase`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+        if (data.status === 'Ok') {
+            alert('Compra realizada con éxito');
+            window.location.reload();  
+        } else {
+            alert(data.error || 'Error al confirmar la compra');
+        }
+    } catch (error) {
+        alert(error.message || 'Error al confirmar la compra');
+    }
+}
+
