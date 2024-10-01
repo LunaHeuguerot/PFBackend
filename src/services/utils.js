@@ -22,7 +22,7 @@ export const handlePolicies = policies => {
     return async (req, res, next) => {
         if(!req.session.user) return res.status(401).send({ origin: config.SERVER, payload: 'Usuario no autenticado' });
 
-        if(policies.includes('self') && req.session.user.cart === req.param.id) return next();
+        if (policies.includes('self') && req.session.user.cart === req.params.cid) return next();
 
         if(policies.includes(req.session.user.role)) return next();
 

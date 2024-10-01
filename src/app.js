@@ -27,6 +27,7 @@ import authRouter from './routes/authRouter.js';
 import morgan from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUiExpress from 'swagger-ui-express';
+import MongoStore from 'connect-mongo';
 
 const app = express();
 
@@ -43,16 +44,16 @@ app.set('views', `${config.DIRNAME}/views`);
 app.set('view engine', 'handlebars');
 
 app.use(cookieParser("sign3dLÑ75622"));
-const fileStorage = FileStore(session);
+const fileStorage = FileStore(session); // cambiar en caso de querer usar fileStorage
 app.use(session({
-    // store: MongoStore.create({
-    //     mongoUrl: config.MONGODB_URI,
-    //     ttl: 600 
-    // }),
-    store: new fileStorage({ path: './sessions', ttl: 100, retries: 0 }),
-    secret: config.SECRET,
-    resave: false,
-    saveUninitialized: false
+    store: MongoStore.create({
+        mongoUrl: config.MONGODB_URI,
+        ttl: 600 
+    }),
+    // store: new fileStorage({ path: './sessions', ttl: 100, retries: 0 }),
+    // secret: config.SECRET,
+    // resave: false,
+    // saveUninitialized: false
 }));
 
 app.use(passport.initialize())
