@@ -22,7 +22,6 @@ async function addProductToCart(productId) {
             cartId = await createCart();
         }
 
-        // Agregar comillas a las rutas
         const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'POST' });
         const data = await response.json();
 
