@@ -54,24 +54,26 @@ export class CartsManagerDB {
 
     async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {
+            console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
             const product = await ProductManagerDB.getInstance().getProductById(productId).lean();
     
             if (userId === product.owner.toString()) {
                 throw new Error('Los usuarios premium no pueden agregar sus propios productos al carrito.');
             }
-
-            let cart = await this.getCartById(cartId); 
-            const productIndex = cart.products.findIndex(product => product.productId.toString() === productId);
+    
+            let cart = await this.getCartById(cartId);
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
         
             if (productIndex !== -1) {
-                cart.products[productIndex].quantity++;
+                cart.products[productIndex].quantity += quantity;  
             } else {
-                cart.products.push({ productId: productId, quantity: 1 });
+                cart.products.push({ productId: productId, quantity });  
             }
-
+    
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
             return cart;
         } catch (error) {
+            console.error('Error en addProductToCart:', error);
             throw error;
         }
     }

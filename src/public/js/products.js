@@ -35,11 +35,14 @@ async function addProductToCart(productId) {
 
         if (data.status === 'success') {
             alert(`Producto con id ${productId} agregado al carrito exitosamente`);
-        } 
+        } else {
+            alert(`Error: ${data.error}`);
+        }
     } catch (error) {
         alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
     }
 }
+
 
 
 
