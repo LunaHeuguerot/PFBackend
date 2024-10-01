@@ -25,11 +25,21 @@ sessionRouter.get('/hash/:password', async (req, res) => {
 
 sessionRouter.post('/register', 
     verifyRequiredBody(['first_name', 'last_name', 'age', 'email', 'password']),
-    passport.authenticate('register', {
-        successRedirect: '/registered',
-        failureRedirect: '/register'
-    })
+    async (req, res, next) => {
+        passport.authenticate('register', (err, user, info) => {
+            if (err) return next(err);
+            if (!user) {
+                return res.status(400).send({ origin: config.SERVER, payload: null, error: info.message });
+            }
+            req.session.user = user;
+            req.session.save(err => {
+                if (err) return res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+                res.redirect('/registered');
+            });
+        })(req, res, next);
+    }
 );
+
 
 
 sessionRouter.post('/login', verifyRequiredBody(['email', 'password']),
@@ -43,7 +53,7 @@ sessionRouter.post('/login', verifyRequiredBody(['email', 'password']),
                 return res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
             }
             res.redirect('/products');
-        });
+        });        
     }
 );
 

@@ -44,17 +44,28 @@ app.set('views', `${config.DIRNAME}/views`);
 app.set('view engine', 'handlebars');
 
 app.use(cookieParser("sign3dLÑ75622"));
-const fileStorage = FileStore(session); // cambiar en caso de querer usar fileStorage o MongoDB
+// const fileStorage = FileStore(session); // cambiar en caso de querer usar fileStorage o MongoDB
+// app.use(session({
+//     // store: MongoStore.create({
+//     //     mongoUrl: config.MONGODB_URI,
+//     //     ttl: 600 
+//     // }),
+//     store: new fileStorage({ path: './sessions', ttl: 100, retries: 0 }),
+//     secret: config.SECRET,
+//     resave: false,
+//     saveUninitialized: false
+// }));
+
 app.use(session({
-    // store: MongoStore.create({
-    //     mongoUrl: config.MONGODB_URI,
-    //     ttl: 600 
-    // }),
-    store: new fileStorage({ path: './sessions', ttl: 100, retries: 0 }),
+    store: MongoStore.create({
+        mongoUrl: config.MONGODB_URI,
+        ttl: 600 
+    }),
     secret: config.SECRET,
     resave: false,
     saveUninitialized: false
 }));
+
 
 app.use(passport.initialize())
 app.use(passport.session())
