@@ -52,7 +52,7 @@ export class CartsManagerDB {
         }
     };
 
-    async addProductToCart(cartId, productId, userId) {
+    async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {
             const product = await ProductManagerDB.getInstance().getProductById(productId);
 

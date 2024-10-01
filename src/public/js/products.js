@@ -22,7 +22,8 @@ async function addProductToCart(productId) {
             cartId = await createCart();
         }
 
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'POST' });
+        const quantity = 1; 
+        const response = await fetch(`/carts/${cartId}/product/${productId}?quantity=${quantity}`, { method: 'POST' });
         const data = await response.json();
 
         if (data.status === 'success') {
@@ -32,6 +33,7 @@ async function addProductToCart(productId) {
         alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
     }
 }
+
 
 async function viewCart() {
     try {
