@@ -23,20 +23,25 @@ export class CartsManagerDB {
     async getCartById(id) {
         try {
             if (id.length !== 24) {
-                throw new Error ('El id debe tener 24 caracteres')
+                throw new Error('El id debe tener 24 caracteres');
             }
-
-            const cart = await cartModel.find().populate('_user_id').populate('products._id').lean();
-
+    
+            const cart = await cartModel.findById(id).populate('_user_id').populate('products._id').lean();
+    
             if (!cart) {
                 throw new Error(`No se encontró el carrito con id ${id}`);
             }
 
+            if (!cart.products) {
+                cart.products = []; 
+            }
+    
             return cart;
         } catch (error) {
             throw error;
         }
-    };
+    }
+    
 
     async createCart() {
         try {
@@ -56,19 +61,23 @@ export class CartsManagerDB {
         try {
             console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
             const product = await ProductManagerDB.getInstance().getProductById(productId);
-    
+        
             if (userId === product.owner.toString()) {
                 throw new Error('Los usuarios premium no pueden agregar sus propios productos al carrito.');
             }
     
             let cart = await this.getCartById(cartId);
+
+            if (!cart.products) {
+                cart.products = [];
+            }
+    
             const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
         
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += quantity;  
             } else {
                 cart.products.push({ productId: productId, quantity });  
-            }
     
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
             return cart;
@@ -77,6 +86,7 @@ export class CartsManagerDB {
             throw error;
         }
     }
+    
     
     
 
