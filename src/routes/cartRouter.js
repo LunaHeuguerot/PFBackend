@@ -84,19 +84,36 @@ cartRouter.get('/:cid', async (req, res) => {
 });
 
 cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
-    const cid = req.params.cid;
-    const pid = req.params.pid;
-    const rta = await CartsManagerDB.getInstance().addProductToCart(cid,pid);
-    if (rta === 0) {
-        res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito con id ${cid} no existe` });
-    } else {
-        if (rta === 1) {
-            res.status(400).send({ status: 'Not Ok', payload: [], error: `El producto con id ${pid} no existe` });
-        } else {
-            res.status(200).send({ status: 'Ok', payload: [], mensaje: `Se agrego el producto con id ${pid} al carrito con id ${cid} OK` });
+    try {
+        const cid = req.params.cid;
+        const pid = req.params.pid;
+        const userId = req.session.user._id;  
+
+        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId);
+
+        if (!updatedCart) {
+            return res.status(400).json({ 
+                status: 'Not Ok', 
+                error: `No se pudo agregar el producto con id ${pid} al carrito con id ${cid}` 
+            });
         }
-    };
+
+        res.status(200).json({ 
+            status: 'Ok', 
+            mensaje: `Se agregó el producto con id ${pid} al carrito con id ${cid} correctamente`, 
+            payload: updatedCart  
+        });
+
+    } catch (error) {
+        console.error('Error al agregar producto al carrito:', error);
+        res.status(500).json({ 
+            status: 'error', 
+            message: 'Error al agregar el producto al carrito', 
+            error: error.message 
+        });
+    }
 });
+
 
 
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {
