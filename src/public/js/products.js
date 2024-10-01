@@ -23,7 +23,14 @@ async function addProductToCart(productId) {
         }
 
         const quantity = 1; 
-        const response = await fetch(`/carts/${cartId}/product/${productId}?quantity=${quantity}`, { method: 'POST' });
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ quantity }) 
+        });
+
         const data = await response.json();
 
         if (data.status === 'success') {
@@ -33,6 +40,7 @@ async function addProductToCart(productId) {
         alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
     }
 }
+
 
 
 async function viewCart() {
