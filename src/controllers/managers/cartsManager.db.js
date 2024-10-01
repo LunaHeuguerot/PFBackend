@@ -55,7 +55,7 @@ export class CartsManagerDB {
     async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {
             console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
-            const product = await ProductManagerDB.getInstance().getProductById(productId).lean();
+            const product = await ProductManagerDB.getInstance().getProductById(productId);
     
             if (userId === product.owner.toString()) {
                 throw new Error('Los usuarios premium no pueden agregar sus propios productos al carrito.');
