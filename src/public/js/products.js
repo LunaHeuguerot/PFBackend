@@ -41,7 +41,6 @@ async function viewCart() {
             cartId = await createCart();
         }
 
-        // Agregar comillas a la ruta
         window.location.href = `/carts/${cartId}`;
     } catch (error) {
         alert(error.message || 'Error al mostrar carrito');

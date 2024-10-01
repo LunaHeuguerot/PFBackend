@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import config from './config.js';
 import { faker } from '@faker-js/faker';
+import CustomError from './CustomError.class.js'
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
@@ -20,15 +21,16 @@ export const verifyRequiredBody = (requiredFields) => {
 
 export const handlePolicies = policies => {
     return async (req, res, next) => {
-        if(!req.session.user) return res.status(401).send({ origin: config.SERVER, payload: 'Usuario no autenticado' });
-
-        if (policies.includes('self') && req.session.user.cart === req.params.cid) return next();
-
-        if(policies.includes(req.session.user.role)) return next();
-
-        res.status(403).send({ origin: config.SERVER, payload: 'No tiene permisos para acceder' });
+        try {
+            if (!req.session.user) throw new CustomError(errorsDictionary.INVALID_LOGIN);
+            if (policies.includes('self') && req.session.user.cart === req.params.cid) return next();
+            if (policies.includes(req.session.user.role)) return next();
+            throw new CustomError(errorsDictionary.USER_ACCESS);
+        } catch (error) {
+            next(error);
+        }
     }
-};
+}
 
 export const createSession = (req, payload) => {
     req.session.user = payload;

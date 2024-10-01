@@ -88,7 +88,6 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         const cid = req.params.cid;
         const pid = req.params.pid;
         const userId = req.session.user._id;  
-        
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1;
 
         const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
@@ -111,7 +110,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         res.status(500).json({ 
             status: 'error', 
             message: 'Error al agregar el producto al carrito', 
-            error: error.message 
+            error: error.message || 'Error desconocido' 
         });
     }
 });

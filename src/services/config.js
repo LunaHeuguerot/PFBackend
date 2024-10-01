@@ -73,7 +73,8 @@ export const errorsDictionary = {
     VALIDATION_ERROR: { code: 27, status: 400, message: 'Error de validación de datos' },
     EMAIL_ALREADY_EXISTS: { code: 28, status: 400, message: 'El email ya está en uso' },
     PASSWORD_INCORRECT: { code: 29, status: 401, message: 'Contraseña incorrecta' },
-    TOKEN_EXPIRED: { code: 30, status: 401, message: 'El token ha expirado' }
+    TOKEN_EXPIRED: { code: 30, status: 401, message: 'El token ha expirado' },
+    USER_ACCESS: { code: 31, status: 403, message: 'No tiene permisos para acceder al recurso' }
 };
 
 export default config;
