@@ -5,17 +5,17 @@ async function createCart() {
         const response = await fetch('/carts', { method: 'POST' });
         const data = await response.json();
 
-        if(data.status === 'Ok') {
-            cartId = data.payload._id;
-            sessionStorage.setItem('cartId', cartId);
-            return cartId;
+        if(data.status === 'success') {
+            sessionStorage.setItem('cartId', data.payload._id);
+            return data.payload._id;
         } else {
-            throw new Error(data.error);
+            throw new Error(data.message);
         }
     } catch (error) {
-        alert(error.message || 'Error al crear el carrito');
+        console.error('Error al crear el carrito:', error);
     }
-};
+}
+
 
 async function addProductToCart(productId) {
     try {
