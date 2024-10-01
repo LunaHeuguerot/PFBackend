@@ -23,7 +23,7 @@ async function addProductToCart(productId) {
             cartId = await createCart();
         }
         
-        const response = await fetch(`/carts/${cartId}/products/${productId}`, { method: 'POST' });
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'POST' });
         const data = await response.json();
         if(data.status === 'success') {
             alert(`Producto con id ${productId} agregado al carrito exitosamente`);
