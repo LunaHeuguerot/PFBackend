@@ -5,7 +5,7 @@ async function createCart() {
         const response = await fetch('/carts', { method: 'POST' });
         const data = await response.json();
 
-        if(data.status === 'success') {
+        if (data.status === 'success') {
             sessionStorage.setItem('cartId', data.payload._id);
             return data.payload._id;
         } else {
@@ -16,34 +16,36 @@ async function createCart() {
     }
 }
 
-
 async function addProductToCart(productId) {
     try {
-        if(!cartId) {
+        if (!cartId) {
             cartId = await createCart();
         }
-        
+
+        // Agregar comillas a las rutas
         const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'POST' });
         const data = await response.json();
-        if(data.status === 'success') {
+
+        if (data.status === 'success') {
             alert(`Producto con id ${productId} agregado al carrito exitosamente`);
         } 
     } catch (error) {
         alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
     }
-};
+}
 
 async function viewCart() {
     try {
-        if(!cartId) {
+        if (!cartId) {
             cartId = await createCart();
         }
 
+        // Agregar comillas a la ruta
         window.location.href = `/carts/${cartId}`;
     } catch (error) {
         alert(error.message || 'Error al mostrar carrito');
     }
-};
+}
 
 async function updateProductQuantity(productId) {
     try {
@@ -101,7 +103,7 @@ async function confirmPurchase() {
         const data = await response.json();
         if (data.status === 'Ok') {
             alert('Compra realizada con éxito');
-            window.location.reload();  
+            window.location.reload();
         } else {
             alert(data.error || 'Error al confirmar la compra');
         }
@@ -109,4 +111,3 @@ async function confirmPurchase() {
         alert(error.message || 'Error al confirmar la compra');
     }
 }
-
