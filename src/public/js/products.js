@@ -5,7 +5,7 @@ async function createCart() {
         const response = await fetch('/carts', { method: 'POST' });
         const data = await response.json();
 
-        if(data.status === 'success') {
+        if(data.status === 'Ok') {
             cartId = data.payload._id;
             sessionStorage.setItem('cartId', cartId);
             return cartId;

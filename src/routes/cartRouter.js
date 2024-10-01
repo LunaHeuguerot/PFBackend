@@ -66,7 +66,7 @@ cartRouter.get('/sms', async (req, res) => {
 cartRouter.post('/', async (req, res) => {
     const rta = await CartsManagerDB.getInstance().createCart();
     if (rta) {
-        res.status(200).send({ status: 'Ok', payload: [], mensaje: `Se creo un nuevo carrito con id ${rta._id} OK` });
+        res.status(200).send({ status: 'Ok', payload: { _id: rta._id }, mensaje: `Se creo un nuevo carrito con id ${rta._id} OK` });
     } else {
         res.status(400).send({ status: 'Not Ok', payload: [], error: 'No se pudo crear un nuevo carrito.' });
     }
