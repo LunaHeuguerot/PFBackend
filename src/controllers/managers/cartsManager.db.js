@@ -112,14 +112,20 @@ export class CartsManagerDB {
     async updateProdQuantity(cartId, productId, quantity) {
         try {
             let cart = await this.getCartById(cartId);
-            const productIndex = cart.products.findIndex(item => item.productId._id.toString() === productId);
+    
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
             if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con id ${productId} en el carrito con id ${cartId}`);
-            } else {
-                cart.products[productIndex].quantity = quantity;
             }
     
-            await cartModel.updateOne({ _id: cartId }, { products: cart.products });
+            if (quantity <= 0) {
+                throw new Error(`La cantidad debe ser mayor a 0. Cantidad recibida: ${quantity}`);
+            }
+
+            cart.products[productIndex].quantity = quantity;
+
+            await cart.save();
+            
             cart = await this.getCartById(cartId);
             return cart; 
         } catch (error) {
@@ -127,6 +133,7 @@ export class CartsManagerDB {
             throw error;
         }
     }
+    
     
     async deleteCart(id) {
         try {

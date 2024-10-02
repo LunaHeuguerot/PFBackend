@@ -140,20 +140,33 @@ cartRouter.put('/:cid', async (req, res) => {
 cartRouter.put('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
-    const quantityUp = +req.body.quantity;
 
-    if (quantityUp <= 0 || isNaN(quantityUp)) {
-        return res.status(400).send({ status: 'Not Ok', payload: [], error: 'Se requiere una cantidad numérica mayor a 0.' });
+    const quantityUp = Number(req.body.quantity);
+    if (!req.body.quantity || isNaN(quantityUp) || quantityUp <= 0) {
+        return res.status(400).send({ 
+            status: 'Not Ok', 
+            payload: [], 
+            error: 'Se requiere una cantidad numérica mayor a 0 en el cuerpo de la solicitud.' 
+        });
     }
 
     try {
         const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);
-        res.status(200).send({ status: 'Ok', payload: updatedCart, mensaje: `Se actualizó la cantidad del producto con id ${pid} en el carrito con id ${cid}.` });
+        res.status(200).send({ 
+            status: 'Ok', 
+            payload: updatedCart, 
+            mensaje: `Se actualizó la cantidad del producto con id ${pid} en el carrito con id ${cid}.` 
+        });
     } catch (error) {
         console.error('Error al actualizar la cantidad del producto:', error);
-        res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
+        res.status(500).send({ 
+            status: 'error', 
+            message: 'Hubo un problema al actualizar la cantidad del producto en el carrito.', 
+            error: error.message 
+        });
     }
 });
+
 
 cartRouter.delete('/:cid', async (req, res) => {
     const cid = req.params.cid;
