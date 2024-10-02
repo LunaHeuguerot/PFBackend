@@ -87,7 +87,8 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1;
 
         const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
-        req.session.cart = updatedCart; 
+        req.session.cart = updatedCart;
+        console.log('Carrito almacenado en la sesión:', req.session.cart); 
 
         if (!updatedCart) {
             return res.status(400).json({
@@ -141,31 +142,22 @@ cartRouter.put('/:cid', async (req, res) => {
 cartRouter.put('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
+    const quantityUp = +req.body.quantity;
 
-    const quantityUp = Number(req.body.quantity);
-    if (!req.body.quantity || isNaN(quantityUp) || quantityUp <= 0) {
-        return res.status(400).send({ 
-            status: 'Not Ok', 
-            payload: [], 
-            error: 'Se requiere una cantidad numérica mayor a 0 en el cuerpo de la solicitud.' 
-        });
+    if (quantityUp <= 0 || isNaN(quantityUp)) {
+        return res.status(400).send({ status: 'Not Ok', payload: [], error: 'Se requiere una cantidad numérica mayor a 0.' });
     }
 
     try {
         const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);
-        req.session.cart = updatedCart; 
-        res.status(200).send({ 
-            status: 'Ok', 
-            payload: updatedCart, 
-            mensaje: `Se actualizó la cantidad del producto con id ${pid} en el carrito con id ${cid}.` 
-        });
+
+        req.session.cart = updatedCart;
+        console.log('Carrito actualizado en la sesión:', req.session.cart);
+
+        res.status(200).send({ status: 'Ok', payload: updatedCart, mensaje: `Se actualizó la cantidad del producto con id ${pid} en el carrito con id ${cid}.` });
     } catch (error) {
         console.error('Error al actualizar la cantidad del producto:', error);
-        res.status(500).send({ 
-            status: 'error', 
-            message: 'Hubo un problema al actualizar la cantidad del producto en el carrito.', 
-            error: error.message 
-        });
+        res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
     }
 });
 
