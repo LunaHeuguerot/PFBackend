@@ -63,7 +63,8 @@ app.use(session({
     }),
     secret: config.SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { secure: false }
 }));
 
 

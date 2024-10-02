@@ -76,7 +76,8 @@ async function updateProductQuantity(productId) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ quantity })
+            body: JSON.stringify({ quantity }),
+            credentials: 'include'
         });
 
         const data = await response.json();
