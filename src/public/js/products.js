@@ -66,7 +66,7 @@ async function updateProductQuantity(productId) {
             return;
         }
 
-        const cartId = await getCartId(); 
+        const cartId = sessionStorage.getItem('cartId');
         if (!cartId) {
             alert('No se encontró el ID del carrito');
             return;
@@ -101,7 +101,7 @@ async function updateProductQuantity(productId) {
 
 async function removeProduct(productId) {
     try {
-        const currentCartId = await getCartId();
+        const currentCartId = sessionStorage.getItem('cartId');
         const response = await fetch(`/carts/${currentCartId}/product/${productId}`, { method: 'DELETE' });
         const data = await response.json();
 
@@ -118,7 +118,7 @@ async function removeProduct(productId) {
 
 async function confirmPurchase() {
     try {
-        const currentCartId = await getCartId();
+        const currentCartId = sessionStorage.getItem('cartId');
         const response = await fetch(`/carts/${currentCartId}/purchase`, {
             method: 'POST',
             headers: {
