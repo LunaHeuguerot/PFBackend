@@ -87,6 +87,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1;
 
         const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
+        req.session.cart = updatedCart; 
 
         if (!updatedCart) {
             return res.status(400).json({
@@ -152,6 +153,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
 
     try {
         const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);
+        req.session.cart = updatedCart; 
         res.status(200).send({ 
             status: 'Ok', 
             payload: updatedCart, 
