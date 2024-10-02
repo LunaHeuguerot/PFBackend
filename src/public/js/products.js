@@ -18,33 +18,33 @@ async function createCart() {
 
 async function addProductToCart(productId) {
     try {
-      console.log('Intentando agregar el producto...');
-      const response = await fetch(`/carts/${cartId}/product/${productId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+        console.log('Intentando agregar el producto...');
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
   
-      console.log('Respuesta recibida, procesando...');
+        console.log('Respuesta recibida, procesando...');
       
-      if (!response.ok) {
-        console.error('Respuesta del servidor no fue ok:', response.status);
-        throw new Error('Error en la petición al servidor.');
-      }
+        if (!response.ok) {
+            console.error('Respuesta del servidor no fue ok:', response.status);
+            throw new Error('Error en la petición al servidor.');
+        }
   
-      const result = await response.json();
-      console.log('Resultado del servidor:', result);
+        const result = await response.json();
+        console.log('Resultado del servidor:', result);
   
-      if (result.success) {
-        console.log('Producto agregado al carrito.');
-      } else {
-        console.error('El servidor respondió con éxito falso:', result);
-        throw new Error('No se pudo agregar el producto al carrito.');
-      }
+        if (result.success) {
+            console.log('Producto agregado al carrito.');
+        } else {
+            console.error('El servidor respondió con éxito falso:', result);
+            throw new Error('No se pudo agregar el producto al carrito.');
+        }
     } catch (error) {
-      console.error('Error capturado:', error.message);
-      alert('Error: No se pudo agregar el producto al carrito.');
+        console.error('Error capturado:', error.message);
+        alert('Error: No se pudo agregar el producto al carrito.');
     }
 }
   
