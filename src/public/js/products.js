@@ -60,6 +60,7 @@ async function addProductToCart(productId) {
 async function updateProductQuantity(productId) {
     try {
         const quantity = parseInt(document.getElementById(`quantity-${productId}`).value, 10); 
+        console.log(`Actualizando producto con ID ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
         if (quantity <= 0 || isNaN(quantity)) {
             alert('La cantidad debe ser mayor a 0 y válida.');
             return;

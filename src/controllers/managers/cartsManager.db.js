@@ -120,7 +120,11 @@ export class CartsManagerDB {
 
     async updateProdQuantity(cartId, productId, quantity) {
         try {
+            console.log(`Actualizando producto con ID ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
+
             let cart = await this.getCartById(cartId);
+            console.log('Carrito encontrado:', cart);
+
             console.log('Carrito encontrado:', cart);
 
             const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
