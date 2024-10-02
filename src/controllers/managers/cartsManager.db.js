@@ -11,14 +11,14 @@ export class CartsManagerDB {
         this.cartModel = cartModel;
         this.userModel = userModel;
         this.productModel = productModel;
-    };
+    }
 
     static getInstance() {
-        if(!CartsManagerDB.#instance) {
+        if (!CartsManagerDB.#instance) {
             CartsManagerDB.#instance = new CartsManagerDB();
         }
         return CartsManagerDB.#instance;
-    };
+    }
 
     async getCartById(id) {
         try {
@@ -42,20 +42,17 @@ export class CartsManagerDB {
         }
     }
     
-
     async createCart() {
         try {
             const cart = await cartModel.create({});
-
-            if(!cart) {
-                throw new Error ('No se pudo crear el carrito');
+            if (!cart) {
+                throw new Error('No se pudo crear el carrito');
             }
-
             return cart;
         } catch (error) {
             throw error;
         }
-    };
+    }
 
     async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {
@@ -67,7 +64,6 @@ export class CartsManagerDB {
             }
     
             let cart = await this.getCartById(cartId);
-
             if (!cart.products) {
                 cart.products = [];
             }
@@ -78,7 +74,8 @@ export class CartsManagerDB {
                 cart.products[productIndex].quantity += quantity;  
             } else {
                 cart.products.push({ productId: productId, quantity });  
-    
+            }
+
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
             return cart;
         } catch (error) {
@@ -86,10 +83,6 @@ export class CartsManagerDB {
             throw error;
         }
     }
-    
-    
-    
-
 
     async updateCart(id, products) {
         try {
@@ -103,9 +96,8 @@ export class CartsManagerDB {
             await Promise.all(promises);
 
             let cart = await this.getCartById(id);
-
             products.forEach(product => {
-                const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
+                const productIndex = cart.products.findIndex(item => item.productId._id.toString() === product.product);
                 if (productIndex !== -1) {
                     cart.products[productIndex].quantity = product.quantity;
                 } else {
@@ -113,20 +105,19 @@ export class CartsManagerDB {
                 }
             });
 
-            await cartModel.updateOne({ _id:id }, { products: cart.products });
-
+            await cartModel.updateOne({ _id: id }, { products: cart.products });
             cart = await this.getCartById(id);
             return cart;
         } catch (error) {
             throw error;
         }
-    };
+    }
 
     async updateProdQuantity(cartId, productId, quantity) {
         try {
             let cart = await this.getCartById(cartId);
-            const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
-            if(productIndex === -1) {
+            const productIndex = cart.products.findIndex(item => item.productId._id.toString() === productId);
+            if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con id ${productId} en el carrito con id ${cartId}`);
             } else {
                 cart.products[productIndex].quantity = quantity;
@@ -138,7 +129,7 @@ export class CartsManagerDB {
         } catch (error) {
             throw error;
         }
-    };
+    }
 
     async deleteCart(id) {
         try {
@@ -150,14 +141,14 @@ export class CartsManagerDB {
         } catch (error) {
             throw error;
         }
-    };
+    }
 
     async removeProdFromCart(cartId, productId) {
         try {
             let cart = await this.getCartById(cartId);
-            const productIndex = cart.products.findIndex(product => product.productId._id.toString() === productId);
+            const productIndex = cart.products.findIndex(item => item.productId._id.toString() === productId);
 
-            if(productIndex === -1) {
+            if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con id ${productId} en el carrito con id ${cartId}`);
             } else {
                 cart.products.splice(productIndex, 1);
@@ -169,73 +160,72 @@ export class CartsManagerDB {
         } catch (error) {
             throw error;
         }
-    };
+    }
 
-    async purchaseCart(cid, user){
+    async purchaseCart(cid, user) {
         try {
             const cartResponse = await this.getById(cid); 
-        if (cartResponse.status !== 200) {
-            throw new Error('Carrito no encontrado');
-        }
-    
-        const cart = cartResponse.payload;
-        if (cart.products.length === 0) {
-            return { status: 400, error: 'cart empty' };
-        }
-    
-        const userData = user;
-        let ticketAmount = 0;
-    
-        for (let item of cart.products) {
-            const productId = item.product._id;
-            const product = await this.productModel.findById(productId);
-            
-            if (!product) {
-                throw new Error(`product not found: ${productId}`);
+            if (cartResponse.status !== 200) {
+                throw new Error('Carrito no encontrado');
             }
     
-            const productStock = product.stock;
-            const requestedQuantity = item.qty;
+            const cart = cartResponse.payload;
+            if (cart.products.length === 0) {
+                return { status: 400, error: 'cart empty' };
+            }
     
-            if (requestedQuantity <= productStock) {
-                const quantityUpdated = productStock - requestedQuantity;
-                await this.productModel.findByIdAndUpdate(productId, { stock: quantityUpdated }, { new: true });
+            const userData = user;
+            let ticketAmount = 0;
     
-                ticketAmount += requestedQuantity * product.price;
-    
-            } else {
-                await this.productModel.findByIdAndUpdate(productId, { stock: 0 }, { new: true });
-
-                const quantityNotPurchased = requestedQuantity - productStock;
-
-                const updateResponse = await this.updateProduct(cid, productId, quantityNotPurchased);
-                if (updateResponse.status !== 200) {
-                    return { status: 500, error: 'error updating product stock' };
+            for (let item of cart.products) {
+                const productId = item.product._id;
+                const product = await this.productModel.findById(productId);
+                
+                if (!product) {
+                    throw new Error(`product not found: ${productId}`);
                 }
-
-                ticketAmount += productStock * product.price;
-            }
-        }
-
-        if (ticketAmount > 0) {
-            const ticket = {
-                amount: ticketAmount,
-                purchaser: userData.email
-            };
-            const ticketFinished = await ticketModel.create(ticket);
-            console.log('ticket created:', ticketFinished);
-               const subject = 'Compra realizada con éxito';
-               const text = `Hola ${userData.firstName},\n\nTu compra con el carrito ${cid} ha sido realizada con éxito.\n\nGracias por tu compra.\n\nSaludos.`;
-               
-               await sendPurchaseEmail(userData.email, subject, text);
-            const clearCartResponse = await this.clearCartProducts(cid);
-            if (clearCartResponse.status !== 200) {
-                console.error("error emptying cart", clearCartResponse.error);
-                return { status: 500, error: 'error emptying cart' };
-            }
     
-            return { status: 200, payload: ticketFinished };
-        }
+                const productStock = product.stock;
+                const requestedQuantity = item.qty;
+    
+                if (requestedQuantity <= productStock) {
+                    const quantityUpdated = productStock - requestedQuantity;
+                    await this.productModel.findByIdAndUpdate(productId, { stock: quantityUpdated }, { new: true });
+    
+                    ticketAmount += requestedQuantity * product.price;
+    
+                } else {
+                    await this.productModel.findByIdAndUpdate(productId, { stock: 0 }, { new: true });
+                    const quantityNotPurchased = requestedQuantity - productStock;
+
+                    const updateResponse = await this.updateProduct(cid, productId, quantityNotPurchased);
+                    if (updateResponse.status !== 200) {
+                        return { status: 500, error: 'error updating product stock' };
+                    }
+
+                    ticketAmount += productStock * product.price;
+                }
+            }
+
+            if (ticketAmount > 0) {
+                const ticket = {
+                    amount: ticketAmount,
+                    purchaser: userData.email
+                };
+                const ticketFinished = await ticketModel.create(ticket);
+                console.log('ticket created:', ticketFinished);
+                const subject = 'Compra realizada con éxito';
+                const text = `Hola ${userData.firstName},\n\nTu compra con el carrito ${cid} ha sido realizada con éxito.\n\nGracias por tu compra.\n\nSaludos.`;
+                
+                await sendPurchaseEmail(userData.email, subject, text);
+                const clearCartResponse = await this.clearCartProducts(cid);
+                if (clearCartResponse.status !== 200) {
+                    console.error("error emptying cart", clearCartResponse.error);
+                    return { status: 500, error: 'error emptying cart' };
+                }
+    
+                return { status: 200, payload: ticketFinished };
+            }
         } catch (error) {
             console.error('Error al procesar la compra:', error);
             return { status: 500, error: 'Error al procesar la compra' };
