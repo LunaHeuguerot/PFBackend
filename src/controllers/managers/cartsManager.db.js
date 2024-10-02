@@ -128,6 +128,8 @@ export class CartsManagerDB {
             if (!cart || !cart.products || cart.products.length === 0) {
                 throw new Error(`El carrito con id ${cartId} no contiene productos.`);
             }
+
+            console.log('Productos en el carrito:', cart.products);
     
             const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
             console.log('Índice del producto encontrado:', productIndex);
@@ -150,10 +152,8 @@ export class CartsManagerDB {
             console.error('Error en updateProdQuantity:', error);
             throw error;
         }
-    }
-    
-    
-    
+    }  
+        
     async deleteCart(id) {
         try {
             let cart = await this.getCartById(id);
