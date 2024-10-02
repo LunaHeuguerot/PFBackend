@@ -19,7 +19,7 @@ async function createCart() {
 async function addProductToCart(productId) {
     try {
       console.log('Intentando agregar el producto...');
-      const response = await fetch(`/api/cart/add/${productId}`, {
+      const response = await fetch(`/carts/${cartId}/product/${productId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
