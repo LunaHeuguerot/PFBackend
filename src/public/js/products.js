@@ -16,7 +16,7 @@ async function createCart() {
     }
 }
 
-async function addProductToCart(productId) {
+async function addProductToCart(productId, cartId) {
     try {
         console.log('Intentando agregar el producto...');
         const response = await fetch(`/carts/${cartId}/product/${productId}`, {
