@@ -23,7 +23,7 @@ async function addProductToCart(productId) {
         }
 
         const quantity = 1; 
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, { // Corrección aquí
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json' 
@@ -39,14 +39,16 @@ async function addProductToCart(productId) {
         const data = await response.json();
 
         if (data.status === 'success') {
-            alert(`Producto con id ${productId} agregado al carrito exitosamente!`); // Corrección aquí
+            alert(`Producto con id ${productId} agregado al carrito exitosamente!`);
         } else {
             alert('No se pudo agregar el producto al carrito.');
         }
     } catch (error) {
-        alert(error.message || `Error al agregar el producto con id ${productId} al carrito`); // Corrección aquí
+        console.error(error); 
+        alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
     }
 }
+
 
 async function viewCart() {
     try {
@@ -54,11 +56,29 @@ async function viewCart() {
             cartId = await createCart();
         }
 
-        window.location.href = `/carts/${cartId}`; // Corrección aquí
+        const response = await fetch(`/carts/${cartId}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al mostrar el carrito');
+        }
+
+        const data = await response.json();
+
+        if (data.products && Array.isArray(data.products)) {
+            data.products.forEach(product => {
+                if (product.price === undefined) {
+                    console.error(`El producto con ID ${product._id} no tiene un precio definido.`);
+                }
+            });
+        } else {
+            console.error('No se encontraron productos en el carrito.');
+        }
+
     } catch (error) {
         alert(error.message || 'Error al mostrar carrito');
     }
 }
+
 
 async function updateProductQuantity(productId) {
     try {
