@@ -16,27 +16,36 @@ async function createCart() {
     }
 }
 
-async function addProductToCart(productId, cartId) {
+async function getCartId() {
+    if (!cartId) {
+        cartId = await createCart();  
+    }
+    return cartId;
+}
+
+async function addProductToCart(productId) {
     try {
+        const currentCartId = await getCartId();  
         console.log('Intentando agregar el producto...');
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
+
+        const response = await fetch(`/carts/${currentCartId}/product/${productId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
         });
-  
+
         console.log('Respuesta recibida, procesando...');
       
         if (!response.ok) {
             console.error('Respuesta del servidor no fue ok:', response.status);
             throw new Error('Error en la petición al servidor.');
         }
-  
+
         const result = await response.json();
         console.log('Resultado del servidor:', result);
   
-        if (result.success) {
+        if (result.status === 'success') {
             console.log('Producto agregado al carrito.');
         } else {
             console.error('El servidor respondió con éxito falso:', result);
@@ -47,32 +56,17 @@ async function addProductToCart(productId, cartId) {
         alert('Error: No se pudo agregar el producto al carrito.');
     }
 }
-  
-
-
-
-async function viewCart() {
-    try {
-        if (!cartId) {
-            cartId = await createCart();
-        }
-
-        window.location.href = `/carts/${cartId}`;
-    } catch (error) {
-        alert(error.message || 'Error al mostrar carrito');
-    }
-}
-
 
 async function updateProductQuantity(productId) {
     try {
-        const quantity = document.getElementById(`quantity-${productId}`).value; // Corrección aquí
+        const quantity = document.getElementById(`quantity-${productId}`).value;
         if (quantity <= 0) {
             alert('La cantidad debe ser mayor a 0.');
             return;
         }
 
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, { // Corrección aquí
+        const currentCartId = await getCartId();
+        const response = await fetch(`/carts/${currentCartId}/product/${productId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,11 +75,11 @@ async function updateProductQuantity(productId) {
         });
 
         const data = await response.json();
-        if (data.status === 'Ok') {
+        if (data.status === 'success') {
             alert('Cantidad actualizada correctamente');
             window.location.reload();
         } else {
-            alert(data.error || 'Error al actualizar la cantidad');
+            alert(data.message || 'Error al actualizar la cantidad');
         }
     } catch (error) {
         alert(error.message || 'Error al actualizar la cantidad');
@@ -94,14 +88,15 @@ async function updateProductQuantity(productId) {
 
 async function removeProduct(productId) {
     try {
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'DELETE' }); // Corrección aquí
+        const currentCartId = await getCartId();
+        const response = await fetch(`/carts/${currentCartId}/product/${productId}`, { method: 'DELETE' });
         const data = await response.json();
 
-        if (data.status === 'Ok') {
+        if (data.status === 'success') {
             alert('Producto eliminado correctamente');
             window.location.reload();
         } else {
-            alert(data.error || 'Error al eliminar el producto');
+            alert(data.message || 'Error al eliminar el producto');
         }
     } catch (error) {
         alert(error.message || 'Error al eliminar el producto');
@@ -110,7 +105,8 @@ async function removeProduct(productId) {
 
 async function confirmPurchase() {
     try {
-        const response = await fetch(`/carts/${cartId}/purchase`, {
+        const currentCartId = await getCartId();
+        const response = await fetch(`/carts/${currentCartId}/purchase`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -118,11 +114,11 @@ async function confirmPurchase() {
         });
 
         const data = await response.json();
-        if (data.status === 'Ok') {
+        if (data.status === 'success') {
             alert('Compra realizada con éxito');
             window.location.reload();
         } else {
-            alert(data.error || 'Error al confirmar la compra');
+            alert(data.message || 'Error al confirmar la compra');
         }
     } catch (error) {
         alert(error.message || 'Error al confirmar la compra');
