@@ -65,7 +65,13 @@ async function updateProductQuantity(productId) {
             return;
         }
 
-        const quantity = parseInt(document.getElementById(`quantity-${productId}`).value, 10); 
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        if (!quantityElement) {
+            alert('Elemento de cantidad no encontrado.');
+            return;
+        }
+
+        const quantity = parseInt(quantityElement.value, 10); 
         console.log(`Actualizando producto con ID ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
 
         if (quantity <= 0 || isNaN(quantity)) {
@@ -82,6 +88,13 @@ async function updateProductQuantity(productId) {
             credentials: 'include'
         });
 
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            const errorText = await response.text(); // Obtener el texto de error
+            console.error('Error en la respuesta del servidor:', response.status, errorText);
+            throw new Error(`Error al actualizar la cantidad: ${response.status}`);
+        }
+
         const data = await response.json();
         if (data.status === 'Ok') {
             alert('Cantidad actualizada correctamente');
@@ -90,6 +103,7 @@ async function updateProductQuantity(productId) {
             alert(data.error || 'Error al actualizar la cantidad');
         }
     } catch (error) {
+        console.error('Error en updateProductQuantity:', error);
         alert(error.message || 'Error al actualizar la cantidad');
     }
 }
