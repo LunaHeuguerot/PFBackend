@@ -121,27 +121,37 @@ export class CartsManagerDB {
     async updateProdQuantity(cartId, productId, quantity) {
         try {
             console.log(`Actualizando producto con ID ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
-
+    
             let cart = await this.getCartById(cartId);
             console.log('Carrito encontrado:', cart);
 
-            console.log('Carrito encontrado:', cart);
-
+            if (!cart || !cart.products || cart.products.length === 0) {
+                throw new Error(`El carrito con id ${cartId} no contiene productos.`);
+            }
+    
             const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
             console.log('Índice del producto encontrado:', productIndex);
-    
+        
             if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con id ${productId} en el carrito con id ${cartId}`);
             }
-    
+
+            if (quantity <= 0 || isNaN(quantity)) {
+                throw new Error('La cantidad debe ser un número mayor a 0.');
+            }
+
             cart.products[productIndex].quantity = quantity; 
-            cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
-            return cart;
+
+            const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
+            console.log('Carrito actualizado:', updatedCart);
+    
+            return updatedCart;
         } catch (error) {
             console.error('Error en updateProdQuantity:', error);
             throw error;
         }
     }
+    
     
     
     async deleteCart(id) {
