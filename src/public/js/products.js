@@ -23,7 +23,7 @@ async function addProductToCart(productId) {
         }
 
         const quantity = 1; 
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, { // Corrección aquí
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json' 
@@ -39,16 +39,14 @@ async function addProductToCart(productId) {
         const data = await response.json();
 
         if (data.status === 'success') {
-            alert(`Producto con id ${productId} agregado al carrito exitosamente!`);
+            alert(`Producto con id ${productId} agregado al carrito exitosamente!`); // Corrección aquí
         } else {
             alert('No se pudo agregar el producto al carrito.');
         }
     } catch (error) {
-        alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
+        alert(error.message || `Error al agregar el producto con id ${productId} al carrito`); // Corrección aquí
     }
 }
-
-
 
 async function viewCart() {
     try {
@@ -56,7 +54,7 @@ async function viewCart() {
             cartId = await createCart();
         }
 
-        window.location.href = `/carts/${cartId}`;
+        window.location.href = `/carts/${cartId}`; // Corrección aquí
     } catch (error) {
         alert(error.message || 'Error al mostrar carrito');
     }
@@ -64,13 +62,13 @@ async function viewCart() {
 
 async function updateProductQuantity(productId) {
     try {
-        const quantity = document.getElementById(`quantity-${productId}`).value;
+        const quantity = document.getElementById(`quantity-${productId}`).value; // Corrección aquí
         if (quantity <= 0) {
             alert('La cantidad debe ser mayor a 0.');
             return;
         }
 
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, { // Corrección aquí
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -92,7 +90,7 @@ async function updateProductQuantity(productId) {
 
 async function removeProduct(productId) {
     try {
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'DELETE' });
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, { method: 'DELETE' }); // Corrección aquí
         const data = await response.json();
 
         if (data.status === 'Ok') {
