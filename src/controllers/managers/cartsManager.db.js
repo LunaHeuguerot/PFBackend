@@ -23,24 +23,20 @@ export class CartsManagerDB {
     async getCartById(id) {
         try {
             if (id.length !== 24) {
-                throw new Error('El id debe tener 24 caracteres');
+                throw new Error ('El id debe tener 24 caracteres')
             }
-    
-            const cart = await cartModel.findById(id).populate('_user_id').populate('products._id').lean();
-    
+
+            const cart = await cartModel.find().populate('_user_id').populate('products._id').lean();
+
             if (!cart) {
                 throw new Error(`No se encontró el carrito con id ${id}`);
             }
 
-            if (!cart.products) {
-                cart.products = []; 
-            }
-    
             return cart;
         } catch (error) {
             throw error;
         }
-    }
+    };
     
     async createCart() {
         try {

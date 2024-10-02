@@ -51,7 +51,7 @@ cartRouter.get('/sms', async (req, res) => {
         const confirmation = await twilioClient.messages.create({
             body: 'Mensaje enviado con servicio Twilio',
             from: config.TWILIO_PHONE,
-            to: 'telefono_destino' // Reemplaza con el número de teléfono de destino
+            to: 'telefono_destino' 
         });
         res.status(200).send({ status: 'OK', data: confirmation });
     } catch (err) {

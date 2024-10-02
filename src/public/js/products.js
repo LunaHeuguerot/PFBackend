@@ -56,24 +56,7 @@ async function viewCart() {
             cartId = await createCart();
         }
 
-        const response = await fetch(`/carts/${cartId}`);
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error al mostrar el carrito');
-        }
-
-        const data = await response.json();
-
-        if (data.products && Array.isArray(data.products)) {
-            data.products.forEach(product => {
-                if (product.price === undefined) {
-                    console.error(`El producto con ID ${product._id} no tiene un precio definido.`);
-                }
-            });
-        } else {
-            console.error('No se encontraron productos en el carrito.');
-        }
-
+        window.location.href = `/carts/${cartId}`;
     } catch (error) {
         alert(error.message || 'Error al mostrar carrito');
     }
