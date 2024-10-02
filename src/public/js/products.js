@@ -59,14 +59,13 @@ async function addProductToCart(productId) {
 
 async function updateProductQuantity(productId) {
     try {
-        const quantity = document.getElementById(`quantity-${productId}`).value;
-        if (quantity <= 0) {
-            alert('La cantidad debe ser mayor a 0.');
+        const quantity = parseInt(document.getElementById(`quantity-${productId}`).value, 10); 
+        if (quantity <= 0 || isNaN(quantity)) {
+            alert('La cantidad debe ser mayor a 0 y válida.');
             return;
         }
 
-        const currentCartId = await getCartId();
-        const response = await fetch(`/carts/${currentCartId}/product/${productId}`, {
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -79,12 +78,13 @@ async function updateProductQuantity(productId) {
             alert('Cantidad actualizada correctamente');
             window.location.reload();
         } else {
-            alert(data.message || 'Error al actualizar la cantidad');
+            alert(data.error || 'Error al actualizar la cantidad');
         }
     } catch (error) {
         alert(error.message || 'Error al actualizar la cantidad');
     }
 }
+
 
 async function removeProduct(productId) {
     try {
