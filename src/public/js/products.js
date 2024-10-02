@@ -41,13 +41,14 @@ async function addProductToCart(productId) {
         if (data.status === 'success') {
             alert(`Producto con id ${productId} agregado al carrito exitosamente!`);
         } else {
-            alert('No se pudo agregar el producto al carrito.');
+            throw new Error('No se pudo agregar el producto al carrito.');
         }
     } catch (error) {
         console.error(error); 
-        alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
+        alert(`Error: ${error.message || 'Error al agregar el producto con id ' + productId} al carrito.`);
     }
 }
+
 
 
 async function viewCart() {
