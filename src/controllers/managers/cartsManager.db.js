@@ -26,7 +26,7 @@ export class CartsManagerDB {
                 throw new Error ('El id debe tener 24 caracteres')
             }
 
-            const cart = await cartModel.find().populate('_user_id').populate('products._id').lean();
+            const cart = await cartModel.findById(id).populate('_user_id').populate('products._id').lean();
 
             if (!cart) {
                 throw new Error(`No se encontró el carrito con id ${id}`);
