@@ -81,13 +81,13 @@ cartRouter.get('/:cid', async (req, res) => {
 
 cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
     try {
-        const cid = req.params.cid;
-        const pid = req.params.pid;
+        const cid = req.params.cid; 
+        const pid = req.params.pid; 
         const userId = req.session.user._id;
-        const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1;
-
+        const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1; 
         const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
-        req.session.cart = updatedCart;
+        req.session.cart = updatedCart; 
+
         console.log('Carrito almacenado en la sesión:', req.session.cart); 
 
         if (!updatedCart) {
@@ -112,6 +112,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
     }
 });
+
 
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
@@ -144,6 +145,8 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
     const pid = req.params.pid;
     const quantityUp = +req.body.quantity;
 
+    console.log(`Actualizando cantidad del producto ${pid} en el carrito ${cid} a ${quantityUp}`); // Log de inicio
+
     if (quantityUp <= 0 || isNaN(quantityUp)) {
         return res.status(400).send({ status: 'Not Ok', payload: [], error: 'Se requiere una cantidad numérica mayor a 0.' });
     }
@@ -152,7 +155,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
         const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);
 
         req.session.cart = updatedCart;
-        console.log('Carrito actualizado en la sesión:', req.session.cart);
+        console.log('Carrito actualizado en la sesión:', req.session.cart); 
 
         res.status(200).send({ status: 'Ok', payload: updatedCart, mensaje: `Se actualizó la cantidad del producto con id ${pid} en el carrito con id ${cid}.` });
     } catch (error) {
@@ -160,6 +163,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
         res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
     }
 });
+
 
 
 cartRouter.delete('/:cid', async (req, res) => {

@@ -36,7 +36,7 @@ async function addProductToCart(productId) {
         });
 
         console.log('Respuesta recibida, procesando...');
-      
+
         if (!response.ok) {
             console.error('Respuesta del servidor no fue ok:', response.status);
             throw new Error('Error en la petición al servidor.');
@@ -44,7 +44,7 @@ async function addProductToCart(productId) {
 
         const result = await response.json();
         console.log('Resultado del servidor:', result);
-  
+
         if (result.status === 'Ok') {
             console.log('Producto agregado al carrito.');
         } else {
