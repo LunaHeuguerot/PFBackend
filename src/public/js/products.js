@@ -18,36 +18,36 @@ async function createCart() {
 
 async function addProductToCart(productId) {
     try {
-        if (!cartId) {
-            cartId = await createCart();
-        }
-
-        const quantity = 1; 
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({ quantity }) 
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error al agregar el producto al carrito');
-        }
-
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            alert(`Producto con id ${productId} agregado al carrito exitosamente!`);
-        } else {
-            throw new Error('No se pudo agregar el producto al carrito.');
-        }
+      console.log('Intentando agregar el producto...');
+      const response = await fetch(`/api/cart/add/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      console.log('Respuesta recibida, procesando...');
+      
+      if (!response.ok) {
+        console.error('Respuesta del servidor no fue ok:', response.status);
+        throw new Error('Error en la petición al servidor.');
+      }
+  
+      const result = await response.json();
+      console.log('Resultado del servidor:', result);
+  
+      if (result.success) {
+        console.log('Producto agregado al carrito.');
+      } else {
+        console.error('El servidor respondió con éxito falso:', result);
+        throw new Error('No se pudo agregar el producto al carrito.');
+      }
     } catch (error) {
-        console.error(error); 
-        alert(`Error: ${error.message || 'Error al agregar el producto con id ' + productId} al carrito.`);
+      console.error('Error capturado:', error.message);
+      alert('Error: No se pudo agregar el producto al carrito.');
     }
 }
+  
 
 
 
