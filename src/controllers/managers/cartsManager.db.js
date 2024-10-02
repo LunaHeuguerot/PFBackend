@@ -122,14 +122,16 @@ export class CartsManagerDB {
             } else {
                 cart.products[productIndex].quantity = quantity;
             }
-
+    
             await cartModel.updateOne({ _id: cartId }, { products: cart.products });
             cart = await this.getCartById(cartId);
-            return cart;
+            return cart; 
         } catch (error) {
+            console.error('Error al actualizar la cantidad del producto:', error);
             throw error;
         }
     }
+    
 
     async deleteCart(id) {
         try {

@@ -152,22 +152,20 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
     const quantityUp = +req.body.quantity;
-    if (quantityUp <= 0 || isNaN(quantityUp)) {
-        res.status(400).send({ status: 'Not Ok', payload: [], error: `Se requiere una cantidad numérico mayor a 0.` });
-    } else {
-        const rta = await CartsManagerDB.getInstance().updateProdQuantity(cid,pid,quantityUp);
-        if (rta === 0) {
-            res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito con id ${cid} no existe` });
-        } else {
-            if (rta === 1) {
-                res.status(400).send({ status: 'Not Ok', payload: [], error: `El producto con id ${pid} no existe en el carrito con id ${cid}.` });
-            } else {
-                res.status(200).send({ status: 'Ok', payload: [], mensaje: `Se actualizo a ${quantityUp} la cantidad del producto con id ${pid} en el carrito con id ${cid}. OK` });
-            }
-        };
 
+    if (quantityUp <= 0 || isNaN(quantityUp)) {
+        return res.status(400).send({ status: 'Not Ok', payload: [], error: 'Se requiere una cantidad numérica mayor a 0.' });
+    }
+
+    try {
+        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);
+        res.status(200).send({ status: 'Ok', payload: updatedCart, mensaje: `Se actualizó la cantidad del producto con id ${pid} en el carrito con id ${cid}.` });
+    } catch (error) {
+        console.error('Error al actualizar la cantidad del producto:', error);
+        res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
     }
 });
+
 
 cartRouter.delete('/:cid', async (req, res) => {
     const cid = req.params.cid;

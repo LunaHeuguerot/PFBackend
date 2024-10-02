@@ -31,18 +31,22 @@ async function addProductToCart(productId) {
             body: JSON.stringify({ quantity }) 
         });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al agregar el producto al carrito');
+        }
+
         const data = await response.json();
 
         if (data.status === 'success') {
-            alert(`Producto con id ${productId} agregado al carrito exitosamente`);
+            alert(`Producto con id ${productId} agregado al carrito exitosamente!`);
         } else {
-            alert(`Error: ${data.error}`);
+            alert('No se pudo agregar el producto al carrito.');
         }
     } catch (error) {
         alert(error.message || `Error al agregar el producto con id ${productId} al carrito`);
     }
 }
-
 
 
 
