@@ -27,14 +27,15 @@ const cartSchema = new mongoose.Schema({
 
 cartSchema.pre('find', function () {
     this.populate({ path: '_user_id', model: userModel });
-    this.populate({ path: 'products.product', model: productModel });
+    this.populate({ path: 'products.productId', model: productModel });  
 });
 
 cartSchema.pre('findOne', function(next) {
     this.populate({ path: '_user_id', model: userModel });
-    this.populate('products.productId');
+    this.populate({ path: 'products.productId', model: productModel });  
     next();
 });
+
 
 const cartModel = mongoose.model(cartsCollection, cartSchema);
 
