@@ -72,12 +72,12 @@ export class CartsManagerDB {
                 throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
             }
     
-            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
-        
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId.toString());  // Asegurarse de comparar como strings
+    
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += quantity;  
             } else {
-                cart.products.push({ productId: productId, quantity });  
+                cart.products.push({ productId: mongoose.Types.ObjectId(productId), quantity }); 
             }
     
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
@@ -87,6 +87,7 @@ export class CartsManagerDB {
             throw error;
         }
     }
+    
     
 
     async updateCart(id, products) {
