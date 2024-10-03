@@ -72,12 +72,13 @@ export class CartsManagerDB {
                 throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
             }
     
-            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId.toString());  // Asegurarse de comparar como strings
-    
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId.toString()); 
+            
             if (productIndex !== -1) {
+                cart.products[productIndex].productId = mongoose.Types.ObjectId(productId); 
                 cart.products[productIndex].quantity += quantity;  
             } else {
-                cart.products.push({ productId: mongoose.Types.ObjectId(productId), quantity }); 
+                cart.products.push({ productId: mongoose.Types.ObjectId(productId), quantity });  
             }
     
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
