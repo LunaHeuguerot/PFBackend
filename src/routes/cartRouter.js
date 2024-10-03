@@ -79,14 +79,14 @@ cartRouter.get('/:cid', async (req, res) => {
     }
 });
 
-cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
+cartRouter.post('/:cid/product/:productCode', handlePolicies('user', 'self'), async (req, res) => { 
     try {
         const cid = req.params.cid; 
-        const pid = req.params.pid; 
+        const productCode = req.params.productCode; 
         const userId = req.session.user._id;
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1;
 
-        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity, req);
+        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, productCode, userId, quantity, req); 
 
         req.session.cart = updatedCart; 
 
@@ -96,13 +96,13 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         if (!updatedCart) {
             return res.status(400).json({
                 status: 'Not Ok',
-                error: `No se pudo agregar el producto con id ${pid} al carrito con id ${cid}`
+                error: `No se pudo agregar el producto con código ${productCode} al carrito con id ${cid}` 
             });
         }
 
         res.status(200).json({
             status: 'Ok',
-            mensaje: `Se agregó el producto con id ${pid} al carrito con id ${cid} correctamente`,
+            mensaje: `Se agregó el producto con código ${productCode} al carrito con id ${cid} correctamente`, 
             payload: updatedCart,
             newProductId: req.session.newProductId 
         });
@@ -116,6 +116,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
     }
 });
+
 
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
@@ -143,30 +144,31 @@ cartRouter.put('/:cid', async (req, res) => {
     };
 });
 
-cartRouter.put('/:cid/product/:pid', async (req, res) => {
+cartRouter.put('/:cid/product/:productCode', async (req, res) => { 
     const cid = req.params.cid;
-    const pid = req.params.pid;
+    const productCode = req.params.productCode; 
     const quantityUp = +req.body.quantity;  
 
-    console.log(`Solicitud PUT recibida para actualizar producto. Carrito ID: ${cid}, Product ID: ${pid}, Nueva Cantidad: ${quantityUp}`); 
+    console.log(`Solicitud PUT recibida para actualizar producto. Carrito ID: ${cid}, Product Code: ${productCode}, Nueva Cantidad: ${quantityUp}`); // Cambiar pid a productCode
 
     if (quantityUp <= 0 || isNaN(quantityUp)) {
         return res.status(400).send({ status: 'Not Ok', payload: [], error: 'Se requiere una cantidad numérica mayor a 0.' });
     }
 
     try {
-        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);  
+        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, productCode, quantityUp);  
         console.log('Carrito actualizado:', updatedCart); 
 
         req.session.cart = updatedCart;
         console.log('Carrito actualizado en la sesión:', req.session.cart); 
 
-        res.status(200).send({ status: 'Ok', payload: updatedCart, mensaje: `Se actualizó la cantidad del producto con id ${pid} en el carrito con id ${cid}.` });
+        res.status(200).send({ status: 'Ok', payload: updatedCart, mensaje: `Se actualizó la cantidad del producto con código ${productCode} en el carrito con id ${cid}.` }); // Cambiar pid a productCode
     } catch (error) {
         console.error('Error al actualizar la cantidad del producto:', error);
         res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
     }
 });
+
 
 
 
