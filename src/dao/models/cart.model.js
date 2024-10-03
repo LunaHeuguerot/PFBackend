@@ -32,7 +32,7 @@ cartSchema.methods.findProductByCode = function (productCode) {
     return this.products.find(product => product.productCode === productCode);
 };
 
-cartSchema.methods.updateProductQuantity = async function (productCode, quantity) {
+cartSchema.methods.updateProductQuantityByCode = async function (productCode, quantity) {
     if (isNaN(quantity) || quantity <= 0) {
         throw new Error('La cantidad debe ser un número válido mayor a 0.');
     }
@@ -47,6 +47,10 @@ cartSchema.methods.updateProductQuantity = async function (productCode, quantity
     }
 };
 
+cartSchema.methods.findProductById = function (productId) {
+    return this.products.find(product => product.productId.toString() === productId);
+};
+
 cartSchema.pre('find', function () {
     this.populate({ path: '_user_id', model: userModel });
     this.populate({ path: 'products.productId', model: productModel });  
@@ -57,7 +61,6 @@ cartSchema.pre('findOne', function(next) {
     this.populate({ path: 'products.productId', model: productModel });  
     next();
 });
-
 
 const cartModel = mongoose.model(cartsCollection, cartSchema);
 

@@ -140,17 +140,18 @@ cartRouter.put('/:cid', async (req, res) => {
 });
 
 cartRouter.put('/:cid/product/:pid', async (req, res) => {
-    const cid = req.params.cid;
-    const pid = req.params.pid; 
-    const quantityUp = +req.body.quantity;  
+    const cid = req.params.cid; 
+    const pid = req.params.pid;
 
-    if (quantityUp <= 0 || isNaN(quantityUp)) {
+    const { quantity } = req.body;  // Extrae la cantidad del cuerpo de la solicitud
+
+    if (quantity <= 0 || isNaN(quantity)) {
         return res.status(400).send({ status: 'Not Ok', error: 'Se requiere una cantidad numérica mayor a 0.' });
     }
 
     try {
-        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);  
-        req.session.cart = updatedCart;
+        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantityById(cid, pid, quantity);
+        req.session.cart = updatedCart;  
 
         res.status(200).send({ status: 'Ok', payload: updatedCart });
     } catch (error) {
@@ -158,6 +159,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
         res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
     }
 });
+
 
 cartRouter.delete('/:cid', async (req, res) => {
     const cid = req.params.cid;
