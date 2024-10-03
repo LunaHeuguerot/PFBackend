@@ -4,6 +4,7 @@ import config from '../services/config.js';
 import nodemailer from 'nodemailer';
 import { handlePolicies } from '../services/utils.js';
 import twilio from 'twilio';
+import { PayloadInstance } from "twilio/lib/rest/api/v2010/account/recording/addOnResult/payload.js";
 
 const cartRouter = Router();
 
@@ -143,9 +144,9 @@ cartRouter.put('/:cid', async (req, res) => {
     };
 });
 
-cartRouter.put('/:cid/product/code/:productCode', async (req, res) => {
+cartRouter.put('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
-    const productCode = req.params.productCode; 
+    const pid = req.params.pid; 
     const quantityUp = +req.body.quantity;  
 
     if (quantityUp <= 0 || isNaN(quantityUp)) {
@@ -153,7 +154,7 @@ cartRouter.put('/:cid/product/code/:productCode', async (req, res) => {
     }
 
     try {
-        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, productCode, quantityUp);  
+        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, PayloadInstance, quantityUp);  
         req.session.cart = updatedCart;
 
         res.status(200).send({ status: 'Ok', payload: updatedCart });

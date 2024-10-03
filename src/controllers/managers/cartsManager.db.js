@@ -114,21 +114,21 @@ export class CartsManagerDB {
                 }
             });
 
-            cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
+            cart = await cartModel.findByIdAndUpdate(id, { products: cart.products }, { new: true }).lean(); 
             return cart;
         } catch (error) {
             throw error;
         }
     }
 
-    async updateProdQuantity(cartId, productCode, quantity) {
+    async updateProdQuantity(cartId, productId, quantity) {
         try {
             const cart = await this.getCartById(cartId); 
 
-            const productInCart = cart.products.find(product => product.productCode === productCode);
+            const productInCart = cart.products.find(product => product.productId._id === productId);
     
             if (!productInCart) {
-                throw new Error(`No se encontró el producto con código ${productCode} en el carrito.`);
+                throw new Error(`No se encontró el producto con código ${productId} en el carrito.`);
             }
 
             productInCart.quantity = quantity;
@@ -192,7 +192,7 @@ export class CartsManagerDB {
             let ticketAmount = 0;
     
             for (let item of cart.products) {
-                const productId = item.product._id;
+                const productId = item._id;
                 const product = await this.productModel.findById(productId);
                 
                 if (!product) {
