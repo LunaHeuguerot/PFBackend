@@ -87,7 +87,7 @@ export class CartsManagerDB {
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += quantity;  
             } else {
-                cart.products.push({ productId: productId._id, productCode: product.productCode, quantity });  
+                cart.products.push({ productId: product._id, productCode: product.productCode, quantity });  
             }
     
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 

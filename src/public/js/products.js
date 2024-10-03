@@ -148,7 +148,7 @@ async function confirmPurchase() {
         const data = await response.json();
         if (data.status === 'Ok') {
             alert('Compra realizada con éxito');
-            window.location.href('/products');
+            window.location.href = '/products';
         } else {
             alert(data.message || 'Error al confirmar la compra');
         }
