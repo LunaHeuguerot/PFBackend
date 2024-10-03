@@ -50,13 +50,9 @@ export class CartsManagerDB {
         }
     }
 
-    async addProductToCart(cartId, productId, userId, quantity = 1) {
+    async addProductToCart(cartId, productId, userId, quantity = 1, req) {
         try {
             console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
-
-            if (!mongoose.Types.ObjectId.isValid(productId)) {
-                throw new Error(`El productId ${productId} no es un ObjectId válido.`);
-            }
             
             const product = await ProductManagerDB.getInstance().getProductById(productId);
             console.log('Producto encontrado:', product);
@@ -76,23 +72,24 @@ export class CartsManagerDB {
                 throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
             }
     
-            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId.toString());
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId.toString());  // Asegurarse de comparar como strings
     
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += quantity;  
             } else {
-                cart.products.push({ productId: mongoose.Types.ObjectId(productId), quantity });  
+                cart.products.push({ productId: productId, quantity });  
+
+                req.session.newProductId = productId;
             }
     
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
             return cart;
         } catch (error) {
-            console.error('Error en addProductToCart:', {
-                cartId, productId, userId, quantity, error: error.message, stack: error.stack
-            });
+            console.error('Error en addProductToCart:', error);
             throw error;
         }
     }
+    
     
     
     
