@@ -127,28 +127,30 @@ export class CartsManagerDB {
         }
     }
 
-    async updateProdQuantityById(cid, productId, quantity) {
+    async updateProductQuantity(cartId, productId, quantity) {
         try {
-            const cart = await this.getCartById(cid);
+            console.log(`Actualizando producto con id ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
+
+            const cart = await cartModel.findById(cartId).lean();
             if (!cart) {
-                throw new Error(`Carrito con id ${cid} no encontrado`);
+                throw new Error(`Carrito con ID ${cartId} no encontrado.`);
             }
 
-            const product = cart.products.find(p => p.productId === productId);
-            if (!product) {
-                throw new Error(`No se encontró el producto con ID ${productId} en el carrito`);
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
+            
+            if (productIndex === -1) {
+                throw new Error(`No se encontró el producto con ID ${productId} en el carrito.`);
             }
 
-            product.quantity = quantity;  
-            await cart.save(); 
-    
-            return cart;  
+            cart.products[productIndex].quantity = quantity;  
+
+            const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
+            return updatedCart;
         } catch (error) {
-            throw new Error(`Error al actualizar la cantidad: ${error.message}`);
+            console.error('Error al actualizar la cantidad del producto:', error);
+            throw error;
         }
     }
-    
-    
     
         
     async deleteCart(id) {

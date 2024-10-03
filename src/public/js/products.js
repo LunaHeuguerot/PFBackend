@@ -82,7 +82,7 @@ async function updateProductQuantity(productId) {
         console.log(`ID del producto que se va a actualizar: ${productId}`);
 
         const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
-            method: 'PUT',
+            method: 'PUT', // Este método debe coincidir con el que definiste en tu router
             headers: {
                 'Content-Type': 'application/json',
             },

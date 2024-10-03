@@ -150,7 +150,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
     }
 
     try {
-        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantityById(cid, pid, quantity);
+        const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, pid, quantity);
         req.session.cart = updatedCart;  
 
         res.status(200).send({ status: 'Ok', payload: updatedCart });
@@ -159,6 +159,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
         res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
     }
 });
+
 
 
 cartRouter.delete('/:cid', async (req, res) => {

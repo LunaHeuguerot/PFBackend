@@ -28,16 +28,18 @@ const cartSchema = new mongoose.Schema({
     }
 });
 
-cartSchema.methods.findProductByCode = function (productCode) {
-    return this.products.find(product => product.productCode === productCode);
+// Método para buscar un producto por ID en lugar de por código
+cartSchema.methods.findProductById = function (productId) {
+    return this.products.find(product => product.productId.toString() === productId);
 };
 
-cartSchema.methods.updateProductQuantityByCode = async function (productCode, quantity) {
+// Método para actualizar la cantidad de un producto por ID
+cartSchema.methods.updateProductQuantityById = async function (productId, quantity) {
     if (isNaN(quantity) || quantity <= 0) {
         throw new Error('La cantidad debe ser un número válido mayor a 0.');
     }
 
-    const product = this.products.find(p => p.productCode === productCode);
+    const product = this.products.find(p => p.productId.toString() === productId);
     
     if (product) {
         product.quantity = quantity; 
@@ -45,10 +47,6 @@ cartSchema.methods.updateProductQuantityByCode = async function (productCode, qu
     } else {
         throw new Error('Producto no encontrado en el carrito.');
     }
-};
-
-cartSchema.methods.findProductById = function (productId) {
-    return this.products.find(product => product.productId.toString() === productId);
 };
 
 cartSchema.pre('find', function () {
