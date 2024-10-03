@@ -88,9 +88,8 @@ async function updateProductQuantity(productId) {
             credentials: 'include'
         });
 
-        // Verificar si la respuesta es exitosa
         if (!response.ok) {
-            const errorText = await response.text(); // Obtener el texto de error
+            const errorText = await response.text(); 
             console.error('Error en la respuesta del servidor:', response.status, errorText);
             throw new Error(`Error al actualizar la cantidad: ${response.status}`);
         }
@@ -98,7 +97,7 @@ async function updateProductQuantity(productId) {
         const data = await response.json();
         if (data.status === 'Ok') {
             alert('Cantidad actualizada correctamente');
-            window.location.reload();
+            window.location.href = `/carts/${cartId}`; // window.location.reload();
         } else {
             alert(data.error || 'Error al actualizar la cantidad');
         }
@@ -141,7 +140,7 @@ async function confirmPurchase() {
         const data = await response.json();
         if (data.status === 'Ok') {
             alert('Compra realizada con éxito');
-            window.location.reload();
+            window.location.href('/products');
         } else {
             alert(data.message || 'Error al confirmar la compra');
         }
