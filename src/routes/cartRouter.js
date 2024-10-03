@@ -154,7 +154,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
     }
 
     try {
-        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, PayloadInstance, quantityUp);  
+        const updatedCart = await CartsManagerDB.getInstance().updateProdQuantity(cid, pid, quantityUp);  
         req.session.cart = updatedCart;
 
         res.status(200).send({ status: 'Ok', payload: updatedCart });
