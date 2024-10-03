@@ -97,10 +97,19 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
             });
         }
 
+        const addedProduct = updatedCart.products.find(product => product.productId === pid); // Ajusta esto según la estructura de tu carrito
+
         res.status(200).json({
             status: 'Ok',
             mensaje: `Se agregó el producto con id ${pid} al carrito con id ${cid} correctamente`,
-            payload: updatedCart
+            payload: {
+                cartId: updatedCart._id, 
+                addedProduct: {
+                    productId: addedProduct.productId, 
+                    quantity: addedProduct.quantity 
+                },
+                products: updatedCart.products 
+            }
         });
 
     } catch (error) {
@@ -112,6 +121,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
     }
 });
+
 
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
@@ -143,7 +153,7 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid; 
     const pid = req.params.pid;
 
-    const { quantity } = req.body;  // Extrae la cantidad del cuerpo de la solicitud
+    const { quantity } = req.body;  
 
     if (quantity <= 0 || isNaN(quantity)) {
         return res.status(400).send({ status: 'Not Ok', error: 'Se requiere una cantidad numérica mayor a 0.' });

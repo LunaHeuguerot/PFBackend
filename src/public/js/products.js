@@ -45,7 +45,7 @@ async function addProductToCart(productId) {
         const result = await response.json();
         console.log('Resultado del servidor:', result);
 
-        console.log('Producto agregado al carrito con ID:', result.payload.productId);
+        console.log('Producto agregado al carrito con ID:', result.payload.addedProduct.productId);
 
         if (result.status === 'Ok') {
             console.log('Producto agregado al carrito.');
