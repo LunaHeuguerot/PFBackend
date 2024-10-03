@@ -99,9 +99,6 @@ async function updateProductQuantity(productId) {
             alert('Cantidad actualizada correctamente');
 
             quantityElement.value = quantity; 
-
-            // redirigir:
-            // window.location.href = `/carts/${cartId}`; 
         } else {
             alert(data.error || 'Error al actualizar la cantidad');
         }
@@ -111,16 +108,14 @@ async function updateProductQuantity(productId) {
     }
 }
 
-
-
-
-
-
-
-
 async function removeProduct(productId) {
     try {
         const currentCartId = sessionStorage.getItem('cartId');
+        if (!currentCartId) {
+            alert('No se encontró el carrito en la sesión.');
+            return;
+        }
+
         const response = await fetch(`/carts/${currentCartId}/product/${productId}`, { method: 'DELETE' });
         const data = await response.json();
 
