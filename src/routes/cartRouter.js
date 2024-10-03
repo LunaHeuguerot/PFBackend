@@ -85,8 +85,6 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         const pid = req.params.pid; 
         const userId = req.session.user._id;
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1; 
-
-        // Asegúrate de que aquí se use productId para buscar el producto.
         const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
         req.session.cart = updatedCart; 
 
@@ -99,19 +97,17 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
             });
         }
 
-        // Asegúrate de que estás buscando el productId y no el productCode aquí.
-        const addedProduct = updatedCart.products.find(product => product.productId === pid); 
-
+        // Aquí se asegura que el payload contenga los productos con su productCode
         res.status(200).json({
             status: 'Ok',
             mensaje: `Se agregó el producto con id ${pid} al carrito con id ${cid} correctamente`,
             payload: {
-                cartId: updatedCart._id, 
-                addedProduct: {
-                    productId: addedProduct.productId, 
-                    quantity: addedProduct.quantity 
-                },
-                products: updatedCart.products 
+                cartId: updatedCart._id,
+                products: updatedCart.products.map(product => ({
+                    productId: product.productId,
+                    productCode: product.productCode,  // Asegurando que se incluya productCode
+                    quantity: product.quantity
+                }))
             }
         });
 
@@ -124,6 +120,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
     }
 });
+
 
 
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {

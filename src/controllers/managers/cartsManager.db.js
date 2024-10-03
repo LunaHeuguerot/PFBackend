@@ -82,21 +82,21 @@ export class CartsManagerDB {
                 throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
             }
     
-            // Busca el índice del producto en el carrito por productId
             const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
-    
+        
             if (productIndex !== -1) {
-                // Si el producto ya está en el carrito, simplemente actualiza la cantidad
+                // Si el producto ya existe, solo actualizamos la cantidad
                 cart.products[productIndex].quantity += quantity;  
             } else {
-                // Si no está, lo agrega al carrito
+                // Cambia aquí para agregar tanto productId como productCode
                 cart.products.push({ 
-                    productId: product._id, // Guardar el productId
-                    productCode: product.productCode, // Guardar el productCode
+                    productId: productId, 
+                    productCode: product.code,  
                     quantity 
-                });  
+                });
             }
     
+            // Actualiza el carrito en la base de datos
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
             return cart;
         } catch (error) {
@@ -104,6 +104,7 @@ export class CartsManagerDB {
             throw error;
         }
     }
+    
 
     async updateCart(id, products) {
         try {
