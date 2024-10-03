@@ -32,12 +32,12 @@ cartSchema.methods.findProductByCode = function (productCode) {
     return this.products.find(product => product.productCode === productCode);
 };
 
-cartSchema.methods.updateProductQuantity = async function (productId, quantity) {
+cartSchema.methods.updateProductQuantity = async function (productCode, quantity) {
     if (isNaN(quantity) || quantity <= 0) {
         throw new Error('La cantidad debe ser un número válido mayor a 0.');
     }
 
-    const product = this.products.find(p => p.productId.toString() === productId);
+    const product = this.products.find(p => p.productCode === productCode);
     
     if (product) {
         product.quantity = quantity; 
@@ -46,8 +46,6 @@ cartSchema.methods.updateProductQuantity = async function (productId, quantity) 
         throw new Error('Producto no encontrado en el carrito.');
     }
 };
-
-
 
 cartSchema.pre('find', function () {
     this.populate({ path: '_user_id', model: userModel });

@@ -84,9 +84,8 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         const cid = req.params.cid; 
         const pid = req.params.pid; 
         const userId = req.session.user._id;
-        const productId = req.session.productId;
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1; 
-        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, productId, quantity);
+        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
         req.session.cart = updatedCart; 
 
         console.log('Carrito almacenado en la sesión:', req.session.cart); 
