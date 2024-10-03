@@ -123,39 +123,24 @@ export class CartsManagerDB {
 
     async updateProdQuantity(cartId, productCode, quantity) {
         try {
-            console.log(`Actualizando producto con código ${productCode} en el carrito ${cartId} con cantidad ${quantity}`);
+            const cart = await this.getCartById(cartId); 
+
+            const productInCart = cart.products.find(product => product.productCode === productCode);
     
-            let cart = await this.getCartById(cartId);
-            console.log('Carrito encontrado:', cart);
-    
-            if (!cart || !cart.products || cart.products.length === 0) {
-                throw new Error(`El carrito con id ${cartId} no contiene productos.`);
+            if (!productInCart) {
+                throw new Error(`No se encontró el producto con código ${productCode} en el carrito.`);
             }
-    
-            console.log('Productos en el carrito:', cart.products);
-    
-            const productIndex = cart.products.findIndex(item => item.productCode === productCode);
-            console.log('Índice del producto encontrado:', productIndex);
-    
-            if (productIndex === -1) {
-                throw new Error(`No se encontró el producto con código ${productCode} en el carrito con id ${cartId}`);
-            }
-    
-            if (quantity <= 0 || isNaN(quantity)) {
-                throw new Error('La cantidad debe ser un número mayor a 0.');
-            }
-    
-            cart.products[productIndex].quantity = quantity;
-    
-            const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean();
-            console.log('Carrito actualizado:', updatedCart);
-    
-            return updatedCart;
+
+            productInCart.quantity = quantity;
+
+            return await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true });
         } catch (error) {
-            console.error('Error en updateProdQuantity:', error);
-            throw error;
+            console.error('Error al actualizar la cantidad del producto en el carrito:', error);
+            throw new Error(`Error al actualizar la cantidad: ${error.message}`);
         }
     }
+    
+    
     
     
     

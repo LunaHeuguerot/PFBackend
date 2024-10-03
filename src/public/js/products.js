@@ -97,7 +97,11 @@ async function updateProductQuantity(productCode) {
         const data = await response.json();
         if (data.status === 'Ok') {
             alert('Cantidad actualizada correctamente');
-            window.location.href = `/carts/${cartId}`; 
+
+            quantityElement.value = quantity; 
+
+            // redirigir:
+            // window.location.href = `/carts/${cartId}`; 
         } else {
             alert(data.error || 'Error al actualizar la cantidad');
         }
@@ -106,6 +110,7 @@ async function updateProductQuantity(productCode) {
         alert(error.message || 'Error al actualizar la cantidad');
     }
 }
+
 
 
 

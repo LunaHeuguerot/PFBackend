@@ -28,6 +28,20 @@ const cartSchema = new mongoose.Schema({
     }
 });
 
+cartSchema.methods.findProductByCode = function (productCode) {
+    return this.products.find(product => product.productCode === productCode);
+};
+
+cartSchema.methods.updateProductQuantity = async function (productCode, quantity) {
+    const product = this.findProductByCode(productCode);
+    if (product) {
+        product.quantity = quantity;
+        await this.save(); 
+    } else {
+        throw new Error('Producto no encontrado en el carrito');
+    }
+};
+
 cartSchema.pre('find', function () {
     this.populate({ path: '_user_id', model: userModel });
     this.populate({ path: 'products.productId', model: productModel });  
