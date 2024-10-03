@@ -23,6 +23,7 @@
         <th>Stock:</th>
         <th>Categoría:</th>
         <th>Imágenes:</th>
+        <th>Acciones:</th>
     </tr>
 
     {{#each products.docs}}
@@ -35,13 +36,20 @@
             <td>{{this.status}}</td>
             <td>{{this.stock}}</td>
             <td>{{this.category}}</td>
-            <td>{{this.thumbnail}}</td>
             <td>
-                <button class="add-to-cart-btn" id="add-to-cart" onclick="addProductToCart('{{_id}}')">Agregar al carrito</button>
+                <img src="{{this.thumbnail}}" alt="{{this.title}}" style="width: 100px; height: auto;" />
+            </td>
+            <td>
+                {{#if this.stock}}
+                    <button class="add-to-cart-btn" data-product-id="{{this._id}}" onclick="addProductToCart(this.dataset.productId)">Agregar al carrito</button>
+                {{else}}
+                    <button class="add-to-cart-btn" disabled>No disponible</button>
+                {{/if}}
             </td>
         </tr>
     {{/each}}
 </table>
+
 
 <div class="pagination">
     {{#if products.hasPrevPage}}

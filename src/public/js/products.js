@@ -45,9 +45,8 @@ async function addProductToCart(productId) {
         const result = await response.json();
         console.log('Resultado del servidor:', result);
 
-        console.log('Producto agregado al carrito con ID:', result.payload.addedProduct.productId);
-
         if (result.status === 'Ok') {
+            alert('Producto agregado al carrito con ID: ' + productId);
             console.log('Producto agregado al carrito.');
         } else {
             console.error('El servidor respondió con éxito falso:', result);
@@ -81,10 +80,8 @@ async function updateProductQuantity(productId) {
             return;
         }
 
-        console.log(`ID del producto que se va a actualizar: ${productId}`);
-
         const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
-            method: 'PUT', // Este método debe coincidir con el que definiste en tu router
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -101,7 +98,6 @@ async function updateProductQuantity(productId) {
         const data = await response.json();
         if (data.status === 'Ok') {
             alert('Cantidad actualizada correctamente');
-
             quantityElement.value = quantity; 
         } else {
             alert(data.error || 'Error al actualizar la cantidad');
@@ -161,7 +157,6 @@ async function viewCart() {
         if (!cartId) {
             cartId = await createCart();
         }
-
         window.location.href = `/carts/${cartId}`;
     } catch (error) {
         alert(error.message || 'Error al mostrar carrito');

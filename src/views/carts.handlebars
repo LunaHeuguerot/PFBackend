@@ -17,6 +17,7 @@
         <th>Precio</th>
         <th>Cantidad</th>
         <th>Subtotal</th>
+        <th>Acciones</th>
     </tr>
 
     {{#each cart.products}}
@@ -29,7 +30,7 @@
             <td>${{productId.price}}</td>
             <td>
                 <input type="number" value="{{quantity}}" min="1" id="quantity-{{_id}}">
-                <button onclick="updateProductQuantity('{{_id}}')">Actualizar cantidad</button>
+                <button onclick="updateProductQuantity('{{productId._id}}')">Actualizar cantidad</button>
             </td>
             <td>${{subtotal}}</td>
             <td><button onclick="removeProduct('{{_id}}')">Eliminar</button></td>
@@ -49,3 +50,4 @@
 {{/if}}
 
 <script src="/static/js/products.js"></script>
+
