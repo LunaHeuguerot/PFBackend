@@ -50,31 +50,40 @@ export class CartsManagerDB {
         }
     }
 
-    async addProductToCart(cartId, productId, userId, quantity) {
+    async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {
-            let cart = await this.getCartById(cartId);
-
-            const productIndex = cart.products.findIndex(item => item.product.toString() === productId);
-
-            if (productIndex !== -1) {
-                cart.products[productIndex].quantity += quantity;
-            } else {
-                const product = await productModel.findById(productId).lean();
-                if (!product) {
-                    throw new Error(`Producto con id ${productId} no encontrado.`);
-                }
-
-                cart.products.push({
-                    productCode: product.code, 
-                    productId: product._id,   
-                    quantity: quantity
-                });
+            console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
+            
+            const product = await ProductManagerDB.getInstance().getProductById(productId);
+            console.log('Producto encontrado:', product);
+    
+            if (!product) {
+                throw new Error(`Producto con ID ${productId} no encontrado.`);
             }
- 
-            const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean();
-            return updatedCart;
+    
+            if (userId === product.owner.toString()) {
+                throw new Error('Los usuarios premium no pueden agregar sus propios productos al carrito.');
+            }
+    
+            let cart = await this.getCartById(cartId);
+            console.log('Carrito encontrado:', cart);
+    
+            if (!cart || !cart.products) {
+                throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
+            }
+    
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
+        
+            if (productIndex !== -1) {
+                cart.products[productIndex].quantity += quantity;  
+            } else {
+                cart.products.push({ productId: productId, productCode: product.productCode, quantity });  
+            }
+    
+            cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
+            return cart;
         } catch (error) {
-            console.error('Error al agregar producto al carrito:', error);
+            console.error('Error en addProductToCart:', error);
             throw error;
         }
     }

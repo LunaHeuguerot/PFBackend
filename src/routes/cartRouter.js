@@ -84,13 +84,12 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         const cid = req.params.cid; 
         const pid = req.params.pid; 
         const userId = req.session.user._id;
+        const productCode = req.session.productCode;
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1; 
+        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, productCode, quantity);
+        req.session.cart = updatedCart; 
 
-        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
-
-        req.session.cart = updatedCart;
-
-        console.log('Carrito almacenado en la sesión:', req.session.cart);
+        console.log('Carrito almacenado en la sesión:', req.session.cart); 
 
         if (!updatedCart) {
             return res.status(400).json({
