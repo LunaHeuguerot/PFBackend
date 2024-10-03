@@ -130,7 +130,7 @@ export class CartsManagerDB {
         try {
             const cart = await this.getCartById(cartId);
 
-            const productIndex = cart.products.findIndex(item => item.productId._id.toString() === productId);
+            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
 
             if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con ID ${productId} en el carrito.`);
