@@ -77,8 +77,12 @@ export class CartsManagerDB {
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += quantity;  
             } else {
-                cart.products.push({ productId: productId, quantity });  
-
+                cart.products.push({ 
+                    productId: productId, 
+                    productCode: product.code,  
+                    quantity 
+                });
+    
                 req.session.newProductId = productId;
             }
     
@@ -125,7 +129,7 @@ export class CartsManagerDB {
     async updateProdQuantity(cartId, productCode, quantity) {
         try {
             console.log(`Actualizando producto con código ${productCode} en el carrito ${cartId} con cantidad ${quantity}`);
-        
+    
             let cart = await this.getCartById(cartId);
             console.log('Carrito encontrado:', cart);
     
@@ -134,10 +138,10 @@ export class CartsManagerDB {
             }
     
             console.log('Productos en el carrito:', cart.products);
-        
-            const productIndex = cart.products.findIndex(item => item.productCode === productCode); 
+    
+            const productIndex = cart.products.findIndex(item => item.productCode === productCode);
             console.log('Índice del producto encontrado:', productIndex);
-            
+    
             if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con código ${productCode} en el carrito con id ${cartId}`);
             }
@@ -146,17 +150,18 @@ export class CartsManagerDB {
                 throw new Error('La cantidad debe ser un número mayor a 0.');
             }
     
-            cart.products[productIndex].quantity = quantity; 
+            cart.products[productIndex].quantity = quantity;
     
-            const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
+            const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean();
             console.log('Carrito actualizado:', updatedCart);
-        
+    
             return updatedCart;
         } catch (error) {
             console.error('Error en updateProdQuantity:', error);
             throw error;
         }
     }
+    
     
     
         
