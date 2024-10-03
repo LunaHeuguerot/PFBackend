@@ -79,29 +79,29 @@ cartRouter.get('/:cid', async (req, res) => {
     }
 });
 
-cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => { 
+cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
     try {
         const cid = req.params.cid; 
-        const pid = req.params.productId;  
+        const pid = req.params.pid; 
         const userId = req.session.user._id;
-        const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1;
+        const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1; 
 
-        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity, req); 
+        const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
 
-        req.session.cart = updatedCart; 
+        req.session.cart = updatedCart;
 
         console.log('Carrito almacenado en la sesión:', req.session.cart);
 
         if (!updatedCart) {
             return res.status(400).json({
                 status: 'Not Ok',
-                error: `No se pudo agregar el producto con ID ${productId} al carrito con id ${cid}` 
+                error: `No se pudo agregar el producto con id ${pid} al carrito con id ${cid}`
             });
         }
 
         res.status(200).json({
             status: 'Ok',
-            mensaje: `Se agregó el producto con ID ${productId} al carrito con id ${cid} correctamente`, 
+            mensaje: `Se agregó el producto con id ${pid} al carrito con id ${cid} correctamente`,
             payload: updatedCart
         });
 
@@ -114,6 +114,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
     }
 });
+
 
 
 

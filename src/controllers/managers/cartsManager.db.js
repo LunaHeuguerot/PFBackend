@@ -50,49 +50,35 @@ export class CartsManagerDB {
         }
     }
 
-    async addProductToCart(cartId, productId, userId, quantity = 1, req) {
+    async addProductToCart(cartId, productId, userId, quantity) {
         try {
-            console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
-            
-            const product = await ProductManagerDB.getInstance().getProductById(productId);
-            console.log('Producto encontrado:', product);
-    
-            if (!product) {
-                throw new Error(`Producto con ID ${productId} no encontrado.`);
-            }
-    
-            if (userId === product.owner.toString()) {
-                throw new Error('Los usuarios premium no pueden agregar sus propios productos al carrito.');
-            }
-    
             let cart = await this.getCartById(cartId);
-            console.log('Carrito encontrado:', cart);
-    
-            if (!cart || !cart.products) {
-                throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
-            }
-    
-            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId.toString());  // Asegurarse de comparar como strings
-    
+
+            const productIndex = cart.products.findIndex(item => item.product.toString() === productId);
+
             if (productIndex !== -1) {
-                cart.products[productIndex].quantity += quantity;  
+                cart.products[productIndex].quantity += quantity;
             } else {
-                cart.products.push({ 
-                    productId: productId, 
-                    productCode: product.code,  
-                    quantity 
+                const product = await productModel.findById(productId).lean();
+                if (!product) {
+                    throw new Error(`Producto con id ${productId} no encontrado.`);
+                }
+
+                cart.products.push({
+                    productCode: product.code, 
+                    productId: product._id,   
+                    quantity: quantity
                 });
-    
-                req.session.newProductId = productId;
             }
-    
-            cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
-            return cart;
+ 
+            const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean();
+            return updatedCart;
         } catch (error) {
-            console.error('Error en addProductToCart:', error);
+            console.error('Error al agregar producto al carrito:', error);
             throw error;
         }
     }
+    
     
     
     
