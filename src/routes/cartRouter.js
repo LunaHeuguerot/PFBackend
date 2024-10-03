@@ -4,7 +4,6 @@ import config from '../services/config.js';
 import nodemailer from 'nodemailer';
 import { handlePolicies } from '../services/utils.js';
 import twilio from 'twilio';
-import { PayloadInstance } from "twilio/lib/rest/api/v2010/account/recording/addOnResult/payload.js";
 
 const cartRouter = Router();
 
@@ -115,9 +114,6 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
     }
 });
 
-
-
-
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
     const pid = req.params.pid;
@@ -163,13 +159,6 @@ cartRouter.put('/:cid/product/:pid', async (req, res) => {
         res.status(500).send({ status: 'error', message: 'Error al actualizar la cantidad del producto', error: error.message });
     }
 });
-
-
-
-
-
-
-
 
 cartRouter.delete('/:cid', async (req, res) => {
     const cid = req.params.cid;

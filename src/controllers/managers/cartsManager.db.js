@@ -23,20 +23,32 @@ export class CartsManagerDB {
     async getCartById(id) {
         try {
             if (id.length !== 24) {
-                throw new Error ('El id debe tener 24 caracteres')
+                throw new Error('El id debe tener 24 caracteres');
             }
 
-            const cart = await cartModel.findById(id).populate('_user_id').populate('products._id').lean();
-
+            const cart = await cartModel.findById(id)
+                .populate('_user_id')  
+                .populate('products.productId')  
+                .lean(); 
+    
             if (!cart) {
                 throw new Error(`No se encontró el carrito con id ${id}`);
             }
-
+    
+            cart.products.forEach(product => {
+                if (!product.productId || !product.productId.price) {
+                    console.error(`El producto con código ${product?.productId?.code || 'desconocido'} no tiene un precio definido.`);
+                    product.productId.price = 0;  
+                }
+            });
+    
             return cart;
         } catch (error) {
-            throw error;
+            console.error('Error al obtener el carrito:', error);
+            throw new Error(`Error al obtener el carrito: ${error.message}`);
         }
-    };
+    }
+    
     
     async createCart() {
         try {
@@ -50,48 +62,31 @@ export class CartsManagerDB {
         }
     }
 
-    async addProductToCart(cartId, productId, userId, quantity = 1) {
+    async getCartById(id) {
         try {
-            console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
-            
-            const product = await ProductManagerDB.getInstance().getProductById(productId);
-            console.log('Producto encontrado:', product);
-    
-            if (!product) {
-                throw new Error(`Producto con ID ${productId} no encontrado.`);
+            if (id.length !== 24) {
+                throw new Error('El id debe tener 24 caracteres');
             }
-    
-            if (userId === product.owner.toString()) {
-                throw new Error('Los usuarios premium no pueden agregar sus propios productos al carrito.');
+
+            const cart = await cartModel.findById(id).lean();
+
+            if (!cart) {
+                throw new Error(`No se encontró el carrito con id ${id}`);
             }
+
+            cart.products.forEach(product => {
+                if (!product.productId || !product.productId.price) {
+                    console.error(`El producto con código ${product?.productCode || 'desconocido'} no tiene un precio definido.`);
+                    product.productId.price = 0;  
+                }
+            });
     
-            let cart = await this.getCartById(cartId);
-            console.log('Carrito encontrado:', cart);
-    
-            if (!cart || !cart.products) {
-                throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
-            }
-    
-            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
-        
-            if (productIndex !== -1) {
-                cart.products[productIndex].quantity += quantity;  
-            } else {
-                cart.products.push({ productId: productId._id, productCode: product.productCode, quantity });  
-            }
-    
-            cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
             return cart;
         } catch (error) {
-            console.error('Error en addProductToCart:', error);
-            throw error;
+            console.error('Error al obtener el carrito:', error);
+            throw new Error(`Error al obtener el carrito: ${error.message}`);
         }
-    }
-    
-    
-    
-    
-    
+    }    
 
     async updateCart(id, products) {
         try {
@@ -139,11 +134,6 @@ export class CartsManagerDB {
             throw new Error(`Error al actualizar la cantidad: ${error.message}`);
         }
     }
-    
-    
-    
-    
-    
         
     async deleteCart(id) {
         try {
