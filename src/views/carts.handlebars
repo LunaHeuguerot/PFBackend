@@ -29,7 +29,7 @@
             <td>{{productId.category}}</td>
             <td>${{productId.price}}</td>
             <td>
-                <input type="number" value="{{quantity}}" min="1" id="quantity-{{_id}}">
+                <input type="number" value="{{quantity}}" min="1" id="quantity-{{productId._id}}">
                 <button onclick="updateProductQuantity('{{productId._id}}')">Actualizar cantidad</button>
             </td>
             <td>${{subtotal}}</td>
@@ -50,4 +50,3 @@
 {{/if}}
 
 <script src="/static/js/products.js"></script>
-
