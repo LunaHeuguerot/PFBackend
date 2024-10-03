@@ -85,10 +85,13 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         const pid = req.params.pid; 
         const userId = req.session.user._id;
         const quantity = req.query.quantity ? parseInt(req.query.quantity) : 1; 
+        
+        console.log(`Request received to add product ${pid} to cart ${cid} by user ${userId}, quantity: ${quantity}`);
+        
         const updatedCart = await CartsManagerDB.getInstance().addProductToCart(cid, pid, userId, quantity);
         req.session.cart = updatedCart; 
 
-        console.log('Carrito almacenado en la sesión:', req.session.cart); 
+        console.log('Carrito actualizado almacenado en la sesión:', req.session.cart); 
 
         if (!updatedCart) {
             return res.status(400).json({
@@ -104,7 +107,9 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
 
     } catch (error) {
-        console.error('Error al agregar producto al carrito:', error);
+        console.error('Error en el router al agregar producto al carrito:', {
+            cid, pid, userId, error: error.message, stack: error.stack
+        });
         res.status(500).json({
             status: 'error',
             message: 'Error al agregar el producto al carrito',
@@ -112,6 +117,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
     }
 });
+
 
 
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {
