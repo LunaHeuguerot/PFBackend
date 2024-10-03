@@ -79,6 +79,8 @@ async function updateProductQuantity(productId) {
             return;
         }
 
+        console.log(`ID del producto que se va a actualizar: ${productId}`);
+
         const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
             method: 'PUT',
             headers: {
