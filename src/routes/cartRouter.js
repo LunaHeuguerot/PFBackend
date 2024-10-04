@@ -121,20 +121,41 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
     }
 });
 
-cartRouter.delete('/:cid/product/:pid', async (req, res) => {
+cartRouter.delete('/:cid/product/:code', async (req, res) => {
     const cid = req.params.cid;
-    const pid = req.params.pid;
-    const rta = await CartsManagerDB.getInstance().removeProdFromCart(cid, pid);
-    if (rta === 0) {
-        res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito con id ${cid} no existe` });
-    } else {
-        if (rta === 1) {
-            res.status(400).send({ status: 'Not Ok', payload: [], error: `El producto con id ${pid} no existe en el carrito con id ${cid}.` });
-        } else {
-            res.status(200).send({ status: 'Ok', payload: [], mensaje: `Se eliminó el producto con id ${pid} del carrito con id ${cid}. OK` });
+    const code = req.params.code; // Cambiado a code
+    try {
+        const rta = await CartsManagerDB.getInstance().removeProdFromCart(cid, code);
+        
+        // Si `removeProdFromCart` devuelve el carrito actualizado, lo consideramos como una operación exitosa
+        res.status(200).send({ status: 'Ok', payload: rta, mensaje: `Se eliminó el producto con código ${code} del carrito con id ${cid}.` });
+    } catch (error) {
+        // Manejo de errores según la excepción lanzada
+        if (error.message.includes('No se encontró el producto')) {
+            return res.status(400).send({ status: 'Not Ok', payload: [], error: error.message });
         }
-    };
+        if (error.message.includes('El carrito con id')) {
+            return res.status(400).send({ status: 'Not Ok', payload: [], error: error.message });
+        }
+        return res.status(500).send({ status: 'Not Ok', payload: [], error: 'Error interno del servidor.' });
+    }
 });
+
+
+// cartRouter.delete('/:cid/product/:pid', async (req, res) => {
+//     const cid = req.params.cid;
+//     const pid = req.params.pid;
+//     const rta = await CartsManagerDB.getInstance().removeProdFromCart(cid, pid);
+//     if (rta === 0) {
+//         res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito con id ${cid} no existe` });
+//     } else {
+//         if (rta === 1) {
+//             res.status(400).send({ status: 'Not Ok', payload: [], error: `El producto con id ${pid} no existe en el carrito con id ${cid}.` });
+//         } else {
+//             res.status(200).send({ status: 'Ok', payload: [], mensaje: `Se eliminó el producto con id ${pid} del carrito con id ${cid}. OK` });
+//         }
+//     };
+// });
 
 cartRouter.put('/:cid', async (req, res) => {
     const cid = req.params.cid;

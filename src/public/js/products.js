@@ -175,7 +175,7 @@ async function updateProductQuantity(productCode) {
 //     }
 // }
 
-async function removeProduct(productId) {
+async function removeProduct(productCode) {  // Cambiar productId a productCode
     try {
         const currentCartId = sessionStorage.getItem('cartId');
         if (!currentCartId) {
@@ -183,15 +183,15 @@ async function removeProduct(productId) {
             return;
         }
 
-        const response = await fetch(`/carts/${currentCartId}/product/${productId}`, { method: 'DELETE' });
+        const response = await fetch(`/carts/${currentCartId}/product/${productCode}`, { method: 'DELETE' });
         console.log('Respuesta del servidor al eliminar producto:', response);
 
         const data = await response.json();
 
         if (data.status === 'Ok') {
             alert('Producto eliminado correctamente');
-            console.log('Producto eliminado del carrito:', productId);
-            window.location.reload();
+            console.log('Producto eliminado del carrito:', productCode);
+            window.location.reload();  // Recargar la página para actualizar el carrito
         } else {
             alert(data.message || 'Error al eliminar el producto');
             console.error('Error al eliminar producto:', data.message);
@@ -201,6 +201,34 @@ async function removeProduct(productId) {
         alert(error.message || 'Error al eliminar el producto');
     }
 }
+
+
+// async function removeProduct(productId) {
+//     try {
+//         const currentCartId = sessionStorage.getItem('cartId');
+//         if (!currentCartId) {
+//             alert('No se encontró el carrito en la sesión.');
+//             return;
+//         }
+
+//         const response = await fetch(`/carts/${currentCartId}/product/${productId}`, { method: 'DELETE' });
+//         console.log('Respuesta del servidor al eliminar producto:', response);
+
+//         const data = await response.json();
+
+//         if (data.status === 'Ok') {
+//             alert('Producto eliminado correctamente');
+//             console.log('Producto eliminado del carrito:', productId);
+//             window.location.reload();
+//         } else {
+//             alert(data.message || 'Error al eliminar el producto');
+//             console.error('Error al eliminar producto:', data.message);
+//         }
+//     } catch (error) {
+//         console.error('Error en removeProduct:', error);
+//         alert(error.message || 'Error al eliminar el producto');
+//     }
+// }
 
 async function confirmPurchase() {
     try {
