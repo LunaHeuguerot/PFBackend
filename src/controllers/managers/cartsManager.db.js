@@ -145,7 +145,12 @@ export class CartsManagerDB {
             }
     
             // Encuentra el índice del producto en el carrito
-            const productIndex = cart.products.findIndex(product => product.productId.equals(objectId)); // Usa equals para comparar ObjectId
+            const productIndex = cart.products.findIndex(product => {
+                // Asegúrate de que product.productId es un ObjectId antes de llamar a equals
+                return product.productId instanceof mongoose.Types.ObjectId 
+                    ? product.productId.equals(objectId) 
+                    : product.productId.toString() === pid; // O convertir a string
+            }); // Usa equals para comparar ObjectId
     
             // Verificar si el producto está en el carrito
             if (productIndex === -1) {
