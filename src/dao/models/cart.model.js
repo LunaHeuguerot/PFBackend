@@ -29,7 +29,8 @@ const cartSchema = new mongoose.Schema({
 });
 
 cartSchema.methods.findProductById = function (productId) {
-    return this.products.find(product => product.productId.toString() === productId);
+    // Asegúrate de usar equals para comparar ObjectId
+    return this.products.find(product => product.productId.equals(productId));
 };
 
 cartSchema.methods.addProduct = async function(productId, productCode, quantity) {

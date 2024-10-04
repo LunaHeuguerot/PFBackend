@@ -4,6 +4,7 @@ import config from '../services/config.js';
 import nodemailer from 'nodemailer';
 import { handlePolicies } from '../services/utils.js';
 import twilio from 'twilio';
+import mongoose from "mongoose";
 
 const cartRouter = Router();
 
@@ -148,14 +149,17 @@ cartRouter.put('/:cid', async (req, res) => {
 
 cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
     try {
-        const cid = req.params.cid; 
-        const pid = req.params.pid; 
+        const cid = req.params.cid;
+        const pid = req.params.pid;
         const { quantity } = req.body;
 
         console.log(`Recibiendo solicitud para actualizar la cantidad del producto con ID ${pid} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
 
+        // Convertir `pid` a ObjectId
+        const objectIdPid = mongoose.Types.ObjectId(pid);
+
         // Llama a la función de actualización de cantidad
-        const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, pid, quantity);
+        const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, objectIdPid, quantity);
         
         req.session.cart = updatedCart; // Almacena el carrito actualizado en la sesión
 
