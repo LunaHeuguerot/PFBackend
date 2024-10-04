@@ -138,25 +138,32 @@ export class CartsManagerDB {
                 throw new Error('El ID del producto no es válido');
             }
     
-            const objectId = mongoose.Types.ObjectId.createFromTime(Date.now());
-            
             // Obtener el carrito por ID
             const cart = await this.getCartById(cid);
             console.log("Carrito obtenido:", cart);
-        
+    
             // Verificar si el carrito existe
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-        
-            // Encuentra el índice del producto en el carrito
-            const productIndex = cart.products.findIndex(product => product.productId.equals(objectId));
     
+            // Encuentra el índice del producto en el carrito
+            const productIndex = cart.products.findIndex(product => {
+                // Asegúrate de que productId es un ObjectId
+                if (product.productId instanceof mongoose.Types.ObjectId) {
+                    return product.productId.equals(pid); // No necesitas crear un nuevo ObjectId aquí
+                } else {
+                    // Si product.productId es un string, lo convertimos a string
+                    return product.productId.toString() === pid;
+                }
+            });
+    
+            // Verificar si el producto está en el carrito
             if (productIndex === -1) {
                 console.error("Producto no encontrado en el carrito. ID buscado:", pid);
                 throw new Error(`No se encontró el producto con ID ${pid} en el carrito.`);
             }
-        
+    
             // Actualiza la cantidad del producto
             cart.products[productIndex].quantity = quantity;
             console.log(`Actualizando cantidad del producto ID ${pid} a ${quantity}`);
@@ -164,7 +171,7 @@ export class CartsManagerDB {
             // Guarda los cambios en el carrito
             await this.saveCart(cart);
             console.log("Carrito actualizado:", cart);
-            
+    
             return cart;
         } catch (error) {
             console.error('Error al actualizar la cantidad del producto:', error);
