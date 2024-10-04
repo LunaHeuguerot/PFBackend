@@ -3,7 +3,6 @@ import { ProductManagerDB } from './productsManager.db.js';
 import productModel from '../../dao/models/products.model.js';
 import ticketModel from '../../dao/models/ticket.model.js';
 import { sendPurchaseEmail } from '../../services/emails.js';
-import mongoose from 'mongoose';
 
 export class CartsManagerDB {
     static #instance;

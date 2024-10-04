@@ -262,13 +262,40 @@ cartRouter.delete('/:cid', async (req, res) => {
 cartRouter.post('/:cid/purchase', handlePolicies('user'), async (req, res) => {
     const cid = req.params.cid;
     const cart = await CartsManagerDB.getInstance().getCartById(cid);
+
     if (cart) {
+        const userEmail = req.session.user.email; // Obtener el correo del usuario
         const cartFiltered = await CartsManagerDB.getInstance().purchaseCart(cart);
+
+        // Preparar el contenido del correo
+        const subject = 'Confirmación de Compra';
+        const text = `
+            ¡Gracias por su compra!
+            Su carrito con ID ${cid} ha sido cerrado correctamente.
+            Detalles de la compra:
+            ${cart.products.map(product => `
+                Código: ${product.productCode}, 
+                Nombre: ${product.productId.title}, 
+                Cantidad: ${product.quantity}, 
+                Precio: $${product.productId.price}, 
+                Subtotal: $${product.quantity * product.productId.price}
+            `).join('')}
+            Total: $${cart.total}
+        `;
+
+        // Enviar el correo de confirmación
+        try {
+            await sendPurchaseEmail(userEmail, subject, text);
+        } catch (emailError) {
+            console.error('Error al enviar el correo de confirmación:', emailError);
+        }
+
         res.status(200).send({ status: 'Ok', payload: cartFiltered, mensaje: `Se cerró correctamente el carrito con id ${cid} OK` });
     } else {
         res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito buscado con id ${cid} no existe` });
     }
 });
+
 
 cartRouter.all('*', async (req, res) => {
     res.status(404).send({ origin: config.SERVER, payload: null, error: 'No se encuentra la ruta solicitada' });

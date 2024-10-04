@@ -233,6 +233,15 @@ async function removeProduct(productCode) {  // Cambiar productId a productCode
 async function confirmPurchase() {
     try {
         const currentCartId = sessionStorage.getItem('cartId');
+        console.log('ID del carrito actual:', currentCartId); // Log del ID del carrito
+
+        // Verifica que el ID del carrito no sea nulo
+        if (!currentCartId) {
+            console.error('No se encontró el carrito en la sesión.'); // Log de error si no se encuentra el carrito
+            alert('No se encontró el carrito en la sesión.');
+            return;
+        }
+
         const response = await fetch(`/carts/${currentCartId}/purchase`, {
             method: 'POST',
             headers: {
@@ -240,21 +249,35 @@ async function confirmPurchase() {
             },
         });
 
-        console.log('Respuesta del servidor al confirmar compra:', response);
+        console.log('Respuesta del servidor al confirmar compra:', response); // Log de respuesta del servidor
+
+        // Verifica si la respuesta fue exitosa
+        if (!response.ok) {
+            console.error('Error en la respuesta del servidor:', response.status, response.statusText); // Log de error si la respuesta no es OK
+            const errorData = await response.json();
+            alert(errorData.message || 'Error al confirmar la compra');
+            console.error('Error al confirmar compra:', errorData.message);
+            return;
+        }
 
         const data = await response.json();
+        console.log('Datos recibidos al confirmar compra:', data); // Log de datos recibidos
+
         if (data.status === 'Ok') {
-            alert('Compra realizada con éxito');
+            const total = data.total; // Asegúrate de que 'total' está presente en la respuesta
+            alert(`Se confirmó la compra por $${total}`); // Alert con el total de la compra
+            console.log('Redireccionando a productos después de la compra.'); // Log antes de redirigir
             window.location.href = '/products';
         } else {
             alert(data.message || 'Error al confirmar la compra');
             console.error('Error al confirmar compra:', data.message);
         }
     } catch (error) {
-        console.error('Error en confirmPurchase:', error);
+        console.error('Error en confirmPurchase:', error); // Log de error en el bloque catch
         alert(error.message || 'Error al confirmar la compra');
     }
 }
+
 
 async function viewCart() {
     try {
