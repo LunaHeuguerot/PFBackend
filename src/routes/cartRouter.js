@@ -150,18 +150,19 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
     try {
         const cid = req.params.cid; 
         const pid = req.params.pid; 
-        const { quantity } = req.body; 
+        const { quantity } = req.body;
 
         console.log(`Recibiendo solicitud para actualizar la cantidad del producto con ID ${pid} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
 
+        // Llama a la función de actualización de cantidad
         const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, pid, quantity);
         
-        req.session.cart = updatedCart;
+        req.session.cart = updatedCart; // Almacena el carrito actualizado en la sesión
 
         res.status(200).json({
             status: 'Ok',
             mensaje: `Cantidad del producto con ID ${pid} actualizada correctamente en el carrito con ID ${cid}.`,
-            payload: updatedCart 
+            payload: updatedCart
         });
 
     } catch (error) {
@@ -169,10 +170,12 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
         res.status(500).json({
             status: 'error',
             message: 'Error al actualizar la cantidad del producto',
-            error: error.message 
+            error: error.message
         });
     }
 });
+
+
 
 cartRouter.delete('/:cid', async (req, res) => {
     const cid = req.params.cid;
