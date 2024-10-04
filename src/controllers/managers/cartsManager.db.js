@@ -142,6 +142,7 @@ export class CartsManagerDB {
             const cart = await cartModel.findById(cid).lean();
             console.log("Productos en el carrito:", cart.products);
 
+
     
             // Verificar si el carrito existe
             if (!cart) {
@@ -150,9 +151,14 @@ export class CartsManagerDB {
     
             // Encuentra el índice del producto en el carrito
             const productIndex = cart.products.findIndex(product => {
-                console.log("Comparando", product.productId.toString(), "con", pid.toString());
-                return product.productId.toString() === pid.toString();
+                const productIdFromCart = product.productId instanceof mongoose.Types.ObjectId 
+                    ? product.productId.toString() 
+                    : product.productId;
+                console.log("Comparando", productIdFromCart, "con", pid);
+                return productIdFromCart === pid;
             });
+            
+            
     
             // Verificar si el producto está en el carrito
             if (productIndex === -1) {
