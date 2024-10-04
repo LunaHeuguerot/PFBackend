@@ -133,47 +133,45 @@ export class CartsManagerDB {
 
     async updateProductQuantity(cid, pid, quantity) {
         try {
-            // Convierte el productId recibido a ObjectId
-            const objectId = new mongoose.Types.ObjectId.isValid(pid); 
+            // Verifica si el ID es válido
+            if (!mongoose.Types.ObjectId.isValid(pid)) {
+                throw new Error('El ID del producto no es válido');
+            }
     
+            const objectId = mongoose.Types.ObjectId.createFromTime(Date.now());
+            
             // Obtener el carrito por ID
             const cart = await this.getCartById(cid);
-            console.log("Carrito obtenido:", cart); // Log del carrito
-    
+            console.log("Carrito obtenido:", cart);
+        
             // Verificar si el carrito existe
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-    
+        
             // Encuentra el índice del producto en el carrito
-            const productIndex = cart.products.findIndex(product => {
-                console.log("Comparando con producto:", product.productId); // Log del producto en el carrito
-                return product.productId instanceof mongoose.Types.ObjectId 
-                    ? product.productId.equals(objectId) 
-                    : product.productId.toString() === pid; // O convertir a string
-            });
+            const productIndex = cart.products.findIndex(product => product.productId.equals(objectId));
     
-            // Verificar si el producto está en el carrito
             if (productIndex === -1) {
-                console.error("Producto no encontrado en el carrito. ID buscado:", pid); // Log del error
+                console.error("Producto no encontrado en el carrito. ID buscado:", pid);
                 throw new Error(`No se encontró el producto con ID ${pid} en el carrito.`);
             }
-    
+        
             // Actualiza la cantidad del producto
             cart.products[productIndex].quantity = quantity;
-            console.log(`Actualizando cantidad del producto ID ${pid} a ${quantity}`); // Log de actualización
+            console.log(`Actualizando cantidad del producto ID ${pid} a ${quantity}`);
     
             // Guarda los cambios en el carrito
             await this.saveCart(cart);
-            console.log("Carrito actualizado:", cart); // Log del carrito actualizado
+            console.log("Carrito actualizado:", cart);
             
             return cart;
         } catch (error) {
-            // Manejo de errores
-            console.error('Error al actualizar la cantidad del producto:', error); // Log del error
+            console.error('Error al actualizar la cantidad del producto:', error);
             throw new Error('Error al actualizar la cantidad del producto: ' + error.message);
         }
     }
+    
     
     
         
