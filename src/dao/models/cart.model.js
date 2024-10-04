@@ -28,10 +28,24 @@ const cartSchema = new mongoose.Schema({
     }
 });
 
-cartSchema.methods.findProductById = function (productId) {
-    return this.products.find(product => product.productId.equals(productId));
+// cartSchema.methods.findProductById = function (productId) {
+//     return this.products.find(product => product.productId.equals(productId));
+// };
+
+cartSchema.methods.findProductByCode = function (productCode) {
+    return this.products.find(product => product.productCode === productCode);
 };
 
+cartSchema.methods.updateProductQuantityByCode = async function (productCode, quantity) {
+    const product = this.findProductByCode(productCode);
+    
+    if (product) {
+        product.quantity = quantity; 
+        await this.save(); 
+    } else {
+        throw new Error('Producto no encontrado en el carrito.');
+    }
+};
 
 
 cartSchema.methods.addProduct = async function(productId, productCode, quantity) {
@@ -51,16 +65,16 @@ cartSchema.methods.addProduct = async function(productId, productCode, quantity)
     return this; 
 };
 
-cartSchema.methods.updateProductQuantityById = async function (productId, quantity) {
-    const product = this.findProductById(productId);
+// cartSchema.methods.updateProductQuantityById = async function (productId, quantity) {
+//     const product = this.findProductById(productId);
     
-    if (product) {
-        product.quantity = quantity; 
-        await this.save(); 
-    } else {
-        throw new Error('Producto no encontrado en el carrito.');
-    }
-};
+//     if (product) {
+//         product.quantity = quantity; 
+//         await this.save(); 
+//     } else {
+//         throw new Error('Producto no encontrado en el carrito.');
+//     }
+// };
 
 cartSchema.pre('find', function () {
     this.populate({ path: '_user_id', model: userModel });
