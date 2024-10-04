@@ -50,15 +50,17 @@ export class CartsManagerDB {
     
     async createCart() {
         try {
-            const cart = await cartModel.create({});
-            if (!cart) {
-                throw new Error('No se pudo crear el carrito');
-            }
-            return cart;
+            const newCart = new cartModel({ products: [] });
+            const savedCart = await newCart.save();
+            console.log('Carrito creado:', savedCart);
+            return { status: 'success', cart: savedCart };
         } catch (error) {
-            throw error;
+            console.error('Error al crear el carrito:', error);
+            throw new Error('No se pudo crear el carrito. Inténtalo de nuevo más tarde.');
         }
     }
+    
+    
 
     async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {

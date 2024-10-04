@@ -38,10 +38,9 @@ export const createSession = (req, payload) => {
 };
 
 export const verifySession = (req, res, next) => {
-    // Verificar si existe una sesión activa
     if (req.session && req.session.user) {
         console.log('Sesión verificada para el usuario:', req.session.user);
-        req.user = req.session.user; // Adjuntar la información del usuario a la solicitud
+        req.user = req.session.user; 
         return next();
     } else {
         return res.status(401).send({ origin: config.SERVER, payload: 'Se requiere autenticación' });
@@ -83,6 +82,15 @@ export const generateFakeProducts = async (qty) => {
     }
     return products;
 }
+
+
+export const sendResponse = (res, status, message, payload = null, error = null) => {
+    const response = { status, message };
+    if (payload) response.payload = payload;
+    if (error) response.error = error;
+    res.status(status === 'Ok' ? 200 : 400).json(response);
+};
+
 
 
 

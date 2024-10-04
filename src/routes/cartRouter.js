@@ -4,6 +4,7 @@ import config from '../services/config.js';
 import nodemailer from 'nodemailer';
 import { handlePolicies } from '../services/utils.js';
 import twilio from 'twilio';
+import { sendResponse } from "../services/utils.js";
 
 const cartRouter = Router();
 
@@ -73,11 +74,12 @@ cartRouter.get('/:cid', async (req, res) => {
     const cid = req.params.cid;
     const cart = await CartsManagerDB.getInstance().getCartById(cid);
     if (cart) {
-        res.status(200).send({ status: 'Ok', payload: cart });
+        sendResponse(res, 'Ok', `Carrito encontrado.`, cart);
     } else {
-        res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito buscado con id ${cid} no existe` });
+        sendResponse(res, 'Not Ok', `El carrito buscado con id ${cid} no existe.`);
     }
 });
+
 
 cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
     try {
