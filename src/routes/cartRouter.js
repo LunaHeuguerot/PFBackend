@@ -177,6 +177,7 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
 
 
 
+
 cartRouter.delete('/:cid', async (req, res) => {
     const cid = req.params.cid;
     const rta = await CartsManagerDB.getInstance().deleteCart(cid);

@@ -131,39 +131,40 @@ export class CartsManagerDB {
         }
     }
 
-async updateProductQuantity(cid, pid, quantity) {
-    try {
-        const objectId = mongoose.Types.ObjectId(pid);
-        // Obtener el carrito por ID
-        const cart = await this.getCartById(cid);
-        
-        // Verificar si el carrito existe
-        if (!cart) {
-            throw new Error('Carrito no encontrado');
+    async updateProductQuantity(cid, pid, quantity) {
+        try {
+            // Convertir pid a ObjectId usando 'new'
+            const objectId = new mongoose.Types.ObjectId(pid); 
+            
+            // Obtener el carrito por ID
+            const cart = await this.getCartById(cid);
+            
+            // Verificar si el carrito existe
+            if (!cart) {
+                throw new Error('Carrito no encontrado');
+            }
+    
+            // Encuentra el índice del producto en el carrito
+            const productIndex = cart.products.findIndex(product => product.productId.equals(objectId)); // Usa equals para comparar ObjectId
+    
+            // Verificar si el producto está en el carrito
+            if (productIndex === -1) {
+                throw new Error(`No se encontró el producto con ID ${pid} en el carrito.`);
+            }
+    
+            // Actualiza la cantidad del producto
+            cart.products[productIndex].quantity = quantity;
+    
+            // Guarda los cambios en el carrito
+            await this.saveCart(cart);
+            
+            return cart;
+        } catch (error) {
+            // Manejo de errores
+            console.error('Error al actualizar la cantidad del producto:', error);
+            throw new Error('Error al actualizar la cantidad del producto: ' + error.message);
         }
-
-        // Encuentra el índice del producto en el carrito
-        const productIndex = cart.products.findIndex(product => product.productId.equals(objectId));
-
-        // Verificar si el producto está en el carrito
-        if (productIndex === -1) {
-            throw new Error(`No se encontró el producto con ID ${pid} en el carrito.`);
-        }
-
-        // Actualiza la cantidad del producto
-        cart.products[productIndex].quantity = quantity;
-
-        // Guarda los cambios en el carrito
-        await this.saveCart(cart);
-        
-        return cart;
-    } catch (error) {
-        // Manejo de errores
-        console.error('Error al actualizar la cantidad del producto:', error);
-        throw new Error('Error al actualizar la cantidad del producto: ' + error.message);
     }
-}
-
     
     
         
