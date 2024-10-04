@@ -155,8 +155,17 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
 
         console.log(`Recibiendo solicitud para actualizar la cantidad del producto con ID ${pid} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
 
+        // Validar si `cid` es un ObjectId válido
+        if (!mongoose.Types.ObjectId.isValid(cid)) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'El ID del carrito no es válido'
+            });
+        }
+
         // Convertir `pid` a ObjectId
         const objectIdPid = new mongoose.Types.ObjectId(pid);
+
         // Llama a la función de actualización de cantidad
         const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, objectIdPid, quantity);
         

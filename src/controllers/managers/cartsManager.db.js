@@ -138,11 +138,9 @@ export class CartsManagerDB {
                 throw new Error('El ID del producto no es válido');
             }
     
-            // Obtener el carrito por ID
-            const cart = await cartModel.findById(cid).lean();
+            // Obtener el carrito por ID (sin lean)
+            const cart = await cartModel.findById(cid);
             console.log("Productos en el carrito:", cart.products);
-
-
     
             // Verificar si el carrito existe
             if (!cart) {
@@ -151,14 +149,8 @@ export class CartsManagerDB {
     
             // Encuentra el índice del producto en el carrito
             const productIndex = cart.products.findIndex(product => {
-                const productIdFromCart = product.productId instanceof mongoose.Types.ObjectId 
-                    ? product.productId.toString() 
-                    : product.productId;
-                console.log("Comparando", productIdFromCart, "con", pid);
-                return productIdFromCart === pid;
+                return product.productId.equals(pid); // Utiliza equals() para comparar
             });
-            
-            
     
             // Verificar si el producto está en el carrito
             if (productIndex === -1) {
@@ -171,7 +163,7 @@ export class CartsManagerDB {
             console.log(`Actualizando cantidad del producto ID ${pid} a ${quantity}`);
     
             // Guarda los cambios en el carrito
-            await this.saveCart(cart);
+            await cart.save(); // Utiliza cart.save() para guardar los cambios
             console.log("Carrito actualizado:", cart);
     
             return cart;
@@ -180,8 +172,6 @@ export class CartsManagerDB {
             throw new Error('Error al actualizar la cantidad del producto: ' + error.message);
         }
     }
-    
-    
     
         
     async deleteCart(id) {
