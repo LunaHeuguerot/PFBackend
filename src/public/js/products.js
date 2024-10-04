@@ -173,7 +173,7 @@ async function confirmPurchase() {
         console.log('Datos recibidos al confirmar compra:', data); 
 
         if (data.status === 'Ok') {
-            const total = cart.total; 
+            const total = data.total; 
             alert(`Se confirmó la compra por $${total}`); 
             console.log('Redireccionando a productos después de la compra.'); 
             window.location.href = '/products';

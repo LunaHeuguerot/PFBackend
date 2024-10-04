@@ -234,7 +234,7 @@ export class CartsManagerDB {
             
             for (let item of cart.products) {
                 const productCode = item.productCode; 
-                const product = await this.productModel.findOne({ productCode }); 
+                const product = await this.productModel.findOne({ code: productCode }); 
     
                 if (!product) {
                     throw new Error(`product not found: ${productCode}`);
