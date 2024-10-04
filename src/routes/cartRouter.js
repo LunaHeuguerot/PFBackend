@@ -147,13 +147,13 @@ cartRouter.put('/:cid', async (req, res) => {
     };
 });
 
-cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
+cartRouter.put('/:cid/product/:code', handlePolicies('user', 'self'), async (req, res) => {
     try {
         const cid = req.params.cid;
-        const pid = req.params.pid;
+        const productCode = req.params.code;
         const { quantity } = req.body;
 
-        console.log(`Recibiendo solicitud para actualizar la cantidad del producto con ID ${pid} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
+        console.log(`Recibiendo solicitud para actualizar la cantidad del producto con código ${productCode} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
 
         // Validar si `cid` es un ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(cid)) {
@@ -163,17 +163,14 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
             });
         }
 
-        // Convertir `pid` a ObjectId
-        const objectIdPid = new mongoose.Types.ObjectId(pid);
-
         // Llama a la función de actualización de cantidad
-        const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, objectIdPid, quantity);
+        const updatedCart = await CartsManagerDB.getInstance().updateProductQuantityByCode(cid, productCode, quantity);
         
         req.session.cart = updatedCart; // Almacena el carrito actualizado en la sesión
 
         res.status(200).json({
             status: 'Ok',
-            mensaje: `Cantidad del producto con ID ${pid} actualizada correctamente en el carrito con ID ${cid}.`,
+            mensaje: `Cantidad del producto con código ${productCode} actualizada correctamente en el carrito con ID ${cid}.`,
             payload: updatedCart
         });
 
@@ -186,6 +183,47 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
         });
     }
 });
+
+
+// cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
+//     try {
+//         const cid = req.params.cid;
+//         const pid = req.params.pid;
+//         const { quantity } = req.body;
+
+//         console.log(`Recibiendo solicitud para actualizar la cantidad del producto con ID ${pid} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
+
+//         // Validar si `cid` es un ObjectId válido
+//         if (!mongoose.Types.ObjectId.isValid(cid)) {
+//             return res.status(400).json({
+//                 status: 'error',
+//                 message: 'El ID del carrito no es válido'
+//             });
+//         }
+
+//         // Convertir `pid` a ObjectId
+//         const objectIdPid = new mongoose.Types.ObjectId(pid);
+
+//         // Llama a la función de actualización de cantidad
+//         const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, objectIdPid, quantity);
+        
+//         req.session.cart = updatedCart; // Almacena el carrito actualizado en la sesión
+
+//         res.status(200).json({
+//             status: 'Ok',
+//             mensaje: `Cantidad del producto con ID ${pid} actualizada correctamente en el carrito con ID ${cid}.`,
+//             payload: updatedCart
+//         });
+
+//     } catch (error) {
+//         console.error('Error al actualizar la cantidad del producto:', error);
+//         res.status(500).json({
+//             status: 'error',
+//             message: 'Error al actualizar la cantidad del producto',
+//             error: error.message
+//         });
+//     }
+// });
 
 
 

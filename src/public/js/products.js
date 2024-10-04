@@ -58,7 +58,7 @@ async function addProductToCart(productId) {
     }
 }
 
-async function updateProductQuantity(productId) { 
+async function updateProductQuantity(productCode) { 
     try {
         const cartId = sessionStorage.getItem('cartId'); 
         console.log(`Obteniendo carrito ID: ${cartId}`);
@@ -68,21 +68,21 @@ async function updateProductQuantity(productId) {
         }
 
         // Esta línea obtiene el valor del input donde está la cantidad
-        const quantityElement = document.getElementById(`quantity-${productId}`); 
+        const quantityElement = document.getElementById(`quantity-${productCode}`); 
         if (!quantityElement) {
             alert('Elemento de cantidad no encontrado.');
             return;
         }
 
         const quantity = parseInt(quantityElement.value, 10); 
-        console.log(`Actualizando producto con id ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
+        console.log(`Actualizando producto con código ${productCode} en el carrito ${cartId} con cantidad ${quantity}`);
 
         if (quantity <= 0 || isNaN(quantity)) {
             alert('La cantidad debe ser mayor a 0 y válida.');
             return;
         }
 
-        const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
+        const response = await fetch(`/carts/${cartId}/product/${productCode}`, { 
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ async function updateProductQuantity(productId) {
         if (data.status === 'Ok') {
             alert('Cantidad actualizada correctamente');
             quantityElement.value = quantity; 
-            console.log('Cantidad actualizada en el DOM para el producto:', productId);
+            console.log('Cantidad actualizada en el DOM para el producto:', productCode);
         } else {
             alert(data.error || 'Error al actualizar la cantidad');
             console.error('Error al actualizar cantidad:', data.error);
@@ -115,6 +115,65 @@ async function updateProductQuantity(productId) {
         alert(error.message || 'Error al actualizar la cantidad');
     }
 }
+
+
+// async function updateProductQuantity(productId) { 
+//     try {
+//         const cartId = sessionStorage.getItem('cartId'); 
+//         console.log(`Obteniendo carrito ID: ${cartId}`);
+//         if (!cartId) {
+//             alert('No se encontró el carrito en la sesión.');
+//             return;
+//         }
+
+//         // Esta línea obtiene el valor del input donde está la cantidad
+//         const quantityElement = document.getElementById(`quantity-${productId}`); 
+//         if (!quantityElement) {
+//             alert('Elemento de cantidad no encontrado.');
+//             return;
+//         }
+
+//         const quantity = parseInt(quantityElement.value, 10); 
+//         console.log(`Actualizando producto con id ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
+
+//         if (quantity <= 0 || isNaN(quantity)) {
+//             alert('La cantidad debe ser mayor a 0 y válida.');
+//             return;
+//         }
+
+//         const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
+//             method: 'PUT',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ quantity }),
+//             credentials: 'include'
+//         });
+
+//         console.log('Respuesta del servidor al actualizar la cantidad:', response);
+
+//         if (!response.ok) {
+//             const errorText = await response.text(); 
+//             console.error('Error en la respuesta del servidor:', response.status, errorText);
+//             throw new Error(`Error al actualizar la cantidad: ${response.status} - ${errorText}`);
+//         }
+
+//         const data = await response.json();
+//         console.log('Datos de la respuesta al actualizar cantidad:', data);
+
+//         if (data.status === 'Ok') {
+//             alert('Cantidad actualizada correctamente');
+//             quantityElement.value = quantity; 
+//             console.log('Cantidad actualizada en el DOM para el producto:', productId);
+//         } else {
+//             alert(data.error || 'Error al actualizar la cantidad');
+//             console.error('Error al actualizar cantidad:', data.error);
+//         }
+//     } catch (error) {
+//         console.error('Error en updateProductQuantity:', error);
+//         alert(error.message || 'Error al actualizar la cantidad');
+//     }
+// }
 
 async function removeProduct(productId) {
     try {
