@@ -61,6 +61,15 @@ export class CartsManagerDB {
         }
     }
 
+    async saveCart(cart) {
+        try {
+            return await cartModel.findByIdAndUpdate(cart._id, { products: cart.products }, { new: true }).lean();
+        } catch (error) {
+            console.error('Error al guardar el carrito:', error);
+            throw new Error('Error al guardar el carrito: ' + error.message);
+        }
+    }
+
     async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {
             console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
@@ -135,36 +144,29 @@ export class CartsManagerDB {
         try {
             // Obtener el carrito por ID
             const cart = await cartModel.findById(cid).lean();
-            console.log("Productos en el carrito:", cart.products);
-    
-            // Verificar si el carrito existe
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-    
+
             // Encuentra el producto en el carrito por su código
             const productIndex = cart.products.findIndex(product => product.productCode === code);
-    
-            // Verificar si el producto está en el carrito
             if (productIndex === -1) {
-                console.error("Producto no encontrado en el carrito. Código buscado:", code);
                 throw new Error(`No se encontró el producto con código ${code} en el carrito.`);
             }
-    
+
             // Actualiza la cantidad del producto
             cart.products[productIndex].quantity = quantity;
-            console.log(`Actualizando cantidad del producto código ${code} a ${quantity}`);
-    
+
             // Guarda los cambios en el carrito
             await this.saveCart(cart);
-            console.log("Carrito actualizado:", cart);
-    
+
             return cart;
         } catch (error) {
             console.error('Error al actualizar la cantidad del producto:', error);
             throw new Error('Error al actualizar la cantidad del producto: ' + error.message);
         }
     }
+
     
 
     // async updateProductQuantity(cid, pid, quantity) {
