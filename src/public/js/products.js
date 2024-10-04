@@ -67,6 +67,7 @@ async function updateProductQuantity(productId) {
             return;
         }
 
+        // Esta línea obtiene el valor del input donde está la cantidad
         const quantityElement = document.getElementById(`quantity-${productId}`); 
         if (!quantityElement) {
             alert('Elemento de cantidad no encontrado.');
