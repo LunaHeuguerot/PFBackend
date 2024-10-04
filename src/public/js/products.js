@@ -53,7 +53,7 @@ async function addProductToCart(productId) {
             throw new Error('No se pudo agregar el producto al carrito.');
         }
     } catch (error) {
-        console.error('Error capturado:', error.message);
+        console.error('Error capturado al agregar producto:', error.message);
         alert('Error: No se pudo agregar el producto al carrito.');
     }
 }
@@ -61,6 +61,7 @@ async function addProductToCart(productId) {
 async function updateProductQuantity(productId) { 
     try {
         const cartId = sessionStorage.getItem('cartId'); 
+        console.log(`Obteniendo carrito ID: ${cartId}`);
         if (!cartId) {
             alert('No se encontró el carrito en la sesión.');
             return;
