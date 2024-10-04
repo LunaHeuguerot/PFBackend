@@ -134,7 +134,7 @@ export class CartsManagerDB {
     async updateProductQuantity(cid, pid, quantity) {
         try {
             // Convierte el productId recibido a ObjectId
-            const objectId = new mongoose.Types.ObjectId(pid); 
+            const objectId = new mongoose.Types.ObjectId.isValid(pid); 
     
             // Obtener el carrito por ID
             const cart = await this.getCartById(cid);
