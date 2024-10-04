@@ -139,8 +139,9 @@ export class CartsManagerDB {
             }
     
             // Obtener el carrito por ID
-            const cart = await this.getCartById(cid);
-            console.log("Carrito obtenido:", cart);
+            const cart = await cartModel.findById(cid).lean();
+            console.log("Productos en el carrito:", cart.products);
+
     
             // Verificar si el carrito existe
             if (!cart) {
@@ -149,13 +150,8 @@ export class CartsManagerDB {
     
             // Encuentra el índice del producto en el carrito
             const productIndex = cart.products.findIndex(product => {
-                // Asegúrate de que productId es un ObjectId
-                if (product.productId instanceof mongoose.Types.ObjectId) {
-                    return product.productId.equals(pid); // No necesitas crear un nuevo ObjectId aquí
-                } else {
-                    // Si product.productId es un string, lo convertimos a string
-                    return product.productId.toString() === pid;
-                }
+                console.log("Comparando", product.productId.toString(), "con", pid.toString());
+                return product.productId.toString() === pid.toString();
             });
     
             // Verificar si el producto está en el carrito
