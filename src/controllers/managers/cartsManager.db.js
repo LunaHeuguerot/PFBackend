@@ -133,6 +133,7 @@ export class CartsManagerDB {
 
 async updateProductQuantity(cid, pid, quantity) {
     try {
+        const objectId = mongoose.Types.ObjectId(pid);
         // Obtener el carrito por ID
         const cart = await this.getCartById(cid);
         
@@ -142,7 +143,7 @@ async updateProductQuantity(cid, pid, quantity) {
         }
 
         // Encuentra el índice del producto en el carrito
-        const productIndex = cart.products.findIndex(product => product.productId.toString() === pid);
+        const productIndex = cart.products.findIndex(product => product.productId.equals(objectId));
 
         // Verificar si el producto está en el carrito
         if (productIndex === -1) {
