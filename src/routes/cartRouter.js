@@ -156,8 +156,7 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
         console.log(`Recibiendo solicitud para actualizar la cantidad del producto con ID ${pid} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
 
         // Convertir `pid` a ObjectId
-        const objectIdPid = mongoose.Types.ObjectId(pid);
-
+        const objectIdPid = new mongoose.Types.ObjectId(pid);
         // Llama a la función de actualización de cantidad
         const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, objectIdPid, quantity);
         
