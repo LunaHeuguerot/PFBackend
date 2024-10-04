@@ -46,6 +46,7 @@
     "winston": "^3.13.1"
   },
   "devDependencies": {
+    "@types/nodemailer": "^6.4.16",
     "artillery": "^1.7.4",
     "chai": "^5.1.1",
     "chai-http": "^5.0.0",

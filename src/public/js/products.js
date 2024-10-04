@@ -1,4 +1,5 @@
 let cartId = sessionStorage.getItem('cartId');
+console.log(cartId)
 
 async function createCart() {
     try {
@@ -23,38 +24,35 @@ async function getCartId() {
     return cartId;
 }
 
-async function addProductToCart(productId) {
+async function addProductToCart(productId, quantity = 1) {
     try {
-        const currentCartId = await getCartId();  
-        console.log('Intentando agregar el producto...');
+        const cartId = await getCartId();  
 
-        const response = await fetch(`/carts/${currentCartId}/product/${productId}`, {
+        const response = await fetch(`/carts/${cartId}/product/${productId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ quantity }),  
         });
 
-        console.log('Respuesta recibida, procesando...');
-
         if (!response.ok) {
-            console.error('Respuesta del servidor no fue ok:', response.status);
+            console.error('Error en la respuesta del servidor:', response.status);
             throw new Error('Error en la petición al servidor.');
         }
 
         const result = await response.json();
-        console.log('Resultado del servidor:', result);
 
         if (result.status === 'Ok') {
-            alert('Producto agregado al carrito con ID: ' + productId);
-            console.log('Producto agregado al carrito.');
+            alert(`Producto con ID: ${productId} agregado/actualizado correctamente.`);
+            window.location.reload();  
         } else {
-            console.error('El servidor respondió con éxito falso:', result);
-            throw new Error('No se pudo agregar el producto al carrito.');
+            console.error('Error al procesar la respuesta del servidor:', result);
+            throw new Error('No se pudo agregar o actualizar el producto en el carrito.');
         }
     } catch (error) {
-        console.error('Error capturado al agregar producto:', error.message);
-        alert('Error: No se pudo agregar el producto al carrito.');
+        console.error('Error en addProductToCart:', error);
+        alert('Error: No se pudo agregar o actualizar el producto en el carrito.');
     }
 }
 
@@ -67,7 +65,6 @@ async function updateProductQuantity(productCode) {
             return;
         }
 
-        // Esta línea obtiene el valor del input donde está la cantidad
         const quantityElement = document.getElementById(`quantity-${productCode}`); 
         if (!quantityElement) {
             alert('Elemento de cantidad no encontrado.');
@@ -117,65 +114,7 @@ async function updateProductQuantity(productCode) {
 }
 
 
-// async function updateProductQuantity(productId) { 
-//     try {
-//         const cartId = sessionStorage.getItem('cartId'); 
-//         console.log(`Obteniendo carrito ID: ${cartId}`);
-//         if (!cartId) {
-//             alert('No se encontró el carrito en la sesión.');
-//             return;
-//         }
-
-//         // Esta línea obtiene el valor del input donde está la cantidad
-//         const quantityElement = document.getElementById(`quantity-${productId}`); 
-//         if (!quantityElement) {
-//             alert('Elemento de cantidad no encontrado.');
-//             return;
-//         }
-
-//         const quantity = parseInt(quantityElement.value, 10); 
-//         console.log(`Actualizando producto con id ${productId} en el carrito ${cartId} con cantidad ${quantity}`);
-
-//         if (quantity <= 0 || isNaN(quantity)) {
-//             alert('La cantidad debe ser mayor a 0 y válida.');
-//             return;
-//         }
-
-//         const response = await fetch(`/carts/${cartId}/product/${productId}`, { 
-//             method: 'PUT',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({ quantity }),
-//             credentials: 'include'
-//         });
-
-//         console.log('Respuesta del servidor al actualizar la cantidad:', response);
-
-//         if (!response.ok) {
-//             const errorText = await response.text(); 
-//             console.error('Error en la respuesta del servidor:', response.status, errorText);
-//             throw new Error(`Error al actualizar la cantidad: ${response.status} - ${errorText}`);
-//         }
-
-//         const data = await response.json();
-//         console.log('Datos de la respuesta al actualizar cantidad:', data);
-
-//         if (data.status === 'Ok') {
-//             alert('Cantidad actualizada correctamente');
-//             quantityElement.value = quantity; 
-//             console.log('Cantidad actualizada en el DOM para el producto:', productId);
-//         } else {
-//             alert(data.error || 'Error al actualizar la cantidad');
-//             console.error('Error al actualizar cantidad:', data.error);
-//         }
-//     } catch (error) {
-//         console.error('Error en updateProductQuantity:', error);
-//         alert(error.message || 'Error al actualizar la cantidad');
-//     }
-// }
-
-async function removeProduct(productCode) {  // Cambiar productId a productCode
+async function removeProduct(productCode) {  
     try {
         const currentCartId = sessionStorage.getItem('cartId');
         if (!currentCartId) {
@@ -191,7 +130,7 @@ async function removeProduct(productCode) {  // Cambiar productId a productCode
         if (data.status === 'Ok') {
             alert('Producto eliminado correctamente');
             console.log('Producto eliminado del carrito:', productCode);
-            window.location.reload();  // Recargar la página para actualizar el carrito
+            window.location.reload();  
         } else {
             alert(data.message || 'Error al eliminar el producto');
             console.error('Error al eliminar producto:', data.message);
@@ -202,40 +141,11 @@ async function removeProduct(productCode) {  // Cambiar productId a productCode
     }
 }
 
-
-// async function removeProduct(productId) {
-//     try {
-//         const currentCartId = sessionStorage.getItem('cartId');
-//         if (!currentCartId) {
-//             alert('No se encontró el carrito en la sesión.');
-//             return;
-//         }
-
-//         const response = await fetch(`/carts/${currentCartId}/product/${productId}`, { method: 'DELETE' });
-//         console.log('Respuesta del servidor al eliminar producto:', response);
-
-//         const data = await response.json();
-
-//         if (data.status === 'Ok') {
-//             alert('Producto eliminado correctamente');
-//             console.log('Producto eliminado del carrito:', productId);
-//             window.location.reload();
-//         } else {
-//             alert(data.message || 'Error al eliminar el producto');
-//             console.error('Error al eliminar producto:', data.message);
-//         }
-//     } catch (error) {
-//         console.error('Error en removeProduct:', error);
-//         alert(error.message || 'Error al eliminar el producto');
-//     }
-// }
-
 async function confirmPurchase() {
     try {
         const currentCartId = sessionStorage.getItem('cartId');
-        console.log('ID del carrito actual:', currentCartId); // Log del ID del carrito
+        console.log('ID del carrito actual:', currentCartId); 
 
-        // Verifica que el ID del carrito no sea nulo
         if (!currentCartId) {
             console.error('No se encontró el carrito en la sesión.'); // Log de error si no se encuentra el carrito
             alert('No se encontró el carrito en la sesión.');
@@ -249,11 +159,10 @@ async function confirmPurchase() {
             },
         });
 
-        console.log('Respuesta del servidor al confirmar compra:', response); // Log de respuesta del servidor
+        console.log('Respuesta del servidor al confirmar compra:', response); 
 
-        // Verifica si la respuesta fue exitosa
         if (!response.ok) {
-            console.error('Error en la respuesta del servidor:', response.status, response.statusText); // Log de error si la respuesta no es OK
+            console.error('Error en la respuesta del servidor:', response.status, response.statusText); 
             const errorData = await response.json();
             alert(errorData.message || 'Error al confirmar la compra');
             console.error('Error al confirmar compra:', errorData.message);
@@ -261,23 +170,22 @@ async function confirmPurchase() {
         }
 
         const data = await response.json();
-        console.log('Datos recibidos al confirmar compra:', data); // Log de datos recibidos
+        console.log('Datos recibidos al confirmar compra:', data); 
 
         if (data.status === 'Ok') {
-            const total = data.total; // Asegúrate de que 'total' está presente en la respuesta
-            alert(`Se confirmó la compra por $${total}`); // Alert con el total de la compra
-            console.log('Redireccionando a productos después de la compra.'); // Log antes de redirigir
+            const total = data.total; 
+            alert(`Se confirmó la compra por $${total}`); 
+            console.log('Redireccionando a productos después de la compra.'); 
             window.location.href = '/products';
         } else {
             alert(data.message || 'Error al confirmar la compra');
             console.error('Error al confirmar compra:', data.message);
         }
     } catch (error) {
-        console.error('Error en confirmPurchase:', error); // Log de error en el bloque catch
+        console.error('Error en confirmPurchase:', error); 
         alert(error.message || 'Error al confirmar la compra');
     }
 }
-
 
 async function viewCart() {
     try {

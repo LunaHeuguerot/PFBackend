@@ -69,7 +69,7 @@ export class CartsManagerDB {
         }
     }
 
-    async addProductToCart(cartId, productId, userId, quantity = 1) {
+    async addProductToCart(cartId, productId, productCode, userId, quantity = 1) {
         try {
             console.log(`Adding product: ${productId}, to cart: ${cartId}, by user: ${userId}, quantity: ${quantity}`);
             
@@ -91,7 +91,9 @@ export class CartsManagerDB {
                 throw new Error(`Carrito con ID ${cartId} no encontrado o sin productos.`);
             }
     
-            const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
+            const productIndex = cart.products.findIndex(item => 
+                item.productCode === product.code 
+            );
         
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += quantity;  
@@ -141,22 +143,18 @@ export class CartsManagerDB {
 
     async updateProductQuantityByCode(cid, code, quantity) {
         try {
-            // Obtener el carrito por ID
             const cart = await cartModel.findById(cid).lean();
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
 
-            // Encuentra el producto en el carrito por su código
             const productIndex = cart.products.findIndex(product => product.productCode === code);
             if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con código ${code} en el carrito.`);
             }
 
-            // Actualiza la cantidad del producto
             cart.products[productIndex].quantity = quantity;
 
-            // Guarda los cambios en el carrito
             await this.saveCart(cart);
 
             return cart;
@@ -168,48 +166,7 @@ export class CartsManagerDB {
 
     
 
-    // async updateProductQuantity(cid, pid, quantity) {
-    //     try {
-    //         // Verifica si el ID es válido
-    //         if (!mongoose.Types.ObjectId.isValid(pid)) {
-    //             throw new Error('El ID del producto no es válido');
-    //         }
-    
-    //         // Obtener el carrito por ID (sin lean)
-    //         const cart = await cartModel.findById(cid);
-    //         console.log("Productos en el carrito:", cart.products);
-    
-    //         // Verificar si el carrito existe
-    //         if (!cart) {
-    //             throw new Error('Carrito no encontrado');
-    //         }
-    
-    //         // Encuentra el índice del producto en el carrito
-    //         const productIndex = cart.products.findIndex(product => {
-    //             return product.productId.equals(pid); // Utiliza equals() para comparar
-    //         });
-    
-    //         // Verificar si el producto está en el carrito
-    //         if (productIndex === -1) {
-    //             console.error("Producto no encontrado en el carrito. ID buscado:", pid);
-    //             throw new Error(`No se encontró el producto con ID ${pid} en el carrito.`);
-    //         }
-    
-    //         // Actualiza la cantidad del producto
-    //         cart.products[productIndex].quantity = quantity;
-    //         console.log(`Actualizando cantidad del producto ID ${pid} a ${quantity}`);
-    
-    //         // Guarda los cambios en el carrito
-    //         await cart.save(); // Utiliza cart.save() para guardar los cambios
-    //         console.log("Carrito actualizado:", cart);
-    
-    //         return cart;
-    //     } catch (error) {
-    //         console.error('Error al actualizar la cantidad del producto:', error);
-    //         throw new Error('Error al actualizar la cantidad del producto: ' + error.message);
-    //     }
-    // }
-    
+ 
         
     async deleteCart(id) {
         try {
@@ -227,7 +184,6 @@ export class CartsManagerDB {
         try {
             let cart = await this.getCartById(cartId);
             
-            // Encuentra el índice del producto por productCode
             const productIndex = cart.products.findIndex(item => item.productCode === productCode);
     
             if (productIndex === -1) {
@@ -245,24 +201,6 @@ export class CartsManagerDB {
     }
     
 
-    // async removeProdFromCart(cartId, productId) {
-    //     try {
-    //         let cart = await this.getCartById(cartId);
-    //         const productIndex = cart.products.findIndex(item => item.productId._id.toString() === productId);
-
-    //         if (productIndex === -1) {
-    //             throw new Error(`No se encontró el producto con id ${productId} en el carrito con id ${cartId}`);
-    //         } else {
-    //             cart.products.splice(productIndex, 1);
-    //         }
-
-    //         await cartModel.updateOne({ _id: cartId }, { products: cart.products });
-    //         cart = await this.getCartById(cartId);
-    //         return cart;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
 
     async purchaseCart(cid, user) {
         try {

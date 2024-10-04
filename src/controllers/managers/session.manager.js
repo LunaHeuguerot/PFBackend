@@ -48,6 +48,7 @@ async function login(req, res, next) {
 }
 
 async function logout(req, res) {
+    console.log("Logout function called");
     try {
         if (req.user) {
             await userModel.findByIdAndUpdate(req.user._id, { last_connection: new Date() });
@@ -62,6 +63,7 @@ async function logout(req, res) {
         res.status(500).json({ message: "Error during logout" });
     }
 }
+
 
 
 export { register, login, logout };

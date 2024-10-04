@@ -23,14 +23,14 @@
 {{#each cart.products}}
 <tr>
     <td>{{_id}}</td>
-    <td>{{productId.code}}</td> <!-- Asegúrate de que productId.code esté definido -->
+    <td>{{productId.code}}</td> 
     <td>{{productId.title}}</td>
     <td>{{productId.description}}</td>
     <td>{{productId.category}}</td>
     <td>${{productId.price}}</td>
     <td>
-        <input type="number" value="{{quantity}}" min="1" id="quantity-{{productId.code}}"> <!-- Cambiar el id a productId.code -->
-        <button onclick="updateProductQuantity('{{productId.code}}')">Actualizar cantidad</button> <!-- Cambiar a productId.code -->
+        <input type="number" value="{{quantity}}" min="1" id="quantity-{{productId.code}}">
+        <button onclick="updateProductQuantity('{{productId.code}}')">Actualizar cantidad</button>
     </td>
     <td>${{subtotal}}</td>
     <td><button onclick="removeProduct('{{productId.code}}')">Eliminar</button></td>

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (response.ok) {
-                window.location.href = '/';
+                window.location.href = '/'; 
             } else {
                 alert('Error al cerrar sesión');
             }
