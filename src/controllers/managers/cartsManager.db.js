@@ -50,17 +50,15 @@ export class CartsManagerDB {
     
     async createCart() {
         try {
-            const newCart = new cartModel({ products: [] });
-            const savedCart = await newCart.save();
-            console.log('Carrito creado:', savedCart);
-            return { status: 'success', cart: savedCart };
+            const cart = await cartModel.create({});
+            if (!cart) {
+                throw new Error('No se pudo crear el carrito');
+            }
+            return cart;
         } catch (error) {
-            console.error('Error al crear el carrito:', error);
-            throw new Error('No se pudo crear el carrito. Inténtalo de nuevo más tarde.');
+            throw error;
         }
     }
-    
-    
 
     async addProductToCart(cartId, productId, userId, quantity = 1) {
         try {
@@ -87,18 +85,14 @@ export class CartsManagerDB {
             const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
         
             if (productIndex !== -1) {
-                // Si el producto ya existe, solo actualizamos la cantidad
                 cart.products[productIndex].quantity += quantity;  
             } else {
-                // Cambia aquí para agregar tanto productId como productCode
                 cart.products.push({ 
                     productId: productId, 
                     productCode: product.code,  
                     quantity 
                 });
             }
-    
-            // Actualiza el carrito en la base de datos
             cart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean(); 
             return cart;
         } catch (error) {
@@ -145,28 +139,24 @@ export class CartsManagerDB {
             if (!cart) {
                 throw new Error(`No se encontró el carrito con ID ${cartId}.`);
             }
-    
-            // Busca el índice del producto en el carrito
+
             const productIndex = cart.products.findIndex(item => item.productId.toString() === productId);
-            
-            // Verifica si el producto está en el carrito
+
             if (productIndex === -1) {
                 throw new Error(`No se encontró el producto con ID ${productId} en el carrito.`);
             }
-    
-            // Actualiza la cantidad del producto
+
             cart.products[productIndex].quantity = quantity;
             console.log(`Cantidad del producto con ID ${productId} actualizada a ${quantity}.`);
-    
-            // Guarda los cambios en la base de datos
+
             const updatedCart = await cartModel.findByIdAndUpdate(cartId, { products: cart.products }, { new: true }).lean();
             
-            console.log(`Carrito actualizado:`, updatedCart); // Log del carrito actualizado
-            return updatedCart; // Devuelve el carrito actualizado
+            console.log(`Carrito actualizado:`, updatedCart); 
+            return updatedCart; 
     
         } catch (error) {
             console.error('Error al actualizar la cantidad del producto:', error);
-            throw new Error(`Error al actualizar la cantidad del producto: ${error.message}`); // Lanza un nuevo error con un mensaje específico
+            throw new Error(`Error al actualizar la cantidad del producto: ${error.message}`); 
         }
     }
     

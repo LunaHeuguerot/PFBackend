@@ -4,7 +4,6 @@ import config from '../services/config.js';
 import nodemailer from 'nodemailer';
 import { handlePolicies } from '../services/utils.js';
 import twilio from 'twilio';
-import { sendResponse } from "../services/utils.js";
 
 const cartRouter = Router();
 
@@ -74,12 +73,11 @@ cartRouter.get('/:cid', async (req, res) => {
     const cid = req.params.cid;
     const cart = await CartsManagerDB.getInstance().getCartById(cid);
     if (cart) {
-        sendResponse(res, 'Ok', `Carrito encontrado.`, cart);
+        res.status(200).send({ status: 'Ok', payload: cart });
     } else {
-        sendResponse(res, 'Not Ok', `El carrito buscado con id ${cid} no existe.`);
+        res.status(400).send({ status: 'Not Ok', payload: [], error: `El carrito buscado con id ${cid} no existe` });
     }
 });
-
 
 cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req, res) => {
     try {
@@ -99,7 +97,6 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
             });
         }
 
-        // Aquí se asegura que el payload contenga los productos con su productCode
         res.status(200).json({
             status: 'Ok',
             mensaje: `Se agregó el producto con id ${pid} al carrito con id ${cid} correctamente`,
@@ -107,7 +104,7 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
                 cartId: updatedCart._id,
                 products: updatedCart.products.map(product => ({
                     productId: product.productId,
-                    productCode: product.productCode,  // Asegurando que se incluya productCode
+                    productCode: product.productCode,  
                     quantity: product.quantity
                 }))
             }
@@ -122,8 +119,6 @@ cartRouter.post('/:cid/product/:pid', handlePolicies('user', 'self'), async (req
         });
     }
 });
-
-
 
 cartRouter.delete('/:cid/product/:pid', async (req, res) => {
     const cid = req.params.cid;
@@ -155,19 +150,18 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
     try {
         const cid = req.params.cid; 
         const pid = req.params.pid; 
-        const { quantity } = req.body; // Asegúrate de que la cantidad se esté enviando correctamente
+        const { quantity } = req.body; 
 
         console.log(`Recibiendo solicitud para actualizar la cantidad del producto con ID ${pid} en el carrito con ID ${cid}. Nueva cantidad: ${quantity}`);
 
-        // Llama a la función de actualización de cantidad
         const updatedCart = await CartsManagerDB.getInstance().updateProductQuantity(cid, pid, quantity);
         
-        req.session.cart = updatedCart; // Almacena el carrito actualizado en la sesión
+        req.session.cart = updatedCart;
 
         res.status(200).json({
             status: 'Ok',
             mensaje: `Cantidad del producto con ID ${pid} actualizada correctamente en el carrito con ID ${cid}.`,
-            payload: updatedCart // Envía el carrito actualizado en la respuesta
+            payload: updatedCart 
         });
 
     } catch (error) {
@@ -175,14 +169,10 @@ cartRouter.put('/:cid/product/:pid', handlePolicies('user', 'self'), async (req,
         res.status(500).json({
             status: 'error',
             message: 'Error al actualizar la cantidad del producto',
-            error: error.message // Envía el mensaje de error específico
+            error: error.message 
         });
     }
 });
-
-
-
-
 
 cartRouter.delete('/:cid', async (req, res) => {
     const cid = req.params.cid;
