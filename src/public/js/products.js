@@ -1,4 +1,4 @@
-let cartId = sessionStorage.getItem('cartId');
+let cartId = sessionStorage.getItem('cartId')?.trim();
 console.log(cartId)
 
 async function createCart() {
@@ -7,7 +7,7 @@ async function createCart() {
         const data = await response.json();
 
         if (data.status === 'success') {
-            sessionStorage.setItem('cartId', data.payload._id);
+            sessionStorage.setItem('cartId', data.payload._id.trim());;
             return data.payload._id;
         } else {
             throw new Error(data.message);
@@ -173,7 +173,7 @@ async function confirmPurchase() {
         console.log('Datos recibidos al confirmar compra:', data); 
 
         if (data.status === 'Ok') {
-            const total = data.total; 
+            const total = cart.total; 
             alert(`Se confirmó la compra por $${total}`); 
             console.log('Redireccionando a productos después de la compra.'); 
             window.location.href = '/products';

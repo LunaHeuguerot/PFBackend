@@ -278,7 +278,8 @@ cartRouter.delete("/:cid", async (req, res) => {
 });
 
 cartRouter.post('/:cid/purchase', handlePolicies('user'), async (req, res) => {
-    const cid = req.params.cid;
+    const { cid } = req.params;
+    console.log('ID del carrito recibido en la ruta:', cid);
     const cart = await CartsManagerDB.getInstance().getCartById(cid);
 
     if (cart) {

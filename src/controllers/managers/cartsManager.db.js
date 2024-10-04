@@ -3,6 +3,7 @@ import { ProductManagerDB } from './productsManager.db.js';
 import productModel from '../../dao/models/products.model.js';
 import ticketModel from '../../dao/models/ticket.model.js';
 import { sendPurchaseEmail } from '../../services/emails.js';
+import mongoose from 'mongoose';
 
 export class CartsManagerDB {
     static #instance;
@@ -20,21 +21,25 @@ export class CartsManagerDB {
         return CartsManagerDB.#instance;
     }
 
-    async getCartById(id) {
+    async getCartById(cartId) {
         try {
-            if (id.length !== 24) {
+            if (cartId.length !== 24) {
                 throw new Error('El id debe tener 24 caracteres');
             }
-
-            const cart = await cartModel.findById(id).lean();
-
-            if (!cart) {
-                throw new Error(`No se encontró el carrito con id ${id}`);
+    
+            if (!mongoose.Types.ObjectId.isValid(cartId)) {
+                throw new Error('ID de carrito inválido');
             }
- 
+
+            const cart = await cartModel.findById(cartId).populate('products.productId').lean();
+    
+            if (!cart) {
+                throw new Error(`No se encontró el carrito con id ${cartId}`);
+            }
+    
             cart.products.forEach(product => {
                 if (!product.productId || !product.productId.price) {
-                    console.error(`El producto con código ${product?.productCode || 'desconocido'} no tiene un precio definido.`);
+                    console.error(`El producto con código ${product.productCode || 'desconocido'} no tiene un precio definido.`);
                     product.productId.price = 0;  
                 }
             });
@@ -45,6 +50,7 @@ export class CartsManagerDB {
             throw new Error(`Error al obtener el carrito: ${error.message}`);
         }
     }
+    
     
     
     
@@ -204,7 +210,16 @@ export class CartsManagerDB {
 
     async purchaseCart(cid, user) {
         try {
-            const cartResponse = await this.getCartById(cid); 
+            const cartId = cid._id.toString();
+            console.log('ID del carrito recibido:', cartId);
+    
+            if (!cartId || cartId.length !== 24 || !mongoose.Types.ObjectId.isValid(cartId)) {
+                throw new Error('El id debe tener 24 caracteres y ser un ObjectId válido');
+            }
+
+            const cartResponse = await this.getCartById(cartId); 
+            console.log('ID del carrito en purchaseCart:', cartId);
+            
             if (!cartResponse) {
                 throw new Error('Carrito no encontrado');
             }
@@ -213,40 +228,40 @@ export class CartsManagerDB {
             if (cart.products.length === 0) {
                 return { status: 400, error: 'cart empty' };
             }
-    
+            console.log('Productos en el carrito', cart.products);
             const userData = user;
             let ticketAmount = 0;
-    
+            
             for (let item of cart.products) {
-                const productId = item._id;
-                const product = await this.productModel.findById(productId);
-                
+                const productCode = item.productCode; 
+                const product = await this.productModel.findOne({ productCode }); 
+    
                 if (!product) {
-                    throw new Error(`product not found: ${productId}`);
+                    throw new Error(`product not found: ${productCode}`);
                 }
     
                 const productStock = product.stock;
-                const requestedQuantity = item.qty;
+                const requestedQuantity = item.quantity; 
     
                 if (requestedQuantity <= productStock) {
                     const quantityUpdated = productStock - requestedQuantity;
-                    await this.productModel.findByIdAndUpdate(productId, { stock: quantityUpdated }, { new: true });
+                    await this.productModel.findByIdAndUpdate(product._id, { stock: quantityUpdated }, { new: true });
     
                     ticketAmount += requestedQuantity * product.price;
     
                 } else {
-                    await this.productModel.findByIdAndUpdate(productId, { stock: 0 }, { new: true });
+                    await this.productModel.findByIdAndUpdate(product._id, { stock: 0 }, { new: true });
                     const quantityNotPurchased = requestedQuantity - productStock;
 
-                    const updateResponse = await this.updateProdQuantity(cid, productId, quantityNotPurchased);
+                    const updateResponse = await this.updateProductQuantityByCode(cartId, productCode, quantityNotPurchased);
                     if (updateResponse.status !== 200) {
                         return { status: 500, error: 'error updating product stock' };
                     }
-
+    
                     ticketAmount += productStock * product.price;
                 }
             }
-
+    
             if (ticketAmount > 0) {
                 const ticket = {
                     amount: ticketAmount,
@@ -255,10 +270,10 @@ export class CartsManagerDB {
                 const ticketFinished = await ticketModel.create(ticket);
                 console.log('ticket created:', ticketFinished);
                 const subject = 'Compra realizada con éxito';
-                const text = `Hola ${userData.firstName},\n\nTu compra con el carrito ${cid} ha sido realizada con éxito.\n\nGracias por tu compra.\n\nSaludos.`;
-                
+                const text = `Hola ${userData.firstName},\n\nTu compra con el carrito ${cartId} ha sido realizada con éxito.\n\nGracias por tu compra.\n\nSaludos.`;
+    
                 await sendPurchaseEmail(userData.email, subject, text);
-                const clearCartResponse = await this.clearCartProducts(cid);
+                const clearCartResponse = await this.clearCartProducts(cartId);
                 if (clearCartResponse.status !== 200) {
                     console.error("error emptying cart", clearCartResponse.error);
                     return { status: 500, error: 'error emptying cart' };
@@ -271,4 +286,6 @@ export class CartsManagerDB {
             return { status: 500, error: 'Error al procesar la compra' };
         }
     }
+    
+    
 }
