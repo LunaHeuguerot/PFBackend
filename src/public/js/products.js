@@ -144,7 +144,6 @@ async function removeProduct(productCode) {
 async function confirmPurchase() {
     try {
         const currentCartId = sessionStorage.getItem('cartId');
-        console.log('ID del carrito actual:', currentCartId); 
 
         if (!currentCartId) {
             console.error('No se encontró el carrito en la sesión.'); // Log de error si no se encuentra el carrito
@@ -159,13 +158,10 @@ async function confirmPurchase() {
             },
         });
 
-        console.log('Respuesta del servidor al confirmar compra:', response); 
 
         if (!response.ok) {
-            console.error('Error en la respuesta del servidor:', response.status, response.statusText); 
             const errorData = await response.json();
             alert(errorData.message || 'Error al confirmar la compra');
-            console.error('Error al confirmar compra:', errorData.message);
             return;
         }
 
@@ -173,13 +169,11 @@ async function confirmPurchase() {
         console.log('Datos recibidos al confirmar compra:', data); 
 
         if (data.status === 'Ok') {
-            const total = data.total; 
+            const total = document.getElementById('cart-total'); 
             alert(`Se confirmó la compra por $${total}`); 
-            console.log('Redireccionando a productos después de la compra.'); 
             window.location.href = '/products';
         } else {
             alert(data.message || 'Error al confirmar la compra');
-            console.error('Error al confirmar compra:', data.message);
         }
     } catch (error) {
         console.error('Error en confirmPurchase:', error); 
