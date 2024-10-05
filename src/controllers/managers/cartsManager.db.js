@@ -212,7 +212,7 @@ export class CartsManagerDB {
         try {
             const cartId = cid._id.toString();
             console.log('ID del carrito recibido:', cartId);
-    
+
             if (!cartId || cartId.length !== 24 || !mongoose.Types.ObjectId.isValid(cartId)) {
                 throw new Error('El id debe tener 24 caracteres y ser un ObjectId válido');
             }
@@ -229,9 +229,13 @@ export class CartsManagerDB {
                 return { status: 400, error: 'cart empty' };
             }
             console.log('Productos en el carrito', cart.products);
-            const userData = user;
-            let ticketAmount = 0;
+
+            if (!user || !user.email) {
+                throw new Error('User data is missing or does not contain an email');
+            }
             
+            let ticketAmount = 0;
+    
             for (let item of cart.products) {
                 const productCode = item.productCode; 
                 const product = await this.productModel.findOne({ code: productCode }); 
@@ -252,7 +256,7 @@ export class CartsManagerDB {
                 } else {
                     await this.productModel.findByIdAndUpdate(product._id, { stock: 0 }, { new: true });
                     const quantityNotPurchased = requestedQuantity - productStock;
-
+    
                     const updateResponse = await this.updateProductQuantityByCode(cartId, productCode, quantityNotPurchased);
                     if (updateResponse.status !== 200) {
                         return { status: 500, error: 'error updating product stock' };
@@ -261,18 +265,19 @@ export class CartsManagerDB {
                     ticketAmount += productStock * product.price;
                 }
             }
-    
+
             if (ticketAmount > 0) {
                 const ticket = {
                     amount: ticketAmount,
-                    purchaser: userData.email
+                    purchaser: user.email, 
+                    code: `TICKET-${Date.now()}`
                 };
                 const ticketFinished = await ticketModel.create(ticket);
                 console.log('ticket created:', ticketFinished);
                 const subject = 'Compra realizada con éxito';
-                const text = `Hola ${userData.firstName},\n\nTu compra con el carrito ${cartId} ha sido realizada con éxito.\n\nGracias por tu compra.\n\nSaludos.`;
+                const text = `Hola ${user.first_name},\n\nTu compra con el carrito ${cartId} ha sido realizada con éxito.\n\nGracias por tu compra.\n\nSaludos.`;
     
-                await sendPurchaseEmail(userData.email, subject, text);
+                await sendPurchaseEmail(user.email, subject, text);
                 const clearCartResponse = await this.clearCartProducts(cartId);
                 if (clearCartResponse.status !== 200) {
                     console.error("error emptying cart", clearCartResponse.error);
@@ -286,6 +291,21 @@ export class CartsManagerDB {
             return { status: 500, error: 'Error al procesar la compra' };
         }
     }
-    
+
+    async clearCartProducts(cartId) {
+        try {
+            const cart = await this.getCartById(cartId);
+            if (!cart) {
+                return { status: 404, error: 'Cart not found' };
+            }
+
+            await cartModel.updateOne({ _id: cartId }, { $set: { products: [] } });
+            
+            return { status: 200, message: 'Cart cleared successfully' };
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            return { status: 500, error: 'Error clearing cart' };
+        }
+    }
     
 }

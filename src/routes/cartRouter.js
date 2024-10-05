@@ -283,8 +283,17 @@ cartRouter.post('/:cid/purchase', handlePolicies('user'), async (req, res) => {
     const cart = await CartsManagerDB.getInstance().getCartById(cid);
 
     if (cart) {
-        const userEmail = req.session.user.email; 
-        const cartFiltered = await CartsManagerDB.getInstance().purchaseCart(cart);
+        const userEmail = req.session.user?.email; 
+
+        if (!userEmail) {
+          return res.status(400).send({
+              status: 'Not Ok',
+              payload: [],
+              error: 'Falta el correo electrónico del usuario en la sesión.'
+          });
+        }
+      
+        const cartFiltered = await CartsManagerDB.getInstance().purchaseCart(cart, req.session.user);
 
         const subject = 'Confirmación de Compra';
         const text = `
